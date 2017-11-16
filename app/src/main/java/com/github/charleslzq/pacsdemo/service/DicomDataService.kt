@@ -1,5 +1,6 @@
 package com.github.charleslzq.pacsdemo.service
 
+import com.github.charleslzq.dicom.data.DicomPatient
 import com.github.charleslzq.dicom.store.DicomDataStore
 
 /**
@@ -7,4 +8,8 @@ import com.github.charleslzq.dicom.store.DicomDataStore
  */
 interface DicomDataService {
     fun getStore(): DicomDataStore
+    fun setUrl(url: String)
+    fun requirePatients(vararg patientId: String)
+    fun refreshPatient(vararg patientId: String)
+    fun findPatient(patientId: String): DicomPatient?
 }

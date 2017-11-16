@@ -27,7 +27,7 @@ class DicomDataServiceBackgroud : Service() {
     private lateinit var wsUrl: String
 
     override fun onBind(intent: Intent): IBinder? {
-        return DicomDataServiceImpl(messageBroker, dataStore)
+        return DicomDataServiceImpl(messageBroker, dataStore, sharedPreferces)
     }
 
     override fun onCreate() {
@@ -81,10 +81,10 @@ class DicomDataServiceBackgroud : Service() {
     }
 
     companion object {
-        private val CLIENT_ID = "clientId"
-        private val WS_URL = "wsUrl"
-        private val PATIENTS = "patients"
-        private val STORE_BASE = "/Pacs/Dicom/Store"
-        private val SHARED_PREFERENCE = "com.github.charleslzq.pacsdemo"
+        val CLIENT_ID = "clientId"
+        val WS_URL = "wsUrl"
+        val PATIENTS = "patients"
+        val STORE_BASE = "/Pacs/Dicom/Store"
+        val SHARED_PREFERENCE = "com.github.charleslzq.pacsdemo"
     }
 }
