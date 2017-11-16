@@ -1,7 +1,9 @@
 package com.github.charleslzq.pacsdemo.broker
 
+import com.fatboyindustrial.gsonjodatime.Converters
 import com.github.charleslzq.pacsdemo.broker.message.*
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 
 /**
  * Created by charleslzq on 17-11-15.
@@ -9,7 +11,7 @@ import com.google.gson.Gson
 class DicomWebSocketMessageBroker(
         url: String,
         private val clientId: String,
-        private val gson: Gson = Gson()
+        private val gson: Gson = Converters.registerLocalDateTime(GsonBuilder()).create()
 ) : DicomMessageBroker {
     private val dicomMessageListener = CompositeDicomMessageListener()
     private val dicomClient = DicomWebsocketClient(url, dicomMessageListener, gson)

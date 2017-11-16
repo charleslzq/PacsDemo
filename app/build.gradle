@@ -37,5 +37,6 @@ dependencies {
         exclude group: 'org.dcm4che.tool', module: 'dcm4che-tool-dcm2jpg'
     }
     compile 'com.koushikdutta.async:androidasync:2.2.1'
+    compile 'com.fatboyindustrial.gson-jodatime-serialisers:gson-jodatime-serialisers:1.6.0'
 
 }

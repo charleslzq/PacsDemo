@@ -3,7 +3,7 @@ package com.github.charleslzq.pacsdemo.broker.message
 import android.util.Log
 import com.github.charleslzq.dicom.data.*
 import com.github.charleslzq.dicom.store.DicomDataStore
-import java.nio.file.Paths
+import java.io.File
 
 /**
  * Created by charleslzq on 17-11-15.
@@ -65,7 +65,7 @@ class StoreMessageListener(
         Log.i("receiveFile", "${Thread.currentThread().id}")
         val fileDir = checkAndGet(byteArrayMessage.headers, MessageHeaders.FILE_DIR)
         val fileName = checkAndGet(byteArrayMessage.headers, MessageHeaders.FILE_NAME)
-        val file = Paths.get(fileDir, fileName).toFile()
+        val file = File(fileDir + File.separator + fileName)
         val content = byteArrayMessage.payload
         file.writeBytes(content)
     }

@@ -35,7 +35,8 @@ class PacsDemoActivity : AppCompatActivity() {
                 bitmaps.clear()
                 val newUris = patient.studies.flatMap { it.series }.flatMap { it.images }.map { it.files }.flatMap { it.values }
                         .take(10).mapNotNull {
-                    BitmapFactory.decodeFile(File(it).absolutePath)
+                    Log.i("test", "$it")
+                    BitmapFactory.decodeFile(File(it.toString()).absolutePath)
                 }.toList()
                 bitmaps.addAll(newUris)
                 Log.i("test", "fetch images ${newUris.size}")

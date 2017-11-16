@@ -1,12 +1,14 @@
 package com.github.charleslzq.pacsdemo.broker
 
 import android.util.Log
+import com.fatboyindustrial.gsonjodatime.Converters
 import com.github.charleslzq.dicom.data.*
 import com.github.charleslzq.pacsdemo.broker.message.DicomMessageListener
 import com.github.charleslzq.pacsdemo.broker.message.Message
 import com.github.charleslzq.pacsdemo.broker.message.MessageHeaders
 import com.github.charleslzq.pacsdemo.broker.message.PayloadType
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.koushikdutta.async.http.AsyncHttpClient
 import com.koushikdutta.async.http.WebSocket
@@ -17,7 +19,7 @@ import com.koushikdutta.async.http.WebSocket
 class DicomWebsocketClient(
         private val url: String,
         private val dicomMessageListener: DicomMessageListener,
-        private val gson: Gson = Gson()
+        private val gson: Gson = Converters.registerLocalDateTime(GsonBuilder()).create()
 ) {
     private var webSocket: WebSocket? = null
     private val logTag = this.javaClass.name
