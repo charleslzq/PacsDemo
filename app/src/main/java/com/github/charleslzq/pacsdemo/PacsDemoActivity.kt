@@ -13,14 +13,12 @@ import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
 import java.io.File
-import java.net.URI
 
 
 class PacsDemoActivity : AppCompatActivity() {
 
     private val serviceConnection = SimpleServiceConnection<DicomDataService>(this::dicomDataService::set)
     private var dicomDataService: DicomDataService? = null
-    private val uris: MutableList<URI> = emptyList<URI>().toMutableList()
     private val bitmaps = emptyList<Bitmap>().toMutableList()
 
     override fun onCreate(savedInstanceState: Bundle?) {

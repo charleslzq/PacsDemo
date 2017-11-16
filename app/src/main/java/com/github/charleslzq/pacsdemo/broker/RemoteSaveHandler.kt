@@ -1,6 +1,7 @@
 package com.github.charleslzq.pacsdemo.broker
 
 import com.github.charleslzq.dicom.store.DicomImageFileSaveHandler
+import java.io.File
 import java.net.URI
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -12,16 +13,15 @@ class RemoteSaveHandler(
         private val dicomMessageBroker: DicomMessageBroker
 ) : DicomImageFileSaveHandler {
 
-    override fun save(path: Path, imageMap: Map<String, URI>): Map<String, URI> {
-        val imageDir = path.toFile()
+    override fun save(path: String, imageMap: Map<String, URI>): Map<String, URI> {
+        val imageDir = File(path)
         imageDir.mkdirs()
-        val imagePath = imageDir.absolutePath
         val fileUris = imageMap.map { it.value.toString() }.toList()
-        dicomMessageBroker.requireFiles(imagePath, fileUris)
-        return imageMap.map { it.key to newUri(imagePath, it.value) }.toMap()
+        dicomMessageBroker.requireFiles(path, fileUris)
+        return imageMap.map { it.key to newUri(path, it.value) }.toMap()
     }
 
     private fun newUri(imageDir: String, uri: URI): URI {
-        return Paths.get(imageDir, Paths.get(uri).toFile().name).toUri()
+        return URI(imageDir + File.pathSeparator + File(uri).name)
     }
 }
