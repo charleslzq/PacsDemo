@@ -22,6 +22,6 @@ class RemoteSaveHandler(
     }
 
     private fun newUri(imageDir: String, uri: URI): URI {
-        return Paths.get(imageDir, File(uri).name).toUri()
+        return URI(imageDir + File.pathSeparator + File(uri).name)
     }
 }
