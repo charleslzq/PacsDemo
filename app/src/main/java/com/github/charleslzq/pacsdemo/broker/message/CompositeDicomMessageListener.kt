@@ -5,7 +5,7 @@ import com.github.charleslzq.dicom.data.*
 /**
  * Created by charleslzq on 17-11-15.
  */
-class CompositeDicomMessageListener: DicomMessageListener {
+class CompositeDicomMessageListener : DicomMessageListener {
     private val listeners: MutableList<DicomMessageListener> = emptyList<DicomMessageListener>().toMutableList()
 
     fun register(listener: DicomMessageListener) {
@@ -29,7 +29,7 @@ class CompositeDicomMessageListener: DicomMessageListener {
     }
 
     override fun onStudyMeta(dicomStudyMetaInfoMessage: Message<DicomStudyMetaInfo>) {
-        listeners.forEach { it.onStudyMeta(dicomStudyMetaInfoMessage)}
+        listeners.forEach { it.onStudyMeta(dicomStudyMetaInfoMessage) }
     }
 
     override fun onSeries(dicomSeriesMessage: Message<DicomSeries>) {

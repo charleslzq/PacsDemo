@@ -10,7 +10,7 @@ import java.nio.file.Paths
  */
 class StoreMessageListener(
         private val dicomDataStore: DicomDataStore
-): DicomMessageListener {
+) : DicomMessageListener {
 
     override fun onPatient(dicomPatientMessage: Message<DicomPatient>) {
         Log.i("receive", "${Thread.currentThread().id}")

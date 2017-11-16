@@ -15,7 +15,7 @@ class DicomDataServiceImpl(
         private val messageBroker: DicomMessageBroker,
         private val dataStore: DicomDataStore,
         private val sharedPreferences: SharedPreferences
-): Binder(), DicomDataService {
+) : Binder(), DicomDataService {
 
     override fun findPatient(patientId: String): DicomPatient? {
         val patientInStore = dataStore.getPatient(patientId)
@@ -50,9 +50,5 @@ class DicomDataServiceImpl(
         val editor = sharedPreferences.edit()
         editor.putString(DicomDataServiceBackgroud.WS_URL, url)
         editor.apply()
-    }
-
-    override fun getStore(): DicomDataStore {
-        return dataStore
     }
 }

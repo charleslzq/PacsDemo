@@ -43,11 +43,6 @@ class DicomDataServiceBackgroud : Service() {
         editor.putStringSet(PATIENTS, patients)
         editor.apply()
 
-        Log.i(logTag, "Service Created")
-    }
-
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        Log.i(logTag, "Service Started")
         messageBroker = DicomWebSocketMessageBroker(wsUrl, clientId)
         val saveHandler = RemoteSaveHandler(messageBroker)
 
@@ -68,6 +63,12 @@ class DicomDataServiceBackgroud : Service() {
 
         val messageListener = StoreMessageListener(dataStore)
         messageBroker.register(messageListener)
+
+        Log.i(logTag, "Service Created")
+    }
+
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        Log.i(logTag, "Service Started")
         if (patients.isNotEmpty()) {
             messageBroker.refreshPatients(*patients.toTypedArray())
         }

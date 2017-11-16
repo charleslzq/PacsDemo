@@ -20,13 +20,14 @@ class PacsDemoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.hello_world_layout)
         Log.d("PacsDemoActivity", "onCreate execute")
-        val intent = Intent(this, DicomDataServiceBackgroud::class.java)
+        bindService(Intent(this, DicomDataServiceBackgroud::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
         startService.setOnClickListener {
-            startService(intent)
+            val patient = dicomDataService?.findPatient("03117795")
+            if (patient != null) {
+                Log.i("test", "$patient")
+            }
         }
         stopService.setOnClickListener {
-            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
-            Log.i("test", dicomDataService?.getStore()?.getStoreData()?.patients?.size.toString())
         }
     }
 }

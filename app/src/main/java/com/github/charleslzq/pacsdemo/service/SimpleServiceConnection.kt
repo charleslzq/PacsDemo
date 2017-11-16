@@ -11,7 +11,7 @@ import android.util.Log
  */
 class SimpleServiceConnection<T>(
         private val setter: (T?) -> Unit
-): ServiceConnection {
+) : ServiceConnection {
     private val logTag = this.javaClass.name
 
     override fun onServiceConnected(componentName: ComponentName, binder: IBinder) {
