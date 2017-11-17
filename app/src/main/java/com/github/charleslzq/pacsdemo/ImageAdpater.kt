@@ -1,16 +1,17 @@
 package com.github.charleslzq.pacsdemo
 
-import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import com.github.charleslzq.dicom.data.DicomImageMetaInfo
 
 /**
  * Created by charleslzq on 17-11-16.
  */
-class ImageAdpater(private val images: MutableList<Bitmap>): RecyclerView.Adapter<ImageAdpater.ViewHolder>() {
+class ImageAdpater(private val images: MutableList<DicomImageMetaInfo>): RecyclerView.Adapter<ImageAdpater.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder{
         val view = LayoutInflater.from(parent.context).inflate(R.layout.image_item, parent, false)
@@ -22,11 +23,18 @@ class ImageAdpater(private val images: MutableList<Bitmap>): RecyclerView.Adapte
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.imageView.setImageBitmap(images[position])
+        val thumbUrl = images[position].files[THUMB]
+        holder.thumbView.setImageBitmap(BitmapFactory.decodeFile(thumbUrl.toString()))
     }
 
     class ViewHolder(
             view: View,
-            val imageView: ImageView = view.findViewById(R.id.image)
+            val thumbView: ImageView = view.findViewById(R.id.thumbView)
     ): RecyclerView.ViewHolder(view)
+
+    companion object {
+        val THUMB = "thumb"
+        val DEFAULT = "default"
+        val RAW = "raw"
+    }
 }

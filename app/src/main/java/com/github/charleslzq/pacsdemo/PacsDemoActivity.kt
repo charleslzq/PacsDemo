@@ -2,48 +2,60 @@ package com.github.charleslzq.pacsdemo
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
+import android.view.View
+import com.github.charleslzq.dicom.data.DicomImageMetaInfo
 import kotlinx.android.synthetic.main.pacs_demo_layout.*
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
-import java.io.File
+
+
 
 
 class PacsDemoActivity : AppCompatActivity() {
 
     private val serviceConnection = SimpleServiceConnection<DicomDataService>(this::dicomDataService::set)
     private var dicomDataService: DicomDataService? = null
-    private val bitmaps = emptyList<Bitmap>().toMutableList()
+    private val images = emptyList<DicomImageMetaInfo>().toMutableList()
+    private val adapter = ImageAdpater(images)
+    private var patientId = "03117795"
+    private val thumbClickHandler = object: ItemClickSupport.OnItemClickListener {
+        override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
+            val imageUrl = images[position].files[ImageAdpater.DEFAULT]
+            image.setImageBitmap(BitmapFactory.decodeFile(imageUrl.toString()))
+        }
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.pacs_demo_layout)
         Log.d("PacsDemoActivity", "onCreate execute")
-        val adapter = ImageAdpater(bitmaps)
-        imageList.adapter = adapter
-        imageList.layoutManager = LinearLayoutManager(this)
+        thumbList.adapter = this.adapter
+        thumbList.layoutManager = LinearLayoutManager(this)
+        ItemClickSupport.addTo(thumbList).setOnItemClickListener(thumbClickHandler)
         bindService(Intent(this, DicomDataServiceBackgroud::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
-        startService.setOnClickListener {
-            val patient = dicomDataService?.findPatient("03117795")
-            if (patient != null) {
-                bitmaps.clear()
-                val newUris = patient.studies.flatMap { it.series }.flatMap { it.images }.map { it.files }.flatMap { it.values }
-                        .take(10).mapNotNull {
-                    Log.i("test", "$it")
-                    BitmapFactory.decodeFile(File(it.toString()).absolutePath)
-                }.toList()
-                bitmaps.addAll(newUris)
-                Log.i("test", "fetch images ${newUris.size}")
-                adapter.notifyDataSetChanged()
-            }
-        }
-        stopService.setOnClickListener {
+        refresh()
+        refreshButton.setOnClickListener { refresh() }
+    }
+
+    private fun refresh() {
+        val patient = dicomDataService?.findPatient(patientId)
+        if (patient != null) {
+            images.clear()
+            val newImages = patient.studies
+                    .flatMap { it.series }
+                    .flatMap { it.images }
+                    .toList()
+            images.addAll(newImages)
+            Log.i("test", "fetch images ${newImages.size}")
+            this.adapter.notifyDataSetChanged()
         }
     }
 }
