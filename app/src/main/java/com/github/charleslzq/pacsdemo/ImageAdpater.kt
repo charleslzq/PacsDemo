@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.github.charleslzq.dicom.data.DicomImageMetaInfo
+import java.io.File
 
 /**
  * Created by charleslzq on 17-11-16.
@@ -24,7 +25,7 @@ class ImageAdpater(private val images: MutableList<DicomImageMetaInfo>): Recycle
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val thumbUrl = images[position].files[THUMB]
-        holder.thumbView.setImageBitmap(BitmapFactory.decodeFile(thumbUrl.toString()))
+        holder.thumbView.setImageBitmap(BitmapFactory.decodeFile(File(thumbUrl).absolutePath))
     }
 
     class ViewHolder(

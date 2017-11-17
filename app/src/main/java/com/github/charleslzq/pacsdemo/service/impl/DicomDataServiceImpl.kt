@@ -20,7 +20,7 @@ class DicomDataServiceImpl(
     override fun findPatient(patientId: String): DicomPatient? {
         val patientInStore = dataStore.getPatient(patientId)
         if (patientInStore == null) {
-            refreshPatient(patientId)
+            requirePatients(patientId)
         }
         return patientInStore
     }
@@ -34,6 +34,7 @@ class DicomDataServiceImpl(
         editor.apply()
 
         messageBroker.requirePatients(*patientId)
+        dataStore.reload()
     }
 
     override fun refreshPatient(vararg patientId: String) {
@@ -44,6 +45,7 @@ class DicomDataServiceImpl(
         editor.apply()
 
         messageBroker.refreshPatients(*patientId)
+        dataStore.reload()
     }
 
     override fun setUrl(url: String) {
