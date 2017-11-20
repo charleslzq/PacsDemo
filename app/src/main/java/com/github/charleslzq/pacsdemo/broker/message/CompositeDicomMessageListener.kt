@@ -24,16 +24,8 @@ class CompositeDicomMessageListener : DicomMessageListener {
         listeners.forEach { it.onPatientMeta(dicomPatientMetaInfoMessage) }
     }
 
-    override fun onStudy(dicomStudyMessage: Message<DicomStudy>) {
-        listeners.forEach { it.onStudy(dicomStudyMessage) }
-    }
-
     override fun onStudyMeta(dicomStudyMetaInfoMessage: Message<DicomStudyMetaInfo>) {
         listeners.forEach { it.onStudyMeta(dicomStudyMetaInfoMessage) }
-    }
-
-    override fun onSeries(dicomSeriesMessage: Message<DicomSeries>) {
-        listeners.forEach { it.onSeries(dicomSeriesMessage) }
     }
 
     override fun onSeriesMeta(dicomSeriesMetaInfoMessage: Message<DicomSeriesMetaInfo>) {

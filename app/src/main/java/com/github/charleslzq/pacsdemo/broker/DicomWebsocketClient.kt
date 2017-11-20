@@ -6,7 +6,7 @@ import com.github.charleslzq.dicom.data.*
 import com.github.charleslzq.pacsdemo.broker.message.DicomMessageListener
 import com.github.charleslzq.pacsdemo.broker.message.Message
 import com.github.charleslzq.pacsdemo.broker.message.MessageHeaders
-import com.github.charleslzq.pacsdemo.broker.message.PayloadType
+import com.github.charleslzq.pacsdemo.broker.message.ServerMessagePayloadType
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -56,49 +56,37 @@ class DicomWebsocketClient(
             val headers = anyMessage.headers
             val type = headers[MessageHeaders.TYPE_HEADER.value]
             if (type != null) {
-                when (PayloadType.valueOf(type)) {
-                    PayloadType.PATIENT -> {
+                when (ServerMessagePayloadType.valueOf(type)) {
+                    ServerMessagePayloadType.PATIENT -> {
                         val patientMessage = gson.fromJson<Message<DicomPatient>>(message, object : TypeToken<Message<DicomPatient>>() {
                         }.type)
                         dicomMessageListener.onPatient(patientMessage)
                     }
-                    PayloadType.PATIENT_META -> {
+                    ServerMessagePayloadType.PATIENT_META -> {
                         val patientMessage = gson.fromJson<Message<DicomPatientMetaInfo>>(message, object : TypeToken<Message<DicomPatientMetaInfo>>() {
                         }.type)
                         dicomMessageListener.onPatientMeta(patientMessage)
                     }
-                    PayloadType.PATIENT_REFRESH -> Log.i(logTag, "Unexpected message type: ${PayloadType.PATIENT_REFRESH}")
-                    PayloadType.STUDY -> {
-                        val studyMessage = gson.fromJson<Message<DicomStudy>>(message, object : TypeToken<Message<DicomStudy>>() {
-                        }.type)
-                        dicomMessageListener.onStudy(studyMessage)
-                    }
-                    PayloadType.STUDY_META -> {
+                    ServerMessagePayloadType.STUDY_META -> {
                         val studyMessage = gson.fromJson<Message<DicomStudyMetaInfo>>(message, object : TypeToken<Message<DicomStudyMetaInfo>>() {
                         }.type)
                         dicomMessageListener.onStudyMeta(studyMessage)
                     }
-                    PayloadType.SERIES -> {
-                        val seriesMessage = gson.fromJson<Message<DicomSeries>>(message, object : TypeToken<Message<DicomSeries>>() {
-                        }.type)
-                        dicomMessageListener.onSeries(seriesMessage)
-                    }
-                    PayloadType.SERIES_META -> {
+                    ServerMessagePayloadType.SERIES_META -> {
                         val seriesMessage = gson.fromJson<Message<DicomSeriesMetaInfo>>(message, object : TypeToken<Message<DicomSeriesMetaInfo>>() {
                         }.type)
                         dicomMessageListener.onSeriesMeta(seriesMessage)
                     }
-                    PayloadType.IMAGE_META -> {
+                    ServerMessagePayloadType.IMAGE_META -> {
                         val imageMessage = gson.fromJson<Message<DicomImageMetaInfo>>(message, object : TypeToken<Message<DicomImageMetaInfo>>() {
                         }.type)
                         dicomMessageListener.onImageMeta(imageMessage)
                     }
-                    PayloadType.FILE -> {
+                    ServerMessagePayloadType.FILE -> {
                         val fileMessage = gson.fromJson<Message<ByteArray>>(message, object : TypeToken<Message<ByteArray>>() {
                         }.type)
                         dicomMessageListener.onFile(fileMessage)
                     }
-                    PayloadType.OTHER -> Log.i(logTag, "Don't know how to handle this message")
                 }
             }
         }

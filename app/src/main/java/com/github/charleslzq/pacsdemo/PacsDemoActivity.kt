@@ -26,7 +26,7 @@ class PacsDemoActivity : AppCompatActivity() {
     private val adapter = ImageAdpater(images)
     private var patientId = "03117795"
     private var selectedView: View? = null
-    private val thumbClickHandler = object: ItemClickSupport.OnItemClickListener {
+    private val thumbClickHandler = object : ItemClickSupport.OnItemClickListener {
         override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
             setImage(position)
             selectedView?.isSelected = false
@@ -68,8 +68,8 @@ class PacsDemoActivity : AppCompatActivity() {
         val leftImageUri = images[position].files[ImageAdpater.DEFAULT]
         image_left.setImageBitmap(BitmapFactory.decodeFile(File(leftImageUri).absolutePath))
         when (position) {
-            in 0..(images.size-2) -> {
-                val rightImageUrl = images[position+1].files[ImageAdpater.DEFAULT]
+            in 0..(images.size - 2) -> {
+                val rightImageUrl = images[position + 1].files[ImageAdpater.DEFAULT]
                 image_right.setImageBitmap(BitmapFactory.decodeFile(File(rightImageUrl).absolutePath))
             }
             else -> image_right.setImageBitmap(BitmapFactory.decodeFile(File(leftImageUri).absolutePath))

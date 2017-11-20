@@ -12,9 +12,9 @@ import java.io.File
 /**
  * Created by charleslzq on 17-11-16.
  */
-class ImageAdpater(private val images: MutableList<DicomImageMetaInfo>): RecyclerView.Adapter<ImageAdpater.ViewHolder>() {
+class ImageAdpater(private val images: MutableList<DicomImageMetaInfo>) : RecyclerView.Adapter<ImageAdpater.ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder{
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.image_item, parent, false)
         return ViewHolder(view)
     }
@@ -31,7 +31,7 @@ class ImageAdpater(private val images: MutableList<DicomImageMetaInfo>): Recycle
     class ViewHolder(
             view: View,
             val thumbView: ImageView = view.findViewById(R.id.thumbView)
-    ): RecyclerView.ViewHolder(view)
+    ) : RecyclerView.ViewHolder(view)
 
     companion object {
         val THUMB = "thumb"

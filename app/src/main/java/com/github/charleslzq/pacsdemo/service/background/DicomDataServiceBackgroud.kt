@@ -59,7 +59,6 @@ class DicomDataServiceBackgroud : Service() {
             }
         }
         dataStore = DicomDataFileStore(storeRoot, saveHandler)
-        dataStore.reload()
 
         val messageListener = StoreMessageListener(dataStore)
         messageBroker.register(messageListener)

@@ -17,9 +17,9 @@ class DicomWebSocketMessageBroker(
     private val dicomClient = DicomWebsocketClient(url, dicomMessageListener, gson)
 
     override fun requirePatients(vararg patientId: String) {
-        val headers = mapOf<String, String>(
+        val headers = mapOf(
                 MessageHeaders.CLIENT_ID.value to clientId,
-                MessageHeaders.TYPE_HEADER.value to PayloadType.PATIENT.name
+                MessageHeaders.TYPE_HEADER.value to ClientMessagePayloadType.PATIENT.name
         ).toMutableMap()
         val idList = listOf(*patientId)
         val message = Message(headers, idList)
@@ -28,9 +28,9 @@ class DicomWebSocketMessageBroker(
     }
 
     override fun refreshPatients(vararg patientId: String) {
-        val headers = mapOf<String, String>(
+        val headers = mapOf(
                 MessageHeaders.CLIENT_ID.value to clientId,
-                MessageHeaders.TYPE_HEADER.value to PayloadType.PATIENT_REFRESH.name
+                MessageHeaders.TYPE_HEADER.value to ClientMessagePayloadType.PATIENT_REFRESH.name
         ).toMutableMap()
         val idList = listOf(*patientId)
         val message = Message(headers, idList)
@@ -39,8 +39,8 @@ class DicomWebSocketMessageBroker(
     }
 
     override fun requireFiles(imageDir: String, fileUris: List<String>) {
-        val headers = mapOf<String, String>(
-                MessageHeaders.TYPE_HEADER.value to PayloadType.FILE.name,
+        val headers = mapOf(
+                MessageHeaders.TYPE_HEADER.value to ClientMessagePayloadType.FILE.name,
                 MessageHeaders.IMG_DIR.value to imageDir
         ).toMutableMap()
         val message = Message(headers, fileUris)

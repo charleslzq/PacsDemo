@@ -34,7 +34,6 @@ class DicomDataServiceImpl(
         editor.apply()
 
         messageBroker.requirePatients(*patientId)
-        dataStore.reload()
     }
 
     override fun refreshPatient(vararg patientId: String) {
@@ -45,7 +44,6 @@ class DicomDataServiceImpl(
         editor.apply()
 
         messageBroker.refreshPatients(*patientId)
-        dataStore.reload()
     }
 
     override fun setUrl(url: String) {
