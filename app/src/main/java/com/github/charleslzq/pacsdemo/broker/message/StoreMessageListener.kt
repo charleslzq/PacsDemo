@@ -4,6 +4,7 @@ import android.util.Log
 import com.github.charleslzq.dicom.data.*
 import com.github.charleslzq.dicom.store.DicomDataStore
 import java.io.File
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Created by charleslzq on 17-11-15.
@@ -11,6 +12,7 @@ import java.io.File
 class StoreMessageListener(
         private val dicomDataStore: DicomDataStore
 ) : DicomMessageListener {
+    private val counter = AtomicInteger(0)
 
     override fun onPatient(dicomPatientMessage: Message<DicomPatient>) {
         dicomDataStore.savePatient(dicomPatientMessage.payload)
@@ -40,7 +42,7 @@ class StoreMessageListener(
     }
 
     override fun onFile(byteArrayMessage: Message<ByteArray>) {
-        Log.i("receiveFile", "${Thread.currentThread().id}")
+        Log.i("receiveFile", "${Thread.currentThread().id}, ${counter.incrementAndGet()} files received")
         val fileDir = checkAndGet(byteArrayMessage.headers, MessageHeaders.FILE_DIR)
         val fileName = checkAndGet(byteArrayMessage.headers, MessageHeaders.FILE_NAME)
         val file = File(fileDir + File.separator + fileName)
