@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.drawable.AnimationDrawable
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
@@ -19,6 +20,7 @@ import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import java.io.File
+import java.net.URI
 
 
 class PacsDemoActivity : AppCompatActivity() {
@@ -28,6 +30,7 @@ class PacsDemoActivity : AppCompatActivity() {
     private val series = emptyList<DicomSeries>().toMutableList()
     private val adapter = DicomSeriesAdpater(series)
     private val patientList = listOf("03117795").toMutableList()
+    private lateinit var animationViewManager: AnimationViewManager
     private var patientId = "03117795"
     private var selectedView: View? = null
     private val thumbClickHandler = object : ItemClickSupport.OnItemClickListener {
@@ -72,22 +75,14 @@ class PacsDemoActivity : AppCompatActivity() {
     private fun setImage(position: Int) {
         val leftImageUri = series[position].images[0].files[DicomSeriesAdpater.DEFAULT]
 //        image_left.setImageBitmap(BitmapFactory.decodeFile(File(leftImageUri).absolutePath))
-        val imageUrls = series[position].images.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[DicomSeriesAdpater.DEFAULT] }
-        if (imageUrls.size > 1) {
-            image_left.setImageBitmap(null)
-            val animation = AnimationDrawable()
-            val duration = 40
-            animation.isOneShot = false
-            imageUrls.forEach {
-                val bitmapDrawable = BitmapDrawable(this.resources, BitmapFactory.decodeFile(File(it).absolutePath))
-                animation.addFrame(bitmapDrawable, duration)
-            }
-            animation.callback = null
-            image_left.background = animation
-            image_left.setOnClickListener { image_left.post(animation) }
-        } else {
-            image_left.setImageBitmap(BitmapFactory.decodeFile(File(leftImageUri).absolutePath))
-        }
+        val imageUrls = series[position].images.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[DicomSeriesAdpater.DEFAULT] }.toList()
+        animationViewManager = AnimationViewManager(
+                this.resources,
+                imageUrls,
+                image_left,
+                40
+        )
+
         when (position) {
             in 0..(series.size - 2) -> {
                 val rightImageUrl = series[position + 1].images[0].files[DicomSeriesAdpater.DEFAULT]
@@ -96,4 +91,6 @@ class PacsDemoActivity : AppCompatActivity() {
             else -> image_right.setImageBitmap(BitmapFactory.decodeFile(File(leftImageUri).absolutePath))
         }
     }
+
+
 }
