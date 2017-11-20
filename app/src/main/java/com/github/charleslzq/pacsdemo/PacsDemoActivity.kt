@@ -9,7 +9,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
-import com.github.charleslzq.dicom.data.DicomImageMetaInfo
+import com.github.charleslzq.dicom.data.DicomSeries
 import kotlinx.android.synthetic.main.pacs_demo_layout.*
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
@@ -22,8 +22,9 @@ class PacsDemoActivity : AppCompatActivity() {
 
     private val serviceConnection = SimpleServiceConnection<DicomDataService>(this::dicomDataService::set)
     private var dicomDataService: DicomDataService? = null
-    private val images = emptyList<DicomImageMetaInfo>().toMutableList()
-    private val adapter = ImageAdpater(images)
+    private val series = emptyList<DicomSeries>().toMutableList()
+    private val adapter = DicomSeriesAdpater(series)
+    private val patientList = listOf("03117795").toMutableList()
     private var patientId = "03117795"
     private var selectedView: View? = null
     private val thumbClickHandler = object : ItemClickSupport.OnItemClickListener {
@@ -52,24 +53,23 @@ class PacsDemoActivity : AppCompatActivity() {
     private fun refresh() {
         val patient = dicomDataService?.findPatient(patientId)
         if (patient != null) {
-            images.clear()
-            val newImages = patient.studies
+            series.clear()
+            val newSeries = patient.studies
                     .flatMap { it.series }
-                    .flatMap { it.images }
                     .toList()
-            images.addAll(newImages)
-            Log.i("test", "fetch images ${newImages.size}")
+            series.addAll(newSeries)
+            Log.i("test", "fetch images ${newSeries.size}")
             this.adapter.notifyDataSetChanged()
             setImage(0)
         }
     }
 
     private fun setImage(position: Int) {
-        val leftImageUri = images[position].files[ImageAdpater.DEFAULT]
+        val leftImageUri = series[position].images[0].files[DicomSeriesAdpater.DEFAULT]
         image_left.setImageBitmap(BitmapFactory.decodeFile(File(leftImageUri).absolutePath))
         when (position) {
-            in 0..(images.size - 2) -> {
-                val rightImageUrl = images[position + 1].files[ImageAdpater.DEFAULT]
+            in 0..(series.size - 2) -> {
+                val rightImageUrl = series[position + 1].images[0].files[DicomSeriesAdpater.DEFAULT]
                 image_right.setImageBitmap(BitmapFactory.decodeFile(File(rightImageUrl).absolutePath))
             }
             else -> image_right.setImageBitmap(BitmapFactory.decodeFile(File(leftImageUri).absolutePath))
