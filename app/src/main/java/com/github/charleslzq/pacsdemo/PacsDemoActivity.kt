@@ -3,7 +3,6 @@ package com.github.charleslzq.pacsdemo
 import ItemClickSupport
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -17,7 +16,6 @@ import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.pacs_demo_layout.*
-import java.io.File
 
 
 class PacsDemoActivity : AppCompatActivity() {
