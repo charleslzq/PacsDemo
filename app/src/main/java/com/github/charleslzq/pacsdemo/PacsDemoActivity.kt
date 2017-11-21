@@ -15,7 +15,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.SeekBar
 import com.github.charleslzq.dicom.data.DicomSeries
-import com.github.charleslzq.pacsdemo.R.id.animated_image
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
@@ -65,7 +64,7 @@ class PacsDemoActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
+        when (item.itemId) {
             R.id.one_one -> {
                 viewSelector.displayedChild = Option.ONE_ONE.ordinal
                 changeSeries(currentPosition)
@@ -117,9 +116,11 @@ class PacsDemoActivity : AppCompatActivity() {
                                 animationViewManager.changePosition(progress - 1)
                             }
                         }
+
                         override fun onStartTrackingTouch(p0: SeekBar?) {
 
                         }
+
                         override fun onStopTrackingTouch(p0: SeekBar?) {
 
                         }
