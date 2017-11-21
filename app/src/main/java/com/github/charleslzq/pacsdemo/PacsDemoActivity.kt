@@ -74,6 +74,7 @@ class PacsDemoActivity : AppCompatActivity() {
             animated_image.setOnClickListener(AnimationImageClickListener(animationViewManager))
 
             imageSeekBar.max = animationViewManager.numOfFrames
+            imageSeekBar.progress = 1
             imageSeekBar.visibility = View.VISIBLE
             imageSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(p0: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -91,6 +92,8 @@ class PacsDemoActivity : AppCompatActivity() {
                 }
 
             })
+        } else {
+            imageSeekBar.visibility = View.INVISIBLE
         }
     }
 
