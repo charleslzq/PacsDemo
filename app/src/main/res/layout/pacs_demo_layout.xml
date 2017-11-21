@@ -33,6 +33,18 @@
                 android:layout_centerVertical="true"
                 android:contentDescription="@string/imageContentDescription"
                 android:scaleType="fitCenter" />
+
+            <SeekBar
+                android:id="@+id/imageSeekBar"
+                style="@style/Widget.AppCompat.SeekBar.Discrete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/animated_image"
+                android:layout_alignStart="@id/animated_image"
+                android:layout_alignRight="@id/animated_image"
+                android:layout_alignEnd="@id/animated_image"
+                android:layout_alignBottom="@id/animated_image"
+                android:visibility="invisible" />
         </RelativeLayout>
 
         <android.support.v7.widget.RecyclerView

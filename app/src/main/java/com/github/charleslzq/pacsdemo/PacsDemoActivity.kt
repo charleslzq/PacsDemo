@@ -69,7 +69,7 @@ class PacsDemoActivity : AppCompatActivity() {
 
     private fun setImage(position: Int) {
         val imageUrls = series[position].images.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[DicomSeriesAdpater.DEFAULT] }.toList()
-        animationViewManager.bind(animated_image, imageUrls)
+        animationViewManager.bind(animated_image, imageUrls, imageSeekBar)
     }
 
 

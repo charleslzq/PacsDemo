@@ -8,7 +8,8 @@ import android.util.Log
  */
 class ControllableAnimationDrawable(
         private val total: Int,
-        private val offset: Int = 0
+        private val offset: Int = 0,
+        private val indexChangeCallback: (Int) -> Unit
 ) : AnimationDrawable() {
     var currentIndex = 0
     var finish = false
@@ -16,6 +17,9 @@ class ControllableAnimationDrawable(
     override fun selectDrawable(index: Int): Boolean {
         Log.i("test", "Processing $index frame(s), $offset, ${this.isRunning}")
         currentIndex = index
+        if (this.isRunning) {
+            indexChangeCallback.invoke(offset + index)
+        }
         if (offset + currentIndex == total -1) {
             finish = true
             this.stop()
