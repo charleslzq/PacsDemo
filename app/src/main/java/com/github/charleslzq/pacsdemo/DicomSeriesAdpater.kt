@@ -14,7 +14,7 @@ import java.io.File
  */
 class DicomSeriesAdpater(
         private val series: List<DicomSeries>
-): RecyclerView.Adapter<DicomSeriesAdpater.ViewHolder>() {
+) : RecyclerView.Adapter<DicomSeriesAdpater.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val thumbUrl = series[position].images[0].files[DicomSeriesAdpater.THUMB]
         holder.thumbView.setImageBitmap(BitmapFactory.decodeFile(File(thumbUrl).absolutePath))

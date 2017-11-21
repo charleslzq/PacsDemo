@@ -41,7 +41,6 @@ class PacsDemoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.pacs_demo_layout)
-        animationViewManager = AnimationViewManager(this.resources)
         Log.d("PacsDemoActivity", "onCreate execute")
         thumbList.adapter = this.adapter
         thumbList.layoutManager = LinearLayoutManager(this)
@@ -69,7 +68,7 @@ class PacsDemoActivity : AppCompatActivity() {
 
     private fun setImage(position: Int) {
         val imageUrls = series[position].images.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[DicomSeriesAdpater.DEFAULT] }.toList()
-        animationViewManager.bind(animated_image, imageUrls, imageSeekBar)
+        animationViewManager = AnimationViewManager(this.resources, animated_image, imageSeekBar, imageUrls)
     }
 
 
