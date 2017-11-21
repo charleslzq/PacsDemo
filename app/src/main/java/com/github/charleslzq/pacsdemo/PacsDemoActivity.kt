@@ -131,28 +131,53 @@ class PacsDemoActivity : AppCompatActivity() {
             }
             PacsDemoActivity.Option.ONE_TWO -> {
                 val imageList = listOf(image_1_2_1, image_1_2_2)
-                bindImage(imageList, position)
+                val seekBarList = listOf(imageSeekBar_1_2_1, imageSeekBar_1_2_2)
+                bindImage(position, imageList, seekBarList)
             }
             PacsDemoActivity.Option.TWO_TWO -> {
                 val imageList = listOf(image_2_2_1, image_2_2_2, image_2_2_3, image_2_2_4)
-                bindImage(imageList, position)
+                bindImage(position, imageList)
             }
             PacsDemoActivity.Option.THREE_THREE -> {
                 val imageList = listOf(image_3_3_1, image_3_3_2, image_3_3_3, image_3_3_4, image_3_3_5, image_3_3_6, image_3_3_7, image_3_3_8, image_3_3_9)
-                bindImage(imageList, position)
+                bindImage(position, imageList)
             }
         }
     }
 
-    private fun bindImage(imageList: List<ImageView>, position: Int) {
-        for (i in 0 until imageList.size) {
+    private fun bindImage(position: Int,viewList: List<ImageView>, seekbarList: List<SeekBar> = emptyList()) {
+        for (i in 0 until viewList.size) {
             val it = position + i
             if (it >= series.size) {
                 return
             }
-            val imageUrl = series[it].images[0].files[DicomSeriesAdpater.DEFAULT]
-            val bitmap = BitmapFactory.decodeFile(File(imageUrl).absolutePath)
-            imageList[i].setImageBitmap(bitmap)
+            val imageUrls = series[it].images.mapNotNull { it.files[DicomSeriesAdpater.DEFAULT] }
+            val bitmap = BitmapFactory.decodeFile(File(imageUrls[0]).absolutePath)
+            viewList[i].setImageBitmap(bitmap)
+            if (i <= seekbarList.size - 1 && imageUrls.size > 1) {
+                seekbarList[i].max = imageUrls.size
+                seekbarList[i].progress = 1
+                seekbarList[i].visibility = View.VISIBLE
+                seekbarList[i].setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
+                    override fun onProgressChanged(p0: SeekBar?, progress: Int, fromUser: Boolean) {
+                        if (fromUser) {
+                            val index = (progress + imageUrls.size -1) % imageUrls.size
+                            val imageUrl = imageUrls[index]
+                            val bitmap = BitmapFactory.decodeFile(File(imageUrl).absolutePath)
+                            viewList[i].setImageBitmap(bitmap)
+                        }
+                    }
+
+                    override fun onStartTrackingTouch(p0: SeekBar?) {
+
+                    }
+
+                    override fun onStopTrackingTouch(p0: SeekBar?) {
+
+                    }
+
+                })
+            }
         }
     }
 

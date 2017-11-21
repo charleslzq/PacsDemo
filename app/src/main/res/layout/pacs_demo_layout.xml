@@ -28,7 +28,6 @@
             android:layout_height="match_parent">
 
             <RelativeLayout
-                android:id="@+id/imagePanel_1_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -74,6 +73,17 @@
                         android:layout_centerVertical="true"
                         android:contentDescription="@string/imageContentDescription"
                         android:scaleType="fitCenter" />
+                    <SeekBar
+                        android:id="@+id/imageSeekBar_1_2_1"
+                        style="@style/Widget.AppCompat.SeekBar.Discrete"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignLeft="@id/image_1_2_1"
+                        android:layout_alignStart="@id/image_1_2_1"
+                        android:layout_alignRight="@id/image_1_2_1"
+                        android:layout_alignEnd="@id/image_1_2_1"
+                        android:layout_alignBottom="@id/image_1_2_1"
+                        android:visibility="invisible" />
                 </RelativeLayout>
                 <RelativeLayout
                     android:layout_width="0dp"
@@ -88,6 +98,17 @@
                         android:layout_centerVertical="true"
                         android:contentDescription="@string/imageContentDescription"
                         android:scaleType="fitCenter" />
+                    <SeekBar
+                        android:id="@+id/imageSeekBar_1_2_2"
+                        style="@style/Widget.AppCompat.SeekBar.Discrete"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignLeft="@id/image_1_2_2"
+                        android:layout_alignStart="@id/image_1_2_2"
+                        android:layout_alignRight="@id/image_1_2_2"
+                        android:layout_alignEnd="@id/image_1_2_2"
+                        android:layout_alignBottom="@id/image_1_2_2"
+                        android:visibility="invisible" />
                 </RelativeLayout>
             </LinearLayout>
 
