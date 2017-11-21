@@ -2,7 +2,6 @@ package com.github.charleslzq.pacsdemo.service
 
 import android.content.ComponentName
 import android.content.ServiceConnection
-import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 

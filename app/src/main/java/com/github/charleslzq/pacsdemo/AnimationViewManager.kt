@@ -1,11 +1,8 @@
 package com.github.charleslzq.pacsdemo
 
-import android.content.res.Resources
 import android.graphics.BitmapFactory
-import android.util.Log
-import android.view.View
+import android.graphics.drawable.BitmapDrawable
 import android.widget.ImageView
-import android.widget.SeekBar
 import java.io.File
 import java.net.URI
 
@@ -13,53 +10,63 @@ import java.net.URI
  * Created by charleslzq on 17-11-20.
  */
 class AnimationViewManager(
-        private val resources: Resources,
         private val imageView: ImageView,
-        private val seekBar: SeekBar,
-        imageUriList: List<URI>
+        imageUriList: List<URI>,
+        var indexChangeListener: (Int) -> Unit = {},
+        var finishedListener: (AnimationViewManager) -> Unit = { it.reset() }
 ) {
-    private val animationState = AnimationImageFramesState(imageUriList, this::setSeekBarIndex, this::reset)
+    private val animationState = AnimationImageFramesState(imageUriList.map {
+        BitmapDrawable(imageView.resources, BitmapFactory.decodeFile(File(it).absolutePath))
+    }, indexChangeListener, {
+        finishedListener.invoke(this)
+    })
     var duration: Int = 40
+    val numOfFrames = animationState.size
 
     init {
-        val firstImage = BitmapFactory.decodeFile(File(animationState.frameUrls[0]).absolutePath)
+        val firstImage = animationState.frames[0].bitmap
         imageView.layoutParams.width = Math.ceil(imageView.measuredHeight * firstImage.height / firstImage.width.toDouble()).toInt()
         imageView.requestLayout()
 
-
         if (animationState.size == 1) {
-            imageView.setImageBitmap(BitmapFactory.decodeFile(File(animationState.frameUrls[0]).absolutePath))
+            imageView.setImageBitmap(firstImage)
         } else {
             imageView.setImageBitmap(null)
             resetAnimation()
-            imageView.setOnClickListener {
-                val animation = imageView.background as IndexListenableAnimationDrawable
-                when (animation.isRunning) {
-                    true -> {
-                        animation.stop()
-                        animation.selectDrawable(animation.currentIndex)
-                    }
-                    false -> {
-                        imageView.post(resetAnimation())
-                    }
-                }
-            }
-
-            seekBar.setOnSeekBarChangeListener(AnimationSeekBarListener(this::progressChanged))
-            seekBar.max = animationState.size
-            seekBar.visibility = View.VISIBLE
         }
+    }
+
+    fun isRunning() = (imageView.background as IndexListenableAnimationDrawable).isRunning
+
+    fun pause() {
+        val animation = imageView.background as IndexListenableAnimationDrawable
+        if (animation.isRunning) {
+            animation.stop()
+            animation.selectDrawable(animation.currentIndex)
+        }
+    }
+
+    fun resume() {
+        imageView.post(resetAnimation())
+    }
+
+    fun stop() {
+        val animation = imageView.background as IndexListenableAnimationDrawable
+        if (animation.isRunning) {
+            animation.stop()
+        }
+        reset()
     }
 
     private fun resetAnimation(): IndexListenableAnimationDrawable {
         imageView.setImageBitmap(null)
         imageView.clearAnimation()
-        val animation = animationState.getAnimation(resources, duration)
+        val animation = animationState.getAnimation(duration)
         imageView.background = animation
         return animation
     }
 
-    private fun progressChanged(index: Int) {
+    fun changePosition(index: Int) {
         val animation = imageView.background as IndexListenableAnimationDrawable
         if (animation.isRunning) {
             animation.stop()
@@ -68,31 +75,8 @@ class AnimationViewManager(
         resetAnimation()
     }
 
-    private fun setSeekBarIndex(index: Int) {
-        seekBar.progress = index + 1
-    }
-
     private fun reset() {
         animationState.currentIndex = 0
         resetAnimation()
-    }
-
-    class AnimationSeekBarListener(
-            private val onUserChangeProgress: (Int) -> Unit
-    ) : SeekBar.OnSeekBarChangeListener {
-        override fun onProgressChanged(p0: SeekBar?, progress: Int, fromUser: Boolean) {
-            Log.i("Seek", "$fromUser: $progress")
-            if (fromUser) {
-                onUserChangeProgress.invoke(progress - 1)
-            }
-        }
-
-        override fun onStartTrackingTouch(p0: SeekBar?) {
-            Log.i("Seek", "start")
-        }
-
-        override fun onStopTrackingTouch(p0: SeekBar?) {
-            Log.i("Seek", "end")
-        }
     }
 }

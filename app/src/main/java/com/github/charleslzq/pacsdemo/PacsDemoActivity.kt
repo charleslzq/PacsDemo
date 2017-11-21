@@ -1,19 +1,21 @@
 package com.github.charleslzq.pacsdemo
 
+import ItemClickSupport
 import android.content.Context
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
+import android.widget.SeekBar
 import com.github.charleslzq.dicom.data.DicomSeries
-import kotlinx.android.synthetic.main.pacs_demo_layout.*
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
+import kotlinx.android.synthetic.main.pacs_demo_layout.*
 
 
 class PacsDemoActivity : AppCompatActivity() {
@@ -23,7 +25,6 @@ class PacsDemoActivity : AppCompatActivity() {
     private val series = emptyList<DicomSeries>().toMutableList()
     private val adapter = DicomSeriesAdpater(series)
     private val patientList = listOf("03117795").toMutableList()
-    private lateinit var animationViewManager: AnimationViewManager
     private var patientId = "03117795"
     private var selectedView: View? = null
     private val thumbClickHandler = object : ItemClickSupport.OnItemClickListener {
@@ -68,7 +69,33 @@ class PacsDemoActivity : AppCompatActivity() {
 
     private fun setImage(position: Int) {
         val imageUrls = series[position].images.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[DicomSeriesAdpater.DEFAULT] }.toList()
-        animationViewManager = AnimationViewManager(this.resources, animated_image, imageSeekBar, imageUrls)
+        val animationViewManager = AnimationViewManager(animated_image, imageUrls, this::setSeekBarProgress)
+        if (animationViewManager.numOfFrames > 1) {
+            animated_image.setOnClickListener(AnimationImageClickListener(animationViewManager))
+
+            imageSeekBar.max = animationViewManager.numOfFrames
+            imageSeekBar.visibility = View.VISIBLE
+            imageSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(p0: SeekBar?, progress: Int, fromUser: Boolean) {
+                    if (fromUser) {
+                        animationViewManager.changePosition(progress - 1)
+                    }
+                }
+
+                override fun onStartTrackingTouch(p0: SeekBar?) {
+
+                }
+
+                override fun onStopTrackingTouch(p0: SeekBar?) {
+
+                }
+
+            })
+        }
+    }
+
+    private fun setSeekBarProgress(index: Int) {
+        imageSeekBar.progress = index + 1
     }
 
 

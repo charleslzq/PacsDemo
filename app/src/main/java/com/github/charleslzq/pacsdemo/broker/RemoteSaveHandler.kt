@@ -3,8 +3,6 @@ package com.github.charleslzq.pacsdemo.broker
 import com.github.charleslzq.dicom.store.DicomImageFileSaveHandler
 import java.io.File
 import java.net.URI
-import java.nio.file.Path
-import java.nio.file.Paths
 
 /**
  * Created by charleslzq on 17-11-15.

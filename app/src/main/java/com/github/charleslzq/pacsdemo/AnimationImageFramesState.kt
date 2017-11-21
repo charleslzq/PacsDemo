@@ -1,20 +1,16 @@
 package com.github.charleslzq.pacsdemo
 
-import android.content.res.Resources
-import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
-import java.io.File
-import java.net.URI
 
 /**
  * Created by charleslzq on 17-11-21.
  */
 class AnimationImageFramesState(
-        val frameUrls: List<URI>,
+        val frames: List<BitmapDrawable>,
         private val indexChangeListener: (Int) -> Unit,
         private val finishListener: () -> Unit
 ) {
-    val size = frameUrls.size
+    val size = frames.size
 
     var currentIndex: Int = 0
         set(value) {
@@ -27,12 +23,11 @@ class AnimationImageFramesState(
 
     fun isFinish() = currentIndex == size - 1
 
-    fun getAnimation(resources: Resources, duration: Int): IndexListenableAnimationDrawable {
+    fun getAnimation(duration: Int): IndexListenableAnimationDrawable {
         val animation = IndexListenableAnimationDrawable(currentIndex, this::currentIndex::set)
         animation.isOneShot = true
-        frameUrls.subList(currentIndex, size).forEach {
-            val bitmapDrawable = BitmapDrawable(resources, BitmapFactory.decodeFile(File(it).absolutePath))
-            animation.addFrame(bitmapDrawable, duration)
+        frames.subList(currentIndex, size).forEach {
+            animation.addFrame(it, duration)
         }
         animation.selectDrawable(0)
         animation.callback = null
