@@ -3,6 +3,7 @@ package com.github.charleslzq.pacsdemo
 import ItemClickSupport
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -16,6 +17,7 @@ import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.pacs_demo_layout.*
+import java.io.File
 
 
 class PacsDemoActivity : AppCompatActivity() {
@@ -29,10 +31,8 @@ class PacsDemoActivity : AppCompatActivity() {
     private var selectedView: View? = null
     private val thumbClickHandler = object : ItemClickSupport.OnItemClickListener {
         override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
-            setImage(position)
+            changeSeries(position)
             selectedView?.isSelected = false
-            selectedView?.background = null
-            selectedView?.clearAnimation()
             selectedView = v
             selectedView?.isSelected = true
         }
@@ -63,16 +63,15 @@ class PacsDemoActivity : AppCompatActivity() {
             series.addAll(newSeries)
             Log.i("test", "fetch images ${newSeries.size}")
             this.adapter.notifyDataSetChanged()
-            setImage(0)
+            changeSeries(0)
         }
     }
 
-    private fun setImage(position: Int) {
+    private fun changeSeries(position: Int) {
         val imageUrls = series[position].images.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[DicomSeriesAdpater.DEFAULT] }.toList()
         val animationViewManager = AnimationViewManager(animated_image, imageUrls, this::setSeekBarProgress)
-        if (animationViewManager.numOfFrames > 1) {
+        if (imageUrls.size > 1) {
             animated_image.setOnClickListener(AnimationImageClickListener(animationViewManager))
-
             imageSeekBar.max = animationViewManager.numOfFrames
             imageSeekBar.progress = 1
             imageSeekBar.visibility = View.VISIBLE
@@ -92,7 +91,7 @@ class PacsDemoActivity : AppCompatActivity() {
                 }
 
             })
-        } else {
+        } else if (imageUrls.size == 1){
             imageSeekBar.visibility = View.INVISIBLE
         }
     }

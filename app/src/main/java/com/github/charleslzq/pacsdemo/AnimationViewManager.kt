@@ -29,6 +29,8 @@ class AnimationViewManager(
         imageView.requestLayout()
 
         if (animationState.size == 1) {
+            imageView.clearAnimation()
+            imageView.background = null
             imageView.setImageBitmap(firstImage)
         } else {
             imageView.setImageBitmap(null)
