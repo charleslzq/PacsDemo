@@ -12,15 +12,22 @@ import java.net.URI
  * Created by charleslzq on 17-11-20.
  */
 class AnimationViewManager(
-        private val resources: Resources,
-        private val imageUriList: List<URI>,
-        private val imageView: ImageView,
-        var duration: Int
+        private val resources: Resources
 ) {
-    private val size = imageUriList.size
+    private var size = 0
     private var lastStartIndex = 0
+    private lateinit var imageUriList: List<URI>
+    private lateinit var imageView: ImageView
+    private var duration: Int = 40
 
-    init {
+    fun bind(view: ImageView, uriList: List<URI>) {
+        imageView = view
+        imageUriList = uriList
+        size = imageUriList.size
+        lastStartIndex = 0
+        val firstImage = BitmapFactory.decodeFile(File(imageUriList[0]).absolutePath)
+        imageView.layoutParams.width = Math.ceil(imageView.measuredHeight * firstImage.height / firstImage.width.toDouble()).toInt()
+        imageView.requestLayout()
         if (imageUriList.size == 1) {
             imageView.setImageBitmap(BitmapFactory.decodeFile(File(imageUriList[0]).absolutePath))
         } else {
@@ -37,12 +44,22 @@ class AnimationViewManager(
                             background.selectDrawable(background.currentIndex)
                         }
                         false -> {
-                            lastStartIndex += background.currentIndex
-                            Log.i("test", "Start at $lastStartIndex")
-                            val newAnimation = getAnimation(lastStartIndex)
-                            imageView.clearAnimation()
-                            imageView.background = newAnimation
-                            imageView.post(newAnimation)
+                            when (background.finish) {
+                                true -> {
+                                    val animation = getAnimation()
+                                    imageView.clearAnimation()
+                                    imageView.background = animation
+                                    imageView.post(animation)
+                                }
+                                false -> {
+                                    lastStartIndex = (lastStartIndex + background.currentIndex) % size
+                                    Log.i("test", "Start at $lastStartIndex")
+                                    val newAnimation = getAnimation(lastStartIndex)
+                                    imageView.clearAnimation()
+                                    imageView.background = newAnimation
+                                    imageView.post(newAnimation)
+                                }
+                            }
                         }
                     }
                 }
@@ -51,15 +68,13 @@ class AnimationViewManager(
     }
 
 
-    private fun getAnimation(startIndex: Int): ControllableAnimationDrawable {
-        when (startIndex) {
-            in 0..(size-2) -> return getAnimation(imageUriList.subList(startIndex, size-1))
-            else -> throw IllegalArgumentException("Wrong Index")
-        }
+    private fun getAnimation(startIndex: Int = 0): ControllableAnimationDrawable {
+        val start = startIndex % size
+        return getAnimation(imageUriList.subList(start, size), start)
     }
 
-    private fun getAnimation(imageUrls: List<URI>): ControllableAnimationDrawable {
-        val animation = ControllableAnimationDrawable()
+    private fun getAnimation(imageUrls: List<URI>, offset: Int = 0): ControllableAnimationDrawable {
+        val animation = ControllableAnimationDrawable(size, offset)
         animation.isOneShot = true
         imageUrls.forEach {
             val bitmapDrawable = BitmapDrawable(resources, BitmapFactory.decodeFile(File(it).absolutePath))

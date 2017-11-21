@@ -2,25 +2,18 @@ package com.github.charleslzq.pacsdemo
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
-import android.graphics.drawable.AnimationDrawable
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
-import android.view.animation.AnimationUtils
 import com.github.charleslzq.dicom.data.DicomSeries
 import kotlinx.android.synthetic.main.pacs_demo_layout.*
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
-import java.io.File
-import java.net.URI
 
 
 class PacsDemoActivity : AppCompatActivity() {
@@ -37,6 +30,7 @@ class PacsDemoActivity : AppCompatActivity() {
         override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
             setImage(position)
             selectedView?.isSelected = false
+            selectedView?.background = null
             selectedView?.clearAnimation()
             selectedView = v
             selectedView?.isSelected = true
@@ -47,6 +41,7 @@ class PacsDemoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.pacs_demo_layout)
+        animationViewManager = AnimationViewManager(this.resources)
         Log.d("PacsDemoActivity", "onCreate execute")
         thumbList.adapter = this.adapter
         thumbList.layoutManager = LinearLayoutManager(this)
@@ -73,23 +68,8 @@ class PacsDemoActivity : AppCompatActivity() {
     }
 
     private fun setImage(position: Int) {
-        val leftImageUri = series[position].images[0].files[DicomSeriesAdpater.DEFAULT]
-//        image_left.setImageBitmap(BitmapFactory.decodeFile(File(leftImageUri).absolutePath))
         val imageUrls = series[position].images.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[DicomSeriesAdpater.DEFAULT] }.toList()
-        animationViewManager = AnimationViewManager(
-                this.resources,
-                imageUrls,
-                image_left,
-                40
-        )
-
-        when (position) {
-            in 0..(series.size - 2) -> {
-                val rightImageUrl = series[position + 1].images[0].files[DicomSeriesAdpater.DEFAULT]
-                image_right.setImageBitmap(BitmapFactory.decodeFile(File(rightImageUrl).absolutePath))
-            }
-            else -> image_right.setImageBitmap(BitmapFactory.decodeFile(File(leftImageUri).absolutePath))
-        }
+        animationViewManager.bind(animated_image, imageUrls)
     }
 
 
