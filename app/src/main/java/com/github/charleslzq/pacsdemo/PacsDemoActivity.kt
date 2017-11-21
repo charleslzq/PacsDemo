@@ -136,16 +136,18 @@ class PacsDemoActivity : AppCompatActivity() {
             }
             PacsDemoActivity.Option.TWO_TWO -> {
                 val imageList = listOf(image_2_2_1, image_2_2_2, image_2_2_3, image_2_2_4)
-                bindImage(position, imageList)
+                val seekBarList = listOf(imageSeekBar_2_2_1, imageSeekBar_2_2_2, imageSeekBar_2_2_3, imageSeekBar_2_2_4)
+                bindImage(position, imageList, seekBarList)
             }
             PacsDemoActivity.Option.THREE_THREE -> {
                 val imageList = listOf(image_3_3_1, image_3_3_2, image_3_3_3, image_3_3_4, image_3_3_5, image_3_3_6, image_3_3_7, image_3_3_8, image_3_3_9)
-                bindImage(position, imageList)
+                val seekBarList = listOf(imageSeekBar_3_3_1, imageSeekBar_3_3_2, imageSeekBar_3_3_3, imageSeekBar_3_3_4, imageSeekBar_3_3_5, imageSeekBar_3_3_6, imageSeekBar_3_3_7, imageSeekBar_3_3_8, imageSeekBar_3_3_9)
+                bindImage(position, imageList, seekBarList)
             }
         }
     }
 
-    private fun bindImage(position: Int,viewList: List<ImageView>, seekbarList: List<SeekBar> = emptyList()) {
+    private fun bindImage(position: Int,viewList: List<ImageView>, seekbarList: List<SeekBar>) {
         for (i in 0 until viewList.size) {
             val it = position + i
             if (it >= series.size) {
