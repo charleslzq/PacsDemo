@@ -12,25 +12,23 @@ class ImageListView(
         context: Context,
         attrs: AttributeSet?,
         defStyleAttr: Int
-) : ImageView(context, attrs, defStyleAttr), ProgressControllable {
+) : ImageView(context, attrs, defStyleAttr), ProgressControllable, PageControllable {
     constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0)
     constructor(context: Context) : this(context, null, 0)
 
     lateinit var imageFramesState: ImageFramesState
     var duration: Int = 40
-    private var animate = false
+    var mode = Mode.SLIDE
 
     fun bindUrls(
             imageUrls: List<URI> = emptyList(),
-            animate: Boolean = false,
             indexChangeListener: (Int) -> Unit = {},
             finishListener: (ImageListView) -> Unit = { it.reset() }) {
         imageFramesState = ImageFramesState(imageUrls, indexChangeListener, {
             finishListener.invoke(this)
         })
-        when(imageUrls.isEmpty()) {
+        when (imageUrls.isEmpty()) {
             true -> {
-                this.animate = false
                 clearAnimation()
                 background = null
             }
@@ -38,64 +36,37 @@ class ImageListView(
                 val firstImage = imageFramesState.getFrame(0)
                 layoutParams.width = Math.ceil(measuredHeight * firstImage.height / firstImage.width.toDouble()).toInt()
                 requestLayout()
-
-                if (imageFramesState.size > 1 && animate) {
-                    this.animate = true
-                    setImageBitmap(null)
-                    resetAnimation()
-                } else {
-                    this.animate = false
-                    clearAnimation()
-                    background = null
-                    setImageBitmap(firstImage)
-                }
+                mode.init(this)
             }
         }
     }
 
     override fun play() {
-        if (animate) {
-            post(resetAnimation())
-        }
+        mode.play(this)
     }
 
     override fun pause() {
-        if (animate) {
-            val animation = background as IndexListenableAnimationDrawable
-            if (animation.isRunning) {
-                animation.stop()
-                animation.selectDrawable(animation.currentIndex)
-            }
-        }
+        mode.pause(this)
     }
 
     override fun reset() {
-        if (animate) {
-            imageFramesState.currentIndex = 0
-            resetAnimation()
-        }
+        mode.reset(this)
     }
 
     override fun isRunning(): Boolean {
-        return animate && background != null && (background as IndexListenableAnimationDrawable).isRunning
+        return mode.isRunning(this)
     }
 
     override fun changeProgress(progress: Int) {
-        val index = (progress + imageFramesState.size - 1) % imageFramesState.size
-        when (animate) {
-            true -> {
-                val animation = background as IndexListenableAnimationDrawable
-                if (animation.isRunning) {
-                    animation.stop()
-                }
-                imageFramesState.currentIndex = index
-                resetAnimation()
-            }
-            false -> {
-                clearAnimation()
-                setImageBitmap(imageFramesState.getFrame(index))
-            }
-        }
+        mode.changeProgress(this, progress)
+    }
+
+    override fun nextPage() {
+        mode.nextPage(this)
+    }
+
+    override fun previousPage() {
+        mode.previousPage(this)
     }
 
     private fun getListAnimation(): IndexListenableAnimationDrawable {
@@ -108,5 +79,90 @@ class ImageListView(
         val animation = getListAnimation()
         background = animation
         return animation
+    }
+
+    enum class Mode {
+        ANIMATE {
+            override fun play(imageListView: ImageListView) {
+                imageListView.post(imageListView.resetAnimation())
+            }
+
+            override fun pause(imageListView: ImageListView) {
+                val animation = imageListView.background as IndexListenableAnimationDrawable
+                if (animation.isRunning) {
+                    animation.stop()
+                    animation.selectDrawable(animation.currentIndex)
+                }
+            }
+
+            override fun isRunning(imageListView: ImageListView): Boolean {
+                return imageListView.background != null
+                        && (imageListView.background as IndexListenableAnimationDrawable).isRunning
+            }
+
+            override fun reset(imageListView: ImageListView) {
+                imageListView.imageFramesState.currentIndex = 0
+                imageListView.resetAnimation()
+            }
+
+            override fun changeProgress(imageListView: ImageListView, progress: Int) {
+                val index = newIndex(imageListView, progress)
+                val animation = imageListView.background as IndexListenableAnimationDrawable
+                if (animation.isRunning) {
+                    animation.stop()
+                }
+                imageListView.imageFramesState.currentIndex = index
+                imageListView.resetAnimation()
+            }
+
+            override fun init(imageListView: ImageListView) {
+                if (imageListView.imageFramesState.size > 1) {
+                    imageListView.setImageBitmap(null)
+                    imageListView.resetAnimation()
+                } else {
+                    imageListView.mode = SLIDE
+                    imageListView.mode.init(imageListView)
+                }
+            }
+        },
+        SLIDE {
+            override fun nextPage(imageListView: ImageListView) {
+                if (!imageListView.imageFramesState.isFinish()) {
+                    changeProgress(imageListView, imageListView.imageFramesState.currentIndex + 2)
+                }
+            }
+
+            override fun previousPage(imageListView: ImageListView) {
+                if (imageListView.imageFramesState.currentIndex != 0) {
+                    changeProgress(imageListView, imageListView.imageFramesState.currentIndex)
+                }
+            }
+
+            override fun changeProgress(imageListView: ImageListView, progress: Int) {
+                val index = newIndex(imageListView, progress)
+                imageListView.clearAnimation()
+                imageListView.imageFramesState.currentIndex = index
+                imageListView.setImageBitmap(imageListView.imageFramesState.getFrame(index))
+            }
+
+            override fun init(imageListView: ImageListView) {
+                val firstImage = imageListView.imageFramesState.getFrame(0)
+                imageListView.clearAnimation()
+                imageListView.background = null
+                imageListView.setImageBitmap(firstImage)
+            }
+        };
+
+        abstract fun init(imageListView: ImageListView)
+        open fun play(imageListView: ImageListView) {}
+        open fun pause(imageListView: ImageListView) {}
+        open fun isRunning(imageListView: ImageListView) = false
+        open fun reset(imageListView: ImageListView) {}
+        open fun nextPage(imageListView: ImageListView) {}
+        open fun previousPage(imageListView: ImageListView) {}
+        abstract fun changeProgress(imageListView: ImageListView, progress: Int)
+        protected fun newIndex(imageListView: ImageListView, progress: Int): Int {
+            return (progress + imageListView.imageFramesState.size - 1) % imageListView.imageFramesState.size
+        }
     }
 }

@@ -3,7 +3,6 @@ package com.github.charleslzq.pacsdemo
 import ItemClickSupport
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -12,15 +11,16 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.RelativeLayout
+import android.widget.SeekBar
+import android.widget.TableLayout
+import android.widget.TableRow
 import com.github.charleslzq.dicom.data.DicomSeries
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.layout_pacs_demo.*
-import java.io.File
-
 
 class PacsDemoActivity : AppCompatActivity() {
 
@@ -103,9 +103,10 @@ class PacsDemoActivity : AppCompatActivity() {
         when (Option.values()[viewSelector.displayedChild]) {
             PacsDemoActivity.Option.ONE_ONE -> {
                 val animatedImage = getImageViewFromView(imagePanel_1)
-                animatedImage.bindUrls(imageUrls, true, { imageSeekBar.progress = it + 1 })
+                animatedImage.mode = ImageListView.Mode.ANIMATE
+                animatedImage.bindUrls(imageUrls, { imageSeekBar.progress = it + 1 })
                 if (imageUrls.size > 1) {
-                    animatedImage.setOnClickListener(ClickToControllPlayListener(animatedImage))
+                    animatedImage.setOnTouchListener(TouchToControlPlayListener(animatedImage))
                     imageSeekBar.max = animatedImage.imageFramesState.size
                     imageSeekBar.progress = 1
                     imageSeekBar.visibility = View.VISIBLE
@@ -171,7 +172,9 @@ class PacsDemoActivity : AppCompatActivity() {
                 return
             }
             val imageUrls = series[it].images.mapNotNull { it.files[DicomSeriesAdpater.DEFAULT] }
+            viewList[i].mode = ImageListView.Mode.SLIDE
             viewList[i].bindUrls(imageUrls)
+            viewList[i].setOnTouchListener(TouchToControlPageListener(viewList[i]))
         }
     }
 
