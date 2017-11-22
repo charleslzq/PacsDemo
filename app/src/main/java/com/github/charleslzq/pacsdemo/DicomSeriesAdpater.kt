@@ -13,7 +13,7 @@ import java.io.File
  * Created by charleslzq on 17-11-20.
  */
 class DicomSeriesAdpater(
-        private val series: List<DicomSeries>
+        val series: MutableList<DicomSeries>
 ) : RecyclerView.Adapter<DicomSeriesAdpater.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val thumbUrl = series[position].images[0].files[DicomSeriesAdpater.THUMB]
@@ -25,7 +25,7 @@ class DicomSeriesAdpater(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.image_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.thumb_item, parent, false)
         return DicomSeriesAdpater.ViewHolder(view)
     }
 

@@ -8,11 +8,27 @@
     android:orientation="vertical"
     tools:context="com.github.charleslzq.pacsdemo.PacsDemoActivity">
 
-    <Button
-        android:id="@+id/refreshButton"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/refresh" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/refreshButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/refresh" />
+
+        <SeekBar
+            android:id="@+id/imageSeekBar"
+            style="@style/Widget.AppCompat.SeekBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="9"
+            android:visibility="invisible" />
+    </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/mainPanel"
@@ -27,410 +43,72 @@
             android:autoStart="false"
             android:layout_height="match_parent">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <com.github.charleslzq.pacsdemo.ImageListView
-                    android:id="@+id/animated_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:contentDescription="@string/imageContentDescription"
-                    android:scaleType="fitCenter" />
-
-                <SeekBar
-                    android:id="@+id/imageSeekBar"
-                    style="@style/Widget.AppCompat.SeekBar.Discrete"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignLeft="@id/animated_image"
-                    android:layout_alignStart="@id/animated_image"
-                    android:layout_alignRight="@id/animated_image"
-                    android:layout_alignEnd="@id/animated_image"
-                    android:layout_alignBottom="@id/animated_image"
-                    android:visibility="invisible" />
-            </RelativeLayout>
+            <include
+                android:id="@+id/imagePanel_1"
+                layout="@layout/image_item" />
 
             <LinearLayout
-                android:id="@+id/imagePanel_1_2"
-                android:baselineAligned="false"
+                android:id="@+id/imagePanel_2"
                 android:layout_width="match_parent"
-                android:orientation="horizontal"
-                android:layout_height="match_parent">
-
-                <RelativeLayout
+                android:layout_height="match_parent"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+                <include
+                    android:id="@+id/imageColumn_1"
+                    android:layout_height="match_parent"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:layout_height="match_parent">
-
-                    <ImageView
-                        android:id="@+id/image_1_2_1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
-                        android:contentDescription="@string/imageContentDescription"
-                        android:scaleType="fitCenter" />
-                    <SeekBar
-                        android:id="@+id/imageSeekBar_1_2_1"
-                        style="@style/Widget.AppCompat.SeekBar.Discrete"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignLeft="@id/image_1_2_1"
-                        android:layout_alignStart="@id/image_1_2_1"
-                        android:layout_alignRight="@id/image_1_2_1"
-                        android:layout_alignEnd="@id/image_1_2_1"
-                        android:layout_alignBottom="@id/image_1_2_1"
-                        android:visibility="invisible" />
-                </RelativeLayout>
-                <RelativeLayout
+                    layout="@layout/image_item" />
+                <include
+                    android:id="@+id/imageColumn_2"
+                    android:layout_height="match_parent"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:layout_height="match_parent">
-
-                    <ImageView
-                        android:id="@+id/image_1_2_2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
-                        android:contentDescription="@string/imageContentDescription"
-                        android:scaleType="fitCenter" />
-                    <SeekBar
-                        android:id="@+id/imageSeekBar_1_2_2"
-                        style="@style/Widget.AppCompat.SeekBar.Discrete"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignLeft="@id/image_1_2_2"
-                        android:layout_alignStart="@id/image_1_2_2"
-                        android:layout_alignRight="@id/image_1_2_2"
-                        android:layout_alignEnd="@id/image_1_2_2"
-                        android:layout_alignBottom="@id/image_1_2_2"
-                        android:visibility="invisible" />
-                </RelativeLayout>
+                    layout="@layout/image_item" />
             </LinearLayout>
 
             <TableLayout
+                android:id="@+id/imagePanel_3"
                 android:stretchColumns="*"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <TableRow android:layout_weight="1">
-                    <RelativeLayout
-                        android:layout_weight="1"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:id="@+id/image_2_2_1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
-                            android:contentDescription="@string/imageContentDescription"
-                            android:scaleType="fitCenter" />
-                        <SeekBar
-                            android:id="@+id/imageSeekBar_2_2_1"
-                            style="@style/Widget.AppCompat.SeekBar.Discrete"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignLeft="@id/image_2_2_1"
-                            android:layout_alignStart="@id/image_2_2_1"
-                            android:layout_alignRight="@id/image_2_2_1"
-                            android:layout_alignEnd="@id/image_2_2_1"
-                            android:layout_alignBottom="@id/image_2_2_1"
-                            android:visibility="invisible" />
-                    </RelativeLayout>
-                    <RelativeLayout
-                        android:layout_weight="1"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:id="@+id/image_2_2_2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
-                            android:contentDescription="@string/imageContentDescription"
-                            android:scaleType="fitCenter" />
-                        <SeekBar
-                            android:id="@+id/imageSeekBar_2_2_2"
-                            style="@style/Widget.AppCompat.SeekBar.Discrete"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignLeft="@id/image_2_2_2"
-                            android:layout_alignStart="@id/image_2_2_2"
-                            android:layout_alignRight="@id/image_2_2_2"
-                            android:layout_alignEnd="@id/image_2_2_2"
-                            android:layout_alignBottom="@id/image_2_2_2"
-                            android:visibility="invisible" />
-                    </RelativeLayout>
-                </TableRow>
-                <TableRow android:layout_weight="1">
-                    <RelativeLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:id="@+id/image_2_2_3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
-                            android:contentDescription="@string/imageContentDescription"
-                            android:scaleType="fitCenter" />
-                        <SeekBar
-                            android:id="@+id/imageSeekBar_2_2_3"
-                            style="@style/Widget.AppCompat.SeekBar.Discrete"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignLeft="@id/image_2_2_3"
-                            android:layout_alignStart="@id/image_2_2_3"
-                            android:layout_alignRight="@id/image_2_2_3"
-                            android:layout_alignEnd="@id/image_2_2_3"
-                            android:layout_alignBottom="@id/image_2_2_3"
-                            android:visibility="invisible" />
-                    </RelativeLayout>
-                    <RelativeLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:id="@+id/image_2_2_4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
-                            android:contentDescription="@string/imageContentDescription"
-                            android:scaleType="fitCenter" />
-                        <SeekBar
-                            android:id="@+id/imageSeekBar_2_2_4"
-                            style="@style/Widget.AppCompat.SeekBar.Discrete"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignLeft="@id/image_2_2_4"
-                            android:layout_alignStart="@id/image_2_2_4"
-                            android:layout_alignRight="@id/image_2_2_4"
-                            android:layout_alignEnd="@id/image_2_2_4"
-                            android:layout_alignBottom="@id/image_2_2_4"
-                            android:visibility="invisible" />
-                    </RelativeLayout>
-                </TableRow>
+                <include
+                    android:id="@+id/imageRow_1"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    layout="@layout/image_row_2" />
+                <include
+                    android:id="@+id/imageRow_2"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    layout="@layout/image_row_2" />
             </TableLayout>
 
             <TableLayout
+                android:id="@+id/imagePanel_4"
                 android:stretchColumns="*"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <TableRow android:layout_weight="1">
-                    <RelativeLayout
-                        android:layout_weight="1"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:id="@+id/image_3_3_1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
-                            android:contentDescription="@string/imageContentDescription"
-                            android:scaleType="fitCenter" />
-                        <SeekBar
-                            android:id="@+id/imageSeekBar_3_3_1"
-                            style="@style/Widget.AppCompat.SeekBar.Discrete"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignLeft="@id/image_3_3_1"
-                            android:layout_alignStart="@id/image_3_3_1"
-                            android:layout_alignRight="@id/image_3_3_1"
-                            android:layout_alignEnd="@id/image_3_3_1"
-                            android:layout_alignBottom="@id/image_3_3_1"
-                            android:visibility="invisible" />
-                    </RelativeLayout>
-                    <RelativeLayout
-                        android:layout_weight="1"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:id="@+id/image_3_3_2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
-                            android:contentDescription="@string/imageContentDescription"
-                            android:scaleType="fitCenter" />
-                        <SeekBar
-                            android:id="@+id/imageSeekBar_3_3_2"
-                            style="@style/Widget.AppCompat.SeekBar.Discrete"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignLeft="@id/image_3_3_2"
-                            android:layout_alignStart="@id/image_3_3_2"
-                            android:layout_alignRight="@id/image_3_3_2"
-                            android:layout_alignEnd="@id/image_3_3_2"
-                            android:layout_alignBottom="@id/image_3_3_2"
-                            android:visibility="invisible" />
-                    </RelativeLayout>
-                    <RelativeLayout
-                        android:layout_weight="1"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:id="@+id/image_3_3_3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
-                            android:contentDescription="@string/imageContentDescription"
-                            android:scaleType="fitCenter" />
-                        <SeekBar
-                            android:id="@+id/imageSeekBar_3_3_3"
-                            style="@style/Widget.AppCompat.SeekBar.Discrete"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignLeft="@id/image_3_3_3"
-                            android:layout_alignStart="@id/image_3_3_3"
-                            android:layout_alignRight="@id/image_3_3_3"
-                            android:layout_alignEnd="@id/image_3_3_3"
-                            android:layout_alignBottom="@id/image_3_3_3"
-                            android:visibility="invisible" />
-                    </RelativeLayout>
-                </TableRow>
-                <TableRow android:layout_weight="1">
-                    <RelativeLayout
-                        android:layout_weight="1"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:id="@+id/image_3_3_4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
-                            android:contentDescription="@string/imageContentDescription"
-                            android:scaleType="fitCenter" />
-                        <SeekBar
-                            android:id="@+id/imageSeekBar_3_3_4"
-                            style="@style/Widget.AppCompat.SeekBar.Discrete"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignLeft="@id/image_3_3_4"
-                            android:layout_alignStart="@id/image_3_3_4"
-                            android:layout_alignRight="@id/image_3_3_4"
-                            android:layout_alignEnd="@id/image_3_3_4"
-                            android:layout_alignBottom="@id/image_3_3_4"
-                            android:visibility="invisible" />
-                    </RelativeLayout>
-                    <RelativeLayout
-                        android:layout_weight="1"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:id="@+id/image_3_3_5"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
-                            android:contentDescription="@string/imageContentDescription"
-                            android:scaleType="fitCenter" />
-                        <SeekBar
-                            android:id="@+id/imageSeekBar_3_3_5"
-                            style="@style/Widget.AppCompat.SeekBar.Discrete"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignLeft="@id/image_3_3_5"
-                            android:layout_alignStart="@id/image_3_3_5"
-                            android:layout_alignRight="@id/image_3_3_5"
-                            android:layout_alignEnd="@id/image_3_3_5"
-                            android:layout_alignBottom="@id/image_3_3_5"
-                            android:visibility="invisible" />
-                    </RelativeLayout>
-                    <RelativeLayout
-                        android:layout_weight="1"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:id="@+id/image_3_3_6"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
-                            android:contentDescription="@string/imageContentDescription"
-                            android:scaleType="fitCenter" />
-                        <SeekBar
-                            android:id="@+id/imageSeekBar_3_3_6"
-                            style="@style/Widget.AppCompat.SeekBar.Discrete"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignLeft="@id/image_3_3_6"
-                            android:layout_alignStart="@id/image_3_3_6"
-                            android:layout_alignRight="@id/image_3_3_6"
-                            android:layout_alignEnd="@id/image_3_3_6"
-                            android:layout_alignBottom="@id/image_3_3_6"
-                            android:visibility="invisible" />
-                    </RelativeLayout>
-                </TableRow>
-                <TableRow android:layout_weight="1">
-                    <RelativeLayout
-                        android:layout_weight="1"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:id="@+id/image_3_3_7"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
-                            android:contentDescription="@string/imageContentDescription"
-                            android:scaleType="fitCenter" />
-                        <SeekBar
-                            android:id="@+id/imageSeekBar_3_3_7"
-                            style="@style/Widget.AppCompat.SeekBar.Discrete"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignLeft="@id/image_3_3_7"
-                            android:layout_alignStart="@id/image_3_3_7"
-                            android:layout_alignRight="@id/image_3_3_7"
-                            android:layout_alignEnd="@id/image_3_3_7"
-                            android:layout_alignBottom="@id/image_3_3_7"
-                            android:visibility="invisible" />
-                    </RelativeLayout>
-                    <RelativeLayout
-                        android:layout_weight="1"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:id="@+id/image_3_3_8"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
-                            android:contentDescription="@string/imageContentDescription"
-                            android:scaleType="fitCenter" />
-                        <SeekBar
-                            android:id="@+id/imageSeekBar_3_3_8"
-                            style="@style/Widget.AppCompat.SeekBar.Discrete"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignLeft="@id/imageSeekBar_3_3_8"
-                            android:layout_alignStart="@id/imageSeekBar_3_3_8"
-                            android:layout_alignRight="@id/imageSeekBar_3_3_8"
-                            android:layout_alignEnd="@id/imageSeekBar_3_3_8"
-                            android:layout_alignBottom="@id/imageSeekBar_3_3_8"
-                            android:visibility="invisible" />
-                    </RelativeLayout>
-                    <RelativeLayout
-                        android:layout_weight="1"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:id="@+id/image_3_3_9"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
-                            android:contentDescription="@string/imageContentDescription"
-                            android:scaleType="fitCenter" />
-                        <SeekBar
-                            android:id="@+id/imageSeekBar_3_3_9"
-                            style="@style/Widget.AppCompat.SeekBar.Discrete"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignLeft="@id/image_3_3_9"
-                            android:layout_alignStart="@id/image_3_3_9"
-                            android:layout_alignRight="@id/image_3_3_9"
-                            android:layout_alignEnd="@id/image_3_3_9"
-                            android:layout_alignBottom="@id/image_3_3_9"
-                            android:visibility="invisible" />
-                    </RelativeLayout>
-                </TableRow>
+                <include
+                    android:id="@+id/imageRow_1"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    layout="@layout/image_row_3" />
+                <include
+                    android:id="@+id/imageRow_2"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    layout="@layout/image_row_3" />
+                <include
+                    android:id="@+id/imageRow_3"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    layout="@layout/image_row_3" />
             </TableLayout>
         </ViewFlipper>
 
@@ -439,7 +117,6 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="10"/>
-
     </LinearLayout>
 
 </LinearLayout>
