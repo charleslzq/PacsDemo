@@ -31,6 +31,7 @@ class ImageListView(
             true -> {
                 clearAnimation()
                 background = null
+                setImageBitmap(null)
             }
             false -> {
                 val firstImage = imageFramesState.getFrame(0)
