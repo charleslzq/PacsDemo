@@ -21,27 +21,35 @@ class ImageListView(
     private var animate = false
 
     fun bindUrls(
-            imageUrls: List<URI>,
+            imageUrls: List<URI> = emptyList(),
             animate: Boolean = false,
             indexChangeListener: (Int) -> Unit = {},
             finishListener: (ImageListView) -> Unit = { it.reset() }) {
         imageFramesState = ImageFramesState(imageUrls, indexChangeListener, {
             finishListener.invoke(this)
         })
+        when(imageUrls.isEmpty()) {
+            true -> {
+                this.animate = false
+                clearAnimation()
+                background = null
+            }
+            false -> {
+                val firstImage = imageFramesState.getFrame(0)
+                layoutParams.width = Math.ceil(measuredHeight * firstImage.height / firstImage.width.toDouble()).toInt()
+                requestLayout()
 
-        val firstImage = imageFramesState.getFrame(0)
-        layoutParams.width = Math.ceil(measuredHeight * firstImage.height / firstImage.width.toDouble()).toInt()
-        requestLayout()
-
-        if (imageFramesState.size > 1 && animate) {
-            this.animate = true
-            setImageBitmap(null)
-            resetAnimation()
-        } else {
-            this.animate = false
-            clearAnimation()
-            background = null
-            setImageBitmap(firstImage)
+                if (imageFramesState.size > 1 && animate) {
+                    this.animate = true
+                    setImageBitmap(null)
+                    resetAnimation()
+                } else {
+                    this.animate = false
+                    clearAnimation()
+                    background = null
+                    setImageBitmap(firstImage)
+                }
+            }
         }
     }
 
