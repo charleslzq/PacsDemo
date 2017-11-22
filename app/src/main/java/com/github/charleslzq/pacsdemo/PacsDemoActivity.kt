@@ -163,7 +163,7 @@ class PacsDemoActivity : AppCompatActivity() {
         return id.map { tableLayout.findViewById<TableRow>(it) }
     }
 
-    private fun bindImage(position: Int, viewList: List<ImageView>) {
+    private fun bindImage(position: Int, viewList: List<ImageListView>) {
         val series = (thumbList.adapter as DicomSeriesAdpater).series
         for (i in 0 until viewList.size) {
             val it = position + i
@@ -171,8 +171,7 @@ class PacsDemoActivity : AppCompatActivity() {
                 return
             }
             val imageUrls = series[it].images.mapNotNull { it.files[DicomSeriesAdpater.DEFAULT] }
-            val bitmap = BitmapFactory.decodeFile(File(imageUrls[0]).absolutePath)
-            viewList[i].setImageBitmap(bitmap)
+            viewList[i].bindUrls(imageUrls)
         }
     }
 
