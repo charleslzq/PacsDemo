@@ -104,16 +104,16 @@ class PacsDemoActivity : AppCompatActivity() {
         val imageUrls = series[position].images.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[DicomSeriesAdpater.DEFAULT] }.toList()
         when (Option.values()[viewSelector.displayedChild]) {
             PacsDemoActivity.Option.ONE_ONE -> {
-                val animationViewManager = AnimationViewManager(animated_image, imageUrls, this::setSeekBarProgress)
+                animated_image.bindUrls(imageUrls, true, { imageSeekBar.progress = it + 1 })
                 if (imageUrls.size > 1) {
-                    animated_image.setOnClickListener(AnimationImageClickListener(animationViewManager))
-                    imageSeekBar.max = animationViewManager.numOfFrames
+                    animated_image.setOnClickListener(ClickToControllPlayListener(animated_image))
+                    imageSeekBar.max = animated_image.imageFramesState.size
                     imageSeekBar.progress = 1
                     imageSeekBar.visibility = View.VISIBLE
                     imageSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                         override fun onProgressChanged(p0: SeekBar?, progress: Int, fromUser: Boolean) {
                             if (fromUser) {
-                                animationViewManager.changePosition(progress - 1)
+                                animated_image.changeProgress(progress)
                             }
                         }
 
@@ -128,6 +128,30 @@ class PacsDemoActivity : AppCompatActivity() {
                 } else if (imageUrls.size == 1) {
                     imageSeekBar.visibility = View.INVISIBLE
                 }
+//                val animationViewManager = AnimationViewManager(animated_image, imageUrls, this::setSeekBarProgress)
+//                if (imageUrls.size > 1) {
+//                    animated_image.setOnClickListener(AnimationImageClickListener(animationViewManager))
+//                    imageSeekBar.max = animationViewManager.numOfFrames
+//                    imageSeekBar.progress = 1
+//                    imageSeekBar.visibility = View.VISIBLE
+//                    imageSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+//                        override fun onProgressChanged(p0: SeekBar?, progress: Int, fromUser: Boolean) {
+//                            if (fromUser) {
+//                                animationViewManager.changePosition(progress - 1)
+//                            }
+//                        }
+//
+//                        override fun onStartTrackingTouch(p0: SeekBar?) {
+//
+//                        }
+//
+//                        override fun onStopTrackingTouch(p0: SeekBar?) {
+//
+//                        }
+//                    })
+//                } else if (imageUrls.size == 1) {
+//                    imageSeekBar.visibility = View.INVISIBLE
+//                }
             }
             PacsDemoActivity.Option.ONE_TWO -> {
                 val imageList = listOf(image_1_2_1, image_1_2_2)
@@ -147,7 +171,7 @@ class PacsDemoActivity : AppCompatActivity() {
         }
     }
 
-    private fun bindImage(position: Int,viewList: List<ImageView>, seekbarList: List<SeekBar>) {
+    private fun bindImage(position: Int, viewList: List<ImageView>, seekbarList: List<SeekBar>) {
         for (i in 0 until viewList.size) {
             val it = position + i
             if (it >= series.size) {
@@ -160,10 +184,10 @@ class PacsDemoActivity : AppCompatActivity() {
                 seekbarList[i].max = imageUrls.size
                 seekbarList[i].progress = 1
                 seekbarList[i].visibility = View.VISIBLE
-                seekbarList[i].setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
+                seekbarList[i].setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(p0: SeekBar?, progress: Int, fromUser: Boolean) {
                         if (fromUser) {
-                            val index = (progress + imageUrls.size -1) % imageUrls.size
+                            val index = (progress + imageUrls.size - 1) % imageUrls.size
                             val imageUrl = imageUrls[index]
                             val bitmap = BitmapFactory.decodeFile(File(imageUrl).absolutePath)
                             viewList[i].setImageBitmap(bitmap)

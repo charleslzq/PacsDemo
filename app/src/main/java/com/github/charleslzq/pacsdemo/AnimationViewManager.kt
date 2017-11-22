@@ -1,9 +1,6 @@
 package com.github.charleslzq.pacsdemo
 
-import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.widget.ImageView
-import java.io.File
 import java.net.URI
 
 /**
@@ -15,16 +12,14 @@ class AnimationViewManager(
         var indexChangeListener: (Int) -> Unit = {},
         var finishedListener: (AnimationViewManager) -> Unit = { it.reset() }
 ) {
-    private val animationState = AnimationImageFramesState(imageUriList.map {
-        BitmapDrawable(imageView.resources, BitmapFactory.decodeFile(File(it).absolutePath))
-    }, indexChangeListener, {
+    private val animationState = ImageFramesState(imageUriList, indexChangeListener, {
         finishedListener.invoke(this)
     })
     var duration: Int = 40
     val numOfFrames = animationState.size
 
     init {
-        val firstImage = animationState.frames[0].bitmap
+        val firstImage = animationState.getFrame(0)
         imageView.layoutParams.width = Math.ceil(imageView.measuredHeight * firstImage.height / firstImage.width.toDouble()).toInt()
         imageView.requestLayout()
 
@@ -63,7 +58,7 @@ class AnimationViewManager(
     private fun resetAnimation(): IndexListenableAnimationDrawable {
         imageView.setImageBitmap(null)
         imageView.clearAnimation()
-        val animation = animationState.getAnimation(duration)
+        val animation = animationState.getAnimation(imageView.resources, duration)
         imageView.background = animation
         return animation
     }
