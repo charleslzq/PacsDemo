@@ -45,7 +45,7 @@
 
             <include
                 android:id="@+id/imagePanel_1"
-                layout="@layout/image_item" />
+                layout="@layout/piece_image_item" />
 
             <LinearLayout
                 android:id="@+id/imagePanel_2"
@@ -58,13 +58,13 @@
                     android:layout_height="match_parent"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    layout="@layout/image_item" />
+                    layout="@layout/piece_image_item" />
                 <include
                     android:id="@+id/imageColumn_2"
                     android:layout_height="match_parent"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    layout="@layout/image_item" />
+                    layout="@layout/piece_image_item" />
             </LinearLayout>
 
             <TableLayout
@@ -77,13 +77,13 @@
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    layout="@layout/image_row_2" />
+                    layout="@layout/piece_image_row_2" />
                 <include
                     android:id="@+id/imageRow_2"
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    layout="@layout/image_row_2" />
+                    layout="@layout/piece_image_row_2" />
             </TableLayout>
 
             <TableLayout
@@ -96,19 +96,19 @@
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    layout="@layout/image_row_3" />
+                    layout="@layout/piece_image_row_3" />
                 <include
                     android:id="@+id/imageRow_2"
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    layout="@layout/image_row_3" />
+                    layout="@layout/piece_image_row_3" />
                 <include
                     android:id="@+id/imageRow_3"
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    layout="@layout/image_row_3" />
+                    layout="@layout/piece_image_row_3" />
             </TableLayout>
         </ViewFlipper>
 

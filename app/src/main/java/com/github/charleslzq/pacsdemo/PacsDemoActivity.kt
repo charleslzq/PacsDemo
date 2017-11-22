@@ -18,7 +18,7 @@ import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
-import kotlinx.android.synthetic.main.pacs_demo_layout.*
+import kotlinx.android.synthetic.main.layout_pacs_demo.*
 import java.io.File
 
 
@@ -43,7 +43,7 @@ class PacsDemoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.pacs_demo_layout)
+        setContentView(R.layout.layout_pacs_demo)
         Log.d("PacsDemoActivity", "onCreate execute")
         thumbList.adapter = DicomSeriesAdpater(emptyList<DicomSeries>().toMutableList())
         thumbList.layoutManager = LinearLayoutManager(this)

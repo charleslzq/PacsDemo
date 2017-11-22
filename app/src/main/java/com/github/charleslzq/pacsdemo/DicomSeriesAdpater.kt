@@ -25,7 +25,7 @@ class DicomSeriesAdpater(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.thumb_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.piece_thumb_item, parent, false)
         return DicomSeriesAdpater.ViewHolder(view)
     }
 
