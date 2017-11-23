@@ -5,36 +5,17 @@
     android:id="@+id/pacsPanel"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     android:orientation="vertical"
+    android:gravity="bottom"
     tools:context="com.github.charleslzq.pacsdemo.PacsDemoActivity">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/refreshButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/refresh" />
-
-        <SeekBar
-            android:id="@+id/imageSeekBar"
-            style="@style/Widget.AppCompat.SeekBar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="9"
-            android:visibility="invisible" />
-    </LinearLayout>
-
 
     <LinearLayout
         android:id="@+id/mainPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_marginTop="50dp"
+        >
 
         <ViewFlipper
             android:id="@+id/viewSelector"
@@ -117,6 +98,41 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="10"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/controlPanel"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:gravity="end"
+        >
+
+        <SeekBar
+            android:id="@+id/imageSeekBar"
+            style="@style/Widget.AppCompat.SeekBar"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:visibility="invisible" />
+        <LinearLayout
+            android:id="@+id/buttonPanel"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            >
+            <Button
+                android:id="@+id/spliteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_normal"
+                android:text="分屏"/>
+            <Button
+                android:id="@+id/refreshButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_normal"
+                android:text="刷新" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

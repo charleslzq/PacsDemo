@@ -11,10 +11,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.RelativeLayout
-import android.widget.SeekBar
-import android.widget.TableLayout
-import android.widget.TableRow
+import android.widget.*
 import com.github.charleslzq.dicom.data.DicomSeries
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
@@ -30,6 +27,7 @@ class PacsDemoActivity : AppCompatActivity() {
     private var patientId = "03117795"
     private var selectedView: View? = null
     private var currentPosition = 0
+    private lateinit var popupMenu: PopupMenu
     private val thumbClickHandler = object : ItemClickSupport.OnItemClickListener {
         override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
             changeSeries(position)
@@ -48,6 +46,17 @@ class PacsDemoActivity : AppCompatActivity() {
         thumbList.adapter = DicomSeriesAdpater(emptyList<DicomSeries>().toMutableList())
         thumbList.layoutManager = LinearLayoutManager(this)
         thumbList.itemAnimator = SlideInUpAnimator()
+        popupMenu = PopupMenu(this, spliteButton)
+        popupMenu.menu.add(Menu.NONE, R.id.one_one, Menu.NONE,"1 X 1")
+        popupMenu.menu.add(Menu.NONE, R.id.one_two, Menu.NONE,"1 X 2")
+        popupMenu.menu.add(Menu.NONE, R.id.two_two, Menu.NONE,"2 X 2")
+        popupMenu.menu.add(Menu.NONE, R.id.three_three, Menu.NONE,"3 X 3")
+        popupMenu.setOnMenuItemClickListener(this::onOptionsItemSelected)
+        spliteButton.setOnTouchListener { view, _ ->
+            view.performClick()
+            popupMenu.show()
+            true
+        }
         viewSelector.displayedChild = Option.ONE_ONE.ordinal
         ItemClickSupport.addTo(thumbList).setOnItemClickListener(thumbClickHandler)
         bindService(Intent(this, DicomDataServiceBackgroud::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
@@ -94,7 +103,9 @@ class PacsDemoActivity : AppCompatActivity() {
             adapter.series.addAll(newSeries)
             Log.i("test", "fetch images ${newSeries.size}")
             adapter.notifyDataSetChanged()
-            changeSeries(0)
+            if (adapter.series.isNotEmpty()) {
+                changeSeries(0)
+            }
         }
     }
 
@@ -166,16 +177,13 @@ class PacsDemoActivity : AppCompatActivity() {
 
     private fun bindImage(position: Int, viewList: List<ImageListView>) {
         val series = (thumbList.adapter as DicomSeriesAdpater).series
-        for (i in 0 until viewList.size) {
-            val it = position + i
-            if (it >= series.size) {
-                return
-            }
-            val imageUrls = series[it].images.mapNotNull { it.files[DicomSeriesAdpater.DEFAULT] }
-            viewList[i].mode = ImageListView.Mode.SLIDE
-            viewList[i].bindUrls(imageUrls)
-            viewList[i].setOnTouchListener(TouchToControlPageListener(viewList[i]))
-        }
+        viewList.filterIndexed { index, _ -> position + index < series.size }
+                .forEachIndexed { index, view ->
+                    val imageUrls = series[position + index].images.mapNotNull { it.files[DicomSeriesAdpater.DEFAULT] }
+                    view.mode = ImageListView.Mode.SLIDE
+                    view.bindUrls(imageUrls)
+                    view.setOnTouchListener(TouchToControlPageListener(view))
+                }
     }
 
     enum class Option {

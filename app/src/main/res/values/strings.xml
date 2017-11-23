@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">PacsDemo</string>
     <string name="click_me">Click Me!</string>
-    <string name="refresh">REFRESH</string>
+    <string name="refresh">&#xf021;</string>
     <string name="stop_service">STOP SERVICE</string>
     <string name="imageContentDescription">The selected image</string>
 </resources>
