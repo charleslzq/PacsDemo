@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
+import android.view.GestureDetector
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -47,10 +48,10 @@ class PacsDemoActivity : AppCompatActivity() {
         thumbList.layoutManager = LinearLayoutManager(this)
         thumbList.itemAnimator = SlideInUpAnimator()
         popupMenu = PopupMenu(this, spliteButton)
-        popupMenu.menu.add(Menu.NONE, R.id.one_one, Menu.NONE,"1 X 1")
-        popupMenu.menu.add(Menu.NONE, R.id.one_two, Menu.NONE,"1 X 2")
-        popupMenu.menu.add(Menu.NONE, R.id.two_two, Menu.NONE,"2 X 2")
-        popupMenu.menu.add(Menu.NONE, R.id.three_three, Menu.NONE,"3 X 3")
+        popupMenu.menu.add(Menu.NONE, R.id.one_one, Menu.NONE, "1 X 1")
+        popupMenu.menu.add(Menu.NONE, R.id.one_two, Menu.NONE, "1 X 2")
+        popupMenu.menu.add(Menu.NONE, R.id.two_two, Menu.NONE, "2 X 2")
+        popupMenu.menu.add(Menu.NONE, R.id.three_three, Menu.NONE, "3 X 3")
         popupMenu.setOnMenuItemClickListener(this::onOptionsItemSelected)
         spliteButton.setOnTouchListener { view, _ ->
             view.performClick()
@@ -117,7 +118,11 @@ class PacsDemoActivity : AppCompatActivity() {
                 animatedImage.mode = ImageListView.Mode.ANIMATE
                 animatedImage.bindUrls(imageUrls, { imageSeekBar.progress = it + 1 })
                 if (imageUrls.size > 1) {
-                    animatedImage.setOnTouchListener(TouchToControlPlayListener(animatedImage))
+                    val gestureDetector = GestureDetector(this, ImageAnimationGestureListener(animatedImage))
+                    animatedImage.setOnTouchListener { _, motionEvent ->
+                        gestureDetector.onTouchEvent(motionEvent)
+                        true
+                    }
                     imageSeekBar.max = animatedImage.imageFramesState.size
                     imageSeekBar.progress = 1
                     imageSeekBar.visibility = View.VISIBLE
@@ -182,7 +187,11 @@ class PacsDemoActivity : AppCompatActivity() {
                     val imageUrls = series[position + index].images.mapNotNull { it.files[DicomSeriesAdpater.DEFAULT] }
                     view.mode = ImageListView.Mode.SLIDE
                     view.bindUrls(imageUrls)
-                    view.setOnTouchListener(TouchToControlPageListener(view))
+                    val gestureDetector = GestureDetector(this, ImageSlideGestureListener(view))
+                    view.setOnTouchListener { _, motionEvent ->
+                        gestureDetector.onTouchEvent(motionEvent)
+                        true
+                    }
                 }
     }
 

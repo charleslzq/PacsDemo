@@ -155,12 +155,30 @@ class ImageListView(
         };
 
         abstract fun init(imageListView: ImageListView)
-        open fun play(imageListView: ImageListView) {}
-        open fun pause(imageListView: ImageListView) {}
-        open fun isRunning(imageListView: ImageListView) = false
-        open fun reset(imageListView: ImageListView) {}
-        open fun nextPage(imageListView: ImageListView) {}
-        open fun previousPage(imageListView: ImageListView) {}
+        open fun play(imageListView: ImageListView) {
+            throw UnsupportedOperationException()
+        }
+
+        open fun pause(imageListView: ImageListView) {
+            throw UnsupportedOperationException()
+        }
+
+        open fun isRunning(imageListView: ImageListView): Boolean {
+            throw UnsupportedOperationException()
+        }
+
+        open fun reset(imageListView: ImageListView) {
+            throw UnsupportedOperationException()
+        }
+
+        open fun nextPage(imageListView: ImageListView) {
+            throw UnsupportedOperationException()
+        }
+
+        open fun previousPage(imageListView: ImageListView) {
+            throw UnsupportedOperationException()
+        }
+
         abstract fun changeProgress(imageListView: ImageListView, progress: Int)
         protected fun newIndex(imageListView: ImageListView, progress: Int): Int {
             return (progress + imageListView.imageFramesState.size - 1) % imageListView.imageFramesState.size
