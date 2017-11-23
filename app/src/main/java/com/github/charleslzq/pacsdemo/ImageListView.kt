@@ -23,7 +23,7 @@ class ImageListView(
     fun bindUrls(
             imageUrls: List<URI> = emptyList(),
             indexChangeListener: (Int) -> Unit = {},
-            finishListener: (ImageListView) -> Unit = { it.reset() }) {
+            finishListener: (ImageListView) -> Unit = {}) {
         imageFramesState = ImageFramesState(imageUrls, indexChangeListener, {
             finishListener.invoke(this)
         })

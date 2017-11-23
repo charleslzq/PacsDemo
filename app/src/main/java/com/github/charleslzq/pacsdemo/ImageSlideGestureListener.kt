@@ -20,7 +20,7 @@ class ImageSlideGestureListener(
     }
 
     override fun onDoubleTap(e: MotionEvent?): Boolean {
-        imageListView.changeProgress(0)
+        imageListView.changeProgress(1)
         return true
     }
 
