@@ -8,10 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.view.GestureDetector
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.*
 import com.github.charleslzq.dicom.data.DicomSeries
 import com.github.charleslzq.pacsdemo.service.DicomDataService
@@ -119,10 +116,11 @@ class PacsDemoActivity : AppCompatActivity() {
                 animatedImage.bindUrls(imageUrls, { imageSeekBar.progress = it + 1 }, { it.reset() })
                 if (imageUrls.size > 1) {
                     val gestureDetector = GestureDetector(this, ImageAnimationGestureListener(animatedImage))
-                    animatedImage.setOnTouchListener { _, motionEvent ->
-                        gestureDetector.onTouchEvent(motionEvent)
-                        true
-                    }
+                    val scaleGestureDetector = ScaleGestureDetector(this, ImageScaleGestureListener(animatedImage))
+                    animatedImage.setOnTouchListener(CompositeTouchEventListener(listOf(
+                            { _, motionEvent -> gestureDetector.onTouchEvent(motionEvent) },
+                            { _, motionEvent -> scaleGestureDetector.onTouchEvent(motionEvent) }
+                    )))
                     imageSeekBar.max = animatedImage.imageFramesState.size
                     imageSeekBar.progress = 1
                     imageSeekBar.visibility = View.VISIBLE
@@ -188,10 +186,11 @@ class PacsDemoActivity : AppCompatActivity() {
                     view.mode = ImageListView.Mode.SLIDE
                     view.bindUrls(imageUrls)
                     val gestureDetector = GestureDetector(this, ImageSlideGestureListener(view))
-                    view.setOnTouchListener { _, motionEvent ->
-                        gestureDetector.onTouchEvent(motionEvent)
-                        true
-                    }
+                    val scaleGestureDetector = ScaleGestureDetector(this, ImageScaleGestureListener(view))
+                    view.setOnTouchListener(CompositeTouchEventListener(listOf(
+                            { _, motionEvent -> gestureDetector.onTouchEvent(motionEvent) },
+                            { _, motionEvent -> scaleGestureDetector.onTouchEvent(motionEvent) }
+                    )))
                 }
     }
 
