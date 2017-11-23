@@ -12,11 +12,11 @@ import java.io.File
 /**
  * Created by charleslzq on 17-11-20.
  */
-class DicomSeriesAdpater(
+class DicomSeriesThumbListAdpater(
         val series: MutableList<DicomSeries>
-) : RecyclerView.Adapter<DicomSeriesAdpater.ViewHolder>() {
+) : RecyclerView.Adapter<DicomSeriesThumbListAdpater.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val thumbUrl = series[position].images[0].files[DicomSeriesAdpater.THUMB]
+        val thumbUrl = series[position].images[0].files[DicomSeriesThumbListAdpater.THUMB]
         holder.thumbView.setImageBitmap(BitmapFactory.decodeFile(File(thumbUrl).absolutePath))
     }
 
@@ -26,7 +26,7 @@ class DicomSeriesAdpater(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.piece_thumb_item, parent, false)
-        return DicomSeriesAdpater.ViewHolder(view)
+        return DicomSeriesThumbListAdpater.ViewHolder(view)
     }
 
     class ViewHolder(

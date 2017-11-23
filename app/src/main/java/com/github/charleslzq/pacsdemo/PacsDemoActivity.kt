@@ -41,7 +41,7 @@ class PacsDemoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_pacs_demo)
         Log.d("PacsDemoActivity", "onCreate execute")
-        thumbList.adapter = DicomSeriesAdpater(emptyList<DicomSeries>().toMutableList())
+        thumbList.adapter = DicomSeriesThumbListAdpater(emptyList<DicomSeries>().toMutableList())
         thumbList.layoutManager = LinearLayoutManager(this)
         thumbList.itemAnimator = SlideInUpAnimator()
         popupMenu = PopupMenu(this, spliteButton)
@@ -92,7 +92,7 @@ class PacsDemoActivity : AppCompatActivity() {
     private fun refresh() {
         val patient = dicomDataService?.findPatient(patientId)
         if (patient != null) {
-            val adapter = thumbList.adapter as DicomSeriesAdpater
+            val adapter = thumbList.adapter as DicomSeriesThumbListAdpater
             adapter.series.clear()
             val newSeries = patient.studies
                     .flatMap { it.series }
@@ -108,7 +108,7 @@ class PacsDemoActivity : AppCompatActivity() {
     }
 
     private fun changeSeries(position: Int) {
-        val imageUrls = (thumbList.adapter as DicomSeriesAdpater).series[position].images.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[DicomSeriesAdpater.DEFAULT] }.toList()
+        val imageUrls = (thumbList.adapter as DicomSeriesThumbListAdpater).series[position].images.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[DicomSeriesThumbListAdpater.DEFAULT] }.toList()
         when (Option.values()[viewSelector.displayedChild]) {
             PacsDemoActivity.Option.ONE_ONE -> {
                 val animatedImage = getImageViewFromView(imagePanel_1)
@@ -179,10 +179,10 @@ class PacsDemoActivity : AppCompatActivity() {
     }
 
     private fun bindImage(position: Int, viewList: List<ImageListView>) {
-        val series = (thumbList.adapter as DicomSeriesAdpater).series
+        val series = (thumbList.adapter as DicomSeriesThumbListAdpater).series
         viewList.filterIndexed { index, _ -> position + index < series.size }
                 .forEachIndexed { index, view ->
-                    val imageUrls = series[position + index].images.mapNotNull { it.files[DicomSeriesAdpater.DEFAULT] }
+                    val imageUrls = series[position + index].images.mapNotNull { it.files[DicomSeriesThumbListAdpater.DEFAULT] }
                     view.mode = ImageListView.Mode.SLIDE
                     view.bindUrls(imageUrls)
                     val gestureDetector = GestureDetector(this, ImageSlideGestureListener(view))
