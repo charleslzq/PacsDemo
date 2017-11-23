@@ -10,11 +10,11 @@ import java.net.URI
  * Created by charleslzq on 17-11-21.
  */
 class ImageFramesState(
-        val frames: List<URI>,
-        private val indexChangeListener: (Int) -> Unit,
-        private val finishListener: () -> Unit
+        val frames: List<URI>
 ) {
     val size = frames.size
+    var indexChangeListener: (Int) -> Unit = {}
+    var finishListener: () -> Unit = {}
 
     var currentIndex: Int = 0
         set(value) {

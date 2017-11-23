@@ -20,13 +20,8 @@ class ImageListView(
     var duration: Int = 40
     var mode = Mode.SLIDE
 
-    fun bindUrls(
-            imageUrls: List<URI> = emptyList(),
-            indexChangeListener: (Int) -> Unit = {},
-            finishListener: (ImageListView) -> Unit = {}) {
-        imageFramesState = ImageFramesState(imageUrls, indexChangeListener, {
-            finishListener.invoke(this)
-        })
+    fun bindUrls(imageUrls: List<URI> = emptyList()) {
+        imageFramesState = ImageFramesState(imageUrls)
         when (imageUrls.isEmpty()) {
             true -> {
                 clearAnimation()

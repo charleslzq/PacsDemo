@@ -113,8 +113,10 @@ class PacsDemoActivity : AppCompatActivity() {
             PacsDemoActivity.Option.ONE_ONE -> {
                 val animatedImage = getImageViewFromView(imagePanel_1)
                 animatedImage.mode = ImageListView.Mode.ANIMATE
-                animatedImage.bindUrls(imageUrls, { imageSeekBar.progress = it + 1 }, { it.reset() })
+                animatedImage.bindUrls(imageUrls)
                 if (imageUrls.size > 1) {
+                    animatedImage.imageFramesState.indexChangeListener = { imageSeekBar.progress = it + 1 }
+                    animatedImage.imageFramesState.finishListener = { animatedImage.reset() }
                     val gestureDetector = GestureDetector(this, ImageAnimationGestureListener(animatedImage))
                     val scaleGestureDetector = ScaleGestureDetector(this, ImageScaleGestureListener(animatedImage))
                     animatedImage.setOnTouchListener(CompositeTouchEventListener(listOf(
