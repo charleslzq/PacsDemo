@@ -15,7 +15,8 @@ class ImageCellViewHolder(
         private val baseView: View,
         private val progress: TextView = baseView.findViewById(R.id.imageProgress),
         val image: ImageListView = baseView.findViewById(R.id.imagesContainer),
-        val scaleBar: SeekBar = baseView.findViewById(R.id.imageScaleBar)
+        val scaleBar: SeekBar = baseView.findViewById(R.id.imageScaleBar),
+        val imageGestureListener: ImageListViewGestureListener = ImageListViewGestureListener(image)
 ) {
     fun bindData(seriesViewModel: PatientSeriesViewModel, mode: PresentationMode = PresentationMode.SLIDE) {
         val imageUrls = seriesViewModel.imageUrls
@@ -39,7 +40,6 @@ class ImageCellViewHolder(
                         image.reset()
                     }
                 }
-                val imageGestureListener = ImageListViewGestureListener(image)
                 imageGestureListener.listModeGestureListener = ImageAnimationGestureListener(image)
                 imageGestureListener.listModeScaleGestureListener = ImageScaleGestureListener(image)
                 imageGestureListener.toListMode()
@@ -47,7 +47,6 @@ class ImageCellViewHolder(
                 scaleBar.visibility = View.INVISIBLE
             }
             PresentationMode.SLIDE -> {
-                val imageGestureListener = ImageListViewGestureListener(image)
                 imageGestureListener.listModeGestureListener = ImageSlideGestureListener(image)
                 imageGestureListener.listModeScaleGestureListener = ImageScaleGestureListener(image)
                 imageGestureListener.toListMode()
