@@ -3,8 +3,6 @@ package com.github.charleslzq.pacsdemo.image
 import android.content.Context
 import android.graphics.Matrix
 import android.util.AttributeSet
-import android.view.GestureDetector
-import android.view.ScaleGestureDetector
 import android.widget.ImageView
 import java.net.URI
 
@@ -22,6 +20,7 @@ class ImageListView(
     lateinit var imageFramesState: ImageFramesState
     var duration: Int = 40
     var presentationMode = PresentationMode.SLIDE
+    var savedMatrix = Matrix()
 
     fun bindUrls(imageUrls: List<URI> = emptyList()) {
         imageFramesState = ImageFramesState(imageUrls)
@@ -33,6 +32,7 @@ class ImageListView(
             }
             false -> {
                 val firstImage = imageFramesState.getFrame(0)
+                savedMatrix.reset()
                 imageFramesState.rawScale = getRawScaleFactor(firstImage.width, firstImage.height)
                 requestLayout()
                 presentationMode.init(this)

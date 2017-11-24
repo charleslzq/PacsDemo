@@ -3,7 +3,6 @@ package com.github.charleslzq.pacsdemo.image
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
 import java.io.File
 import java.net.URI
@@ -35,7 +34,7 @@ class ImageFramesState(
 
     var indexChangeListener: (Int) -> Unit = {}
     var finishListener: () -> Unit = {}
-    var scaleChangeListener: (Float)-> Unit = {}
+    var scaleChangeListener: (Float) -> Unit = {}
 
     fun isFinish() = currentIndex == size - 1
 
@@ -43,10 +42,9 @@ class ImageFramesState(
 
     fun getScaledFrame(index: Int): Bitmap {
         val rawBitmap = getFrame(index)
-        val scale = rawScale * scaleFactor
-        return if (scale != 1.0f) {
-            val newWidth = (rawBitmap.width * scale).toInt()
-            val newHeight = (rawBitmap.height * scale).toInt()
+        return if (rawScale != 1.0f) {
+            val newWidth = (rawBitmap.width * rawScale).toInt()
+            val newHeight = (rawBitmap.height * rawScale).toInt()
             val resizedBitmap = Bitmap.createScaledBitmap(rawBitmap, newWidth, newHeight, false)
             rawBitmap.recycle()
             resizedBitmap

@@ -8,9 +8,10 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.widget.*
-import com.github.charleslzq.pacsdemo.image.ImageListView
 import com.github.charleslzq.pacsdemo.image.PresentationMode
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
@@ -122,7 +123,7 @@ class PacsDemoActivity : AppCompatActivity() {
                 holder.bindData(patientSeriesViewModelList[index + position])
             }
             imageSeekBar.visibility = View.INVISIBLE
-        } else if (holders.size == 1){
+        } else if (holders.size == 1) {
             val holder = holders[0]
             holder.bindData(patientSeriesViewModelList[position], PresentationMode.ANIMATE)
             if (holder.image.presentationMode == PresentationMode.ANIMATE) {
@@ -158,7 +159,7 @@ class PacsDemoActivity : AppCompatActivity() {
 
     private fun getImageViewHoldersFromPanel(): List<ImageCellViewHolder> {
         val displayedChild = viewSelector.getChildAt(viewSelector.displayedChild)
-        return when(Option.values()[viewSelector.displayedChild]) {
+        return when (Option.values()[viewSelector.displayedChild]) {
             Option.ONE_ONE -> {
                 listOf(ImageCellViewHolder(displayedChild))
             }

@@ -10,7 +10,7 @@ import android.view.View
  */
 class ImageListViewGestureListener(
         private val imageListView: ImageListView
-): View.OnTouchListener {
+) : View.OnTouchListener {
 
     var listModeGestureListener: GestureDetector.SimpleOnGestureListener = GestureDetector.SimpleOnGestureListener()
         set(value) {

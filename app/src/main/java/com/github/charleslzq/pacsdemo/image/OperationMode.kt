@@ -12,7 +12,7 @@ import android.view.View
 sealed class OperationMode(
         private val gestureDetector: GestureDetector,
         private val scaleGestureDetector: ScaleGestureDetector
-): View.OnTouchListener {
+) : View.OnTouchListener {
 
     override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
         view.performClick()
@@ -24,16 +24,16 @@ class ListMode(
         context: Context,
         gestureListener: GestureDetector.SimpleOnGestureListener = GestureDetector.SimpleOnGestureListener(),
         scaleGestureListener: ScaleGestureDetector.SimpleOnScaleGestureListener = ScaleGestureDetector.SimpleOnScaleGestureListener()
-): OperationMode(GestureDetector(context, gestureListener), ScaleGestureDetector(context, scaleGestureListener))
+) : OperationMode(GestureDetector(context, gestureListener), ScaleGestureDetector(context, scaleGestureListener))
 
 class ImageMode(
         context: Context,
         gestureListener: GestureDetector.SimpleOnGestureListener = GestureDetector.SimpleOnGestureListener(),
         scaleGestureListener: ScaleGestureDetector.SimpleOnScaleGestureListener = ScaleGestureDetector.SimpleOnScaleGestureListener()
-): OperationMode(GestureDetector(context, gestureListener), ScaleGestureDetector(context, scaleGestureListener))
+) : OperationMode(GestureDetector(context, gestureListener), ScaleGestureDetector(context, scaleGestureListener))
 
 class EditMode(
         context: Context,
         gestureListener: GestureDetector.SimpleOnGestureListener = GestureDetector.SimpleOnGestureListener(),
         scaleGestureListener: ScaleGestureDetector.SimpleOnScaleGestureListener = ScaleGestureDetector.SimpleOnScaleGestureListener()
-): OperationMode(GestureDetector(context, gestureListener), ScaleGestureDetector(context, scaleGestureListener))
+) : OperationMode(GestureDetector(context, gestureListener), ScaleGestureDetector(context, scaleGestureListener))

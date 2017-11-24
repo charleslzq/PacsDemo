@@ -8,5 +8,5 @@ import com.github.charleslzq.pacsdemo.image.ImageListView
  */
 class ImageScaleGestureListener(
         private val imageListView: ImageListView
-): ScaleGestureDetector.SimpleOnScaleGestureListener() {
+) : ScaleGestureDetector.SimpleOnScaleGestureListener() {
 }

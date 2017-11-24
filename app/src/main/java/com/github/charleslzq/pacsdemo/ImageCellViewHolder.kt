@@ -1,9 +1,12 @@
 package com.github.charleslzq.pacsdemo
 
+import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import android.widget.TextView
-import com.github.charleslzq.pacsdemo.image.*
+import com.github.charleslzq.pacsdemo.image.ImageListView
+import com.github.charleslzq.pacsdemo.image.ImageListViewGestureListener
+import com.github.charleslzq.pacsdemo.image.PresentationMode
 import com.github.charleslzq.pacsdemo.image.gesture.ImageAnimationGestureListener
 import com.github.charleslzq.pacsdemo.image.gesture.ImageModeGestureListener
 import com.github.charleslzq.pacsdemo.image.gesture.ImageScaleGestureListener
@@ -37,7 +40,7 @@ class ImageCellViewHolder(
         imageGestureListener.imageModeGestureListener = ImageModeGestureListener(image)
         imageGestureListener.listModeScaleGestureListener = ImageScaleGestureListener(image)
 
-        when(image.presentationMode) {
+        when (image.presentationMode) {
             PresentationMode.ANIMATE -> {
                 image.imageFramesState.finishListener = {
                     if (image.isRunning()) {
@@ -55,11 +58,16 @@ class ImageCellViewHolder(
                 scaleBar.max = 40
                 scaleBar.progress = 0
                 scaleBar.visibility = View.VISIBLE
-                scaleBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
+                scaleBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(p0: SeekBar?, progress: Int, fromUser: Boolean) {
                         if (fromUser) {
-                            val newScale = 1 + progress.toFloat() / 10
+                            val newScale = (1 + progress.toFloat() / 10)
+                            val scaleRatio = newScale / image.imageFramesState.scaleFactor
                             image.imageFramesState.scaleFactor = newScale
+                            Log.i("scale", "$newScale, ${image.savedMatrix}")
+                            image.savedMatrix.postScale(scaleRatio, scaleRatio)
+                            image.imageMatrix = image.savedMatrix
+                            image.invalidate()
                             if (newScale > 1) {
                                 imageGestureListener.toImageMode()
                             } else if (newScale == 1.0f) {
