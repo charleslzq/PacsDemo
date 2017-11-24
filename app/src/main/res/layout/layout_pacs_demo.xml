@@ -25,23 +25,19 @@
             android:layout_height="match_parent">
 
             <include
-                android:id="@+id/imagePanel_1"
                 layout="@layout/piece_image_item" />
 
             <LinearLayout
-                android:id="@+id/imagePanel_2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:baselineAligned="false"
                 android:orientation="horizontal">
                 <include
-                    android:id="@+id/imageColumn_1"
                     android:layout_height="match_parent"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     layout="@layout/piece_image_item" />
                 <include
-                    android:id="@+id/imageColumn_2"
                     android:layout_height="match_parent"
                     android:layout_width="0dp"
                     android:layout_weight="1"
@@ -49,18 +45,15 @@
             </LinearLayout>
 
             <TableLayout
-                android:id="@+id/imagePanel_3"
                 android:stretchColumns="*"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
                 <include
-                    android:id="@+id/imageRow_1"
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     layout="@layout/piece_image_row_2" />
                 <include
-                    android:id="@+id/imageRow_2"
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
                     android:layout_weight="1"
@@ -68,24 +61,20 @@
             </TableLayout>
 
             <TableLayout
-                android:id="@+id/imagePanel_4"
                 android:stretchColumns="*"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
                 <include
-                    android:id="@+id/imageRow_1"
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     layout="@layout/piece_image_row_3" />
                 <include
-                    android:id="@+id/imageRow_2"
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     layout="@layout/piece_image_row_3" />
                 <include
-                    android:id="@+id/imageRow_3"
                     android:layout_height="wrap_content"
                     android:layout_width="0dp"
                     android:layout_weight="1"
