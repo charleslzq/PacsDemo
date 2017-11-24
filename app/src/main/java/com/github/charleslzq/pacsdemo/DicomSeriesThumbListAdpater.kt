@@ -16,7 +16,7 @@ class DicomSeriesThumbListAdpater(
         val series: MutableList<DicomSeries>
 ) : RecyclerView.Adapter<DicomSeriesThumbListAdpater.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val thumbUrl = series[position].images[0].files[DicomSeriesThumbListAdpater.THUMB]
+        val thumbUrl = series[position].images.sortedBy { it.instanceNumber?.toInt() }[0].files[DicomSeriesThumbListAdpater.THUMB]
         holder.thumbView.setImageBitmap(BitmapFactory.decodeFile(File(thumbUrl).absolutePath))
     }
 

@@ -108,92 +108,65 @@ class PacsDemoActivity : AppCompatActivity() {
     }
 
     private fun changeSeries(position: Int) {
-        val imageUrls = (thumbList.adapter as DicomSeriesThumbListAdpater).series[position].images.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[DicomSeriesThumbListAdpater.DEFAULT] }.toList()
-        when (Option.values()[viewSelector.displayedChild]) {
-            PacsDemoActivity.Option.ONE_ONE -> {
-                val animatedImage = getImageViewFromView(imagePanel_1)
-                animatedImage.mode = ImageListView.Mode.ANIMATE
-                animatedImage.bindUrls(imageUrls)
-                if (imageUrls.size > 1) {
-                    animatedImage.imageFramesState.indexChangeListener = { imageSeekBar.progress = it + 1 }
-                    animatedImage.imageFramesState.finishListener = { animatedImage.reset() }
-                    val gestureDetector = GestureDetector(this, ImageAnimationGestureListener(animatedImage))
-                    val scaleGestureDetector = ScaleGestureDetector(this, ImageScaleGestureListener(animatedImage))
-                    animatedImage.setOnTouchListener(CompositeTouchEventListener(listOf(
-                            { _, motionEvent -> gestureDetector.onTouchEvent(motionEvent) },
-                            { _, motionEvent -> scaleGestureDetector.onTouchEvent(motionEvent) }
-                    )))
-                    imageSeekBar.max = animatedImage.imageFramesState.size
-                    imageSeekBar.progress = 1
-                    imageSeekBar.visibility = View.VISIBLE
-                    imageSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                        override fun onProgressChanged(p0: SeekBar?, progress: Int, fromUser: Boolean) {
-                            if (fromUser) {
-                                animatedImage.changeProgress(progress)
-                            }
-                        }
-
-                        override fun onStartTrackingTouch(p0: SeekBar?) {
-
-                        }
-
-                        override fun onStopTrackingTouch(p0: SeekBar?) {
-
-                        }
-                    })
-                } else if (imageUrls.size == 1) {
-                    imageSeekBar.visibility = View.INVISIBLE
+        val series = (thumbList.adapter as DicomSeriesThumbListAdpater).series
+        val holders = getImageViewHoldersFromPanel()
+        if (holders.size > 1) {
+            holders.filterIndexed { index, _ ->
+                index + position < series.size
+            }.forEachIndexed { index, holder ->
+                holder.bindData(series[index + position])
+            }
+            imageSeekBar.visibility = View.INVISIBLE
+        } else if (holders.size == 1){
+            val holder = holders[0]
+            holder.bindData(series[position], ImageListView.Mode.ANIMATE)
+            if (holder.image.mode == ImageListView.Mode.ANIMATE) {
+                val animatedImage = holder.image
+                val originalIndexListener = animatedImage.imageFramesState.indexChangeListener
+                animatedImage.imageFramesState.indexChangeListener = {
+                    originalIndexListener.invoke(it)
+                    imageSeekBar.progress = it + 1
                 }
-            }
-            PacsDemoActivity.Option.ONE_TWO -> {
-                val imageList = getRelativeLayoutFromView(imagePanel_2, R.id.imageColumn_1, R.id.imageColumn_2)
-                        .map { getImageViewFromView(it) }
-                bindImage(position, imageList)
-                imageSeekBar.visibility = View.INVISIBLE
-            }
-            PacsDemoActivity.Option.TWO_TWO -> {
-                val imageList = getTableRowFromTable(imagePanel_3, R.id.imageRow_1, R.id.imageRow_2)
-                        .flatMap { getRelativeLayoutFromView(it, R.id.imageColumn_1, R.id.imageColumn_2) }
-                        .map { getImageViewFromView(it) }
-                bindImage(position, imageList)
-                imageSeekBar.visibility = View.INVISIBLE
-            }
-            PacsDemoActivity.Option.THREE_THREE -> {
-                val imageList = getTableRowFromTable(imagePanel_4, R.id.imageRow_1, R.id.imageRow_2, R.id.imageRow_3)
-                        .flatMap { getRelativeLayoutFromView(it, R.id.imageColumn_1, R.id.imageColumn_2, R.id.imageColumn_3) }
-                        .map { getImageViewFromView(it) }
-                bindImage(position, imageList)
+                imageSeekBar.max = animatedImage.imageFramesState.size
+                imageSeekBar.progress = 1
+                imageSeekBar.visibility = View.VISIBLE
+                imageSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                    override fun onProgressChanged(p0: SeekBar?, progress: Int, fromUser: Boolean) {
+                        if (fromUser) {
+                            animatedImage.changeProgress(progress)
+                        }
+                    }
+
+                    override fun onStartTrackingTouch(p0: SeekBar?) {
+
+                    }
+
+                    override fun onStopTrackingTouch(p0: SeekBar?) {
+
+                    }
+                })
+            } else {
                 imageSeekBar.visibility = View.INVISIBLE
             }
         }
     }
 
-    private fun getImageViewFromView(view: View): ImageListView {
-        return view.findViewById(R.id.imagesContainer)
-    }
-
-    private fun getRelativeLayoutFromView(view: View, vararg id: Int): List<RelativeLayout> {
-        return id.map { view.findViewById<RelativeLayout>(it) }
-    }
-
-    private fun getTableRowFromTable(tableLayout: TableLayout, vararg id: Int): List<TableRow> {
-        return id.map { tableLayout.findViewById<TableRow>(it) }
-    }
-
-    private fun bindImage(position: Int, viewList: List<ImageListView>) {
-        val series = (thumbList.adapter as DicomSeriesThumbListAdpater).series
-        viewList.filterIndexed { index, _ -> position + index < series.size }
-                .forEachIndexed { index, view ->
-                    val imageUrls = series[position + index].images.mapNotNull { it.files[DicomSeriesThumbListAdpater.DEFAULT] }
-                    view.mode = ImageListView.Mode.SLIDE
-                    view.bindUrls(imageUrls)
-                    val gestureDetector = GestureDetector(this, ImageSlideGestureListener(view))
-                    val scaleGestureDetector = ScaleGestureDetector(this, ImageScaleGestureListener(view))
-                    view.setOnTouchListener(CompositeTouchEventListener(listOf(
-                            { _, motionEvent -> gestureDetector.onTouchEvent(motionEvent) },
-                            { _, motionEvent -> scaleGestureDetector.onTouchEvent(motionEvent) }
-                    )))
-                }
+    private fun getImageViewHoldersFromPanel(): List<ImageCellViewHolder> {
+        val displayedChild = viewSelector.getChildAt(viewSelector.displayedChild)
+        return when(Option.values()[viewSelector.displayedChild]) {
+            Option.ONE_ONE -> {
+                listOf(ImageCellViewHolder(displayedChild))
+            }
+            Option.ONE_TWO -> {
+                ViewUtils.getTypedChildren(displayedChild as LinearLayout, RelativeLayout::class.java)
+                        .map { ImageCellViewHolder(it) }
+            }
+            else -> {
+                ViewUtils.getTypedChildren(displayedChild as TableLayout, TableRow::class.java)
+                        .flatMap { ViewUtils.getTypedChildren(it, RelativeLayout::class.java) }
+                        .map { ImageCellViewHolder(it) }
+            }
+        }
     }
 
     enum class Option {
