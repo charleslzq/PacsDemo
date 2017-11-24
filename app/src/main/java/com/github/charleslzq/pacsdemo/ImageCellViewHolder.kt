@@ -5,19 +5,18 @@ import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.SeekBar
 import android.widget.TextView
-import com.github.charleslzq.dicom.data.DicomSeries
 
 /**
  * Created by charleslzq on 17-11-24.
  */
 class ImageCellViewHolder(
         private val baseView: View,
-        val progress: TextView = baseView.findViewById(R.id.imageProgress),
+        private val progress: TextView = baseView.findViewById(R.id.imageProgress),
         val image: ImageListView = baseView.findViewById(R.id.imagesContainer),
         val scaleBar: SeekBar = baseView.findViewById(R.id.imageScaleBar)
 ) {
-    fun bindData(series: DicomSeries, mode: ImageListView.Mode = ImageListView.Mode.SLIDE) {
-        val imageUrls = series.images.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[DicomSeriesThumbListAdpater.DEFAULT] }
+    fun bindData(seriesViewModel: PatientSeriesViewModel, mode: ImageListView.Mode = ImageListView.Mode.SLIDE) {
+        val imageUrls = seriesViewModel.imageUrls
         if (imageUrls.isEmpty()) {
             throw IllegalArgumentException("No Image Found!")
         }

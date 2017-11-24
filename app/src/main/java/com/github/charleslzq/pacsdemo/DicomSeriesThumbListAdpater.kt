@@ -6,22 +6,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import com.github.charleslzq.dicom.data.DicomSeries
 import java.io.File
 
 /**
  * Created by charleslzq on 17-11-20.
  */
 class DicomSeriesThumbListAdpater(
-        val series: MutableList<DicomSeries>
+        val seriesViewModels: MutableList<PatientSeriesViewModel>
 ) : RecyclerView.Adapter<DicomSeriesThumbListAdpater.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val thumbUrl = series[position].images.sortedBy { it.instanceNumber?.toInt() }[0].files[DicomSeriesThumbListAdpater.THUMB]
-        holder.thumbView.setImageBitmap(BitmapFactory.decodeFile(File(thumbUrl).absolutePath))
+        holder.thumbView.setImageBitmap(BitmapFactory.decodeFile(File(seriesViewModels[position].thumUrl).absolutePath))
     }
 
     override fun getItemCount(): Int {
-        return series.size
+        return seriesViewModels.size
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -33,10 +31,4 @@ class DicomSeriesThumbListAdpater(
             view: View,
             val thumbView: ImageView = view.findViewById(R.id.thumbView)
     ) : RecyclerView.ViewHolder(view)
-
-    companion object {
-        val THUMB = "thumb"
-        val DEFAULT = "default"
-        val RAW = "raw"
-    }
 }

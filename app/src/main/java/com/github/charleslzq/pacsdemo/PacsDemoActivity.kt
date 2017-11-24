@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.*
 import android.widget.*
-import com.github.charleslzq.dicom.data.DicomSeries
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
@@ -23,6 +22,7 @@ class PacsDemoActivity : AppCompatActivity() {
     private var dicomDataService: DicomDataService? = null
     private val patientList = listOf("03117795").toMutableList()
     private var patientId = "03117795"
+    private val patientSeriesViewModelList: MutableList<PatientSeriesViewModel> = emptyList<PatientSeriesViewModel>().toMutableList()
     private var selectedView: View? = null
     private var currentPosition = 0
     private lateinit var popupMenu: PopupMenu
@@ -41,9 +41,12 @@ class PacsDemoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_pacs_demo)
         Log.d("PacsDemoActivity", "onCreate execute")
-        thumbList.adapter = DicomSeriesThumbListAdpater(emptyList<DicomSeries>().toMutableList())
+
+        thumbList.adapter = DicomSeriesThumbListAdpater(patientSeriesViewModelList)
         thumbList.layoutManager = LinearLayoutManager(this)
         thumbList.itemAnimator = SlideInUpAnimator()
+        ItemClickSupport.addTo(thumbList).setOnItemClickListener(thumbClickHandler)
+
         popupMenu = PopupMenu(this, spliteButton)
         popupMenu.menu.add(Menu.NONE, R.id.one_one, Menu.NONE, "1 X 1")
         popupMenu.menu.add(Menu.NONE, R.id.one_two, Menu.NONE, "1 X 2")
@@ -55,8 +58,8 @@ class PacsDemoActivity : AppCompatActivity() {
             popupMenu.show()
             true
         }
+
         viewSelector.displayedChild = Option.ONE_ONE.ordinal
-        ItemClickSupport.addTo(thumbList).setOnItemClickListener(thumbClickHandler)
         bindService(Intent(this, DicomDataServiceBackgroud::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
         refresh()
         refreshButton.setOnClickListener { refresh() }
@@ -92,34 +95,34 @@ class PacsDemoActivity : AppCompatActivity() {
     private fun refresh() {
         val patient = dicomDataService?.findPatient(patientId)
         if (patient != null) {
-            val adapter = thumbList.adapter as DicomSeriesThumbListAdpater
-            adapter.series.clear()
+            patientSeriesViewModelList.clear()
             val newSeries = patient.studies
-                    .flatMap { it.series }
-                    .sortedBy { it.metaInfo.instanceUID }
+                    .flatMap { study ->
+                        study.series.map { PatientSeriesViewModel(patient.metaInfo, study.metaInfo, it) }
+                    }
+                    .sortedBy { it.dicomSeries.metaInfo.instanceUID }
                     .toList()
-            adapter.series.addAll(newSeries)
+            patientSeriesViewModelList.addAll(newSeries)
             Log.i("test", "fetch images ${newSeries.size}")
-            adapter.notifyDataSetChanged()
-            if (adapter.series.isNotEmpty()) {
+            thumbList.adapter.notifyDataSetChanged()
+            if (patientSeriesViewModelList.isNotEmpty()) {
                 changeSeries(0)
             }
         }
     }
 
     private fun changeSeries(position: Int) {
-        val series = (thumbList.adapter as DicomSeriesThumbListAdpater).series
         val holders = getImageViewHoldersFromPanel()
         if (holders.size > 1) {
             holders.filterIndexed { index, _ ->
-                index + position < series.size
+                index + position < patientSeriesViewModelList.size
             }.forEachIndexed { index, holder ->
-                holder.bindData(series[index + position])
+                holder.bindData(patientSeriesViewModelList[index + position])
             }
             imageSeekBar.visibility = View.INVISIBLE
         } else if (holders.size == 1){
             val holder = holders[0]
-            holder.bindData(series[position], ImageListView.Mode.ANIMATE)
+            holder.bindData(patientSeriesViewModelList[position], ImageListView.Mode.ANIMATE)
             if (holder.image.mode == ImageListView.Mode.ANIMATE) {
                 val animatedImage = holder.image
                 val originalIndexListener = animatedImage.imageFramesState.indexChangeListener
