@@ -1,28 +1,26 @@
-package com.github.charleslzq.pacsdemo
+package com.github.charleslzq.pacsdemo.image
 
 import android.view.GestureDetector
 import android.view.MotionEvent
-import android.view.View
 
 /**
  * Created by charleslzq on 17-11-23.
  */
-class ImageSlideGestureListener(
+class ImageAnimationGestureListener(
         private val imageListView: ImageListView
 ) : GestureDetector.SimpleOnGestureListener() {
 
     override fun onSingleTapConfirmed(motionEvent: MotionEvent): Boolean {
-        when (isRightSide(imageListView, motionEvent)) {
-            true -> imageListView.nextPage()
-            false -> imageListView.previousPage()
+        if (imageListView.isRunning()) {
+            imageListView.pause()
+        } else {
+            imageListView.play()
         }
         return true
     }
 
     override fun onDoubleTap(e: MotionEvent?): Boolean {
-        imageListView.changeProgress(1)
+        imageListView.reset()
         return true
     }
-
-    private fun isRightSide(view: View, motionEvent: MotionEvent) = motionEvent.x > view.measuredWidth / 2
 }

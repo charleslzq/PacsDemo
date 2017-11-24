@@ -5,6 +5,7 @@ import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.SeekBar
 import android.widget.TextView
+import com.github.charleslzq.pacsdemo.image.*
 
 /**
  * Created by charleslzq on 17-11-24.

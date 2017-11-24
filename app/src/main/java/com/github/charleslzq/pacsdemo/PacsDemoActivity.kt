@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.*
 import android.widget.*
+import com.github.charleslzq.pacsdemo.image.ImageListView
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud

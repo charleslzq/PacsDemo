@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo
+package com.github.charleslzq.pacsdemo.image
 
 /**
  * Created by charleslzq on 17-11-22.

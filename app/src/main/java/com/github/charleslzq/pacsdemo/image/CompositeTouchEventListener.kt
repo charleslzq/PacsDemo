@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo
+package com.github.charleslzq.pacsdemo.image
 
 import android.view.MotionEvent
 import android.view.View

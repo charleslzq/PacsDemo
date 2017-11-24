@@ -5,7 +5,7 @@
     android:padding="3dp"
     android:background="@drawable/border_thumb">
 
-    <com.github.charleslzq.pacsdemo.ImageListView
+    <com.github.charleslzq.pacsdemo.image.ImageListView
         android:id="@+id/imagesContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
