@@ -72,9 +72,6 @@ enum class PresentationMode {
             imageListView.clearAnimation()
             imageListView.background = null
             imageListView.setImageBitmap(firstImage)
-            imageListView.imageFramesState.scaleChangeListener = {
-                imageListView.changeProgress(imageListView.imageFramesState.currentIndex + 1)
-            }
         }
     };
 
