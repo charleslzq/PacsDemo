@@ -1,11 +1,12 @@
 package com.github.charleslzq.pacsdemo
 
-import android.view.GestureDetector
-import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.SeekBar
 import android.widget.TextView
 import com.github.charleslzq.pacsdemo.image.*
+import com.github.charleslzq.pacsdemo.image.gesture.ImageAnimationGestureListener
+import com.github.charleslzq.pacsdemo.image.gesture.ImageScaleGestureListener
+import com.github.charleslzq.pacsdemo.image.gesture.ImageSlideGestureListener
 
 /**
  * Created by charleslzq on 17-11-24.
@@ -16,14 +17,13 @@ class ImageCellViewHolder(
         val image: ImageListView = baseView.findViewById(R.id.imagesContainer),
         val scaleBar: SeekBar = baseView.findViewById(R.id.imageScaleBar)
 ) {
-    fun bindData(seriesViewModel: PatientSeriesViewModel, mode: ImageListView.Mode = ImageListView.Mode.SLIDE) {
+    fun bindData(seriesViewModel: PatientSeriesViewModel, mode: PresentationMode = PresentationMode.SLIDE) {
         val imageUrls = seriesViewModel.imageUrls
         if (imageUrls.isEmpty()) {
             throw IllegalArgumentException("No Image Found!")
         }
-        val scaleGestureDetector = ScaleGestureDetector(baseView.context, ImageScaleGestureListener(image))
 
-        image.mode = mode
+        image.presentationMode = mode
         image.bindUrls(imageUrls)
 
         if (imageUrls.size > 1) {
@@ -32,26 +32,18 @@ class ImageCellViewHolder(
         setProgress(0)
         progress.visibility = View.VISIBLE
 
-        when(image.mode) {
-            ImageListView.Mode.ANIMATE -> {
+        when(image.presentationMode) {
+            PresentationMode.ANIMATE -> {
                 image.imageFramesState.finishListener = {
                     if (image.isRunning()) {
                         image.reset()
                     }
                 }
-                val gestureDetector = GestureDetector(baseView.context, ImageAnimationGestureListener(image))
-                image.setOnTouchListener(CompositeTouchEventListener(listOf(
-                        { _, motionEvent -> gestureDetector.onTouchEvent(motionEvent) },
-                        { _, motionEvent -> scaleGestureDetector.onTouchEvent(motionEvent) }
-                )))
+                image.operationMode = ListMode(baseView.context, ImageAnimationGestureListener(image), ImageScaleGestureListener(image))
                 scaleBar.visibility = View.INVISIBLE
             }
-            ImageListView.Mode.SLIDE -> {
-                val gestureDetector = GestureDetector(baseView.context, ImageSlideGestureListener(image))
-                image.setOnTouchListener(CompositeTouchEventListener(listOf(
-                        { _, motionEvent -> gestureDetector.onTouchEvent(motionEvent) },
-                        { _, motionEvent -> scaleGestureDetector.onTouchEvent(motionEvent) }
-                )))
+            PresentationMode.SLIDE -> {
+                image.operationMode = ListMode(baseView.context, ImageSlideGestureListener(image), ImageScaleGestureListener(image))
                 scaleBar.visibility = View.VISIBLE
             }
         }

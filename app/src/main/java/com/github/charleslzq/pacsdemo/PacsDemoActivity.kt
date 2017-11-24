@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import com.github.charleslzq.pacsdemo.image.ImageListView
+import com.github.charleslzq.pacsdemo.image.PresentationMode
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
@@ -123,8 +124,8 @@ class PacsDemoActivity : AppCompatActivity() {
             imageSeekBar.visibility = View.INVISIBLE
         } else if (holders.size == 1){
             val holder = holders[0]
-            holder.bindData(patientSeriesViewModelList[position], ImageListView.Mode.ANIMATE)
-            if (holder.image.mode == ImageListView.Mode.ANIMATE) {
+            holder.bindData(patientSeriesViewModelList[position], PresentationMode.ANIMATE)
+            if (holder.image.presentationMode == PresentationMode.ANIMATE) {
                 val animatedImage = holder.image
                 val originalIndexListener = animatedImage.imageFramesState.indexChangeListener
                 animatedImage.imageFramesState.indexChangeListener = {
