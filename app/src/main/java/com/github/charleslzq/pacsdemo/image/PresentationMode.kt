@@ -64,14 +64,17 @@ enum class PresentationMode {
             val index = newIndex(imageListView, progress)
             imageListView.clearAnimation()
             imageListView.imageFramesState.currentIndex = index
-            imageListView.setImageBitmap(imageListView.imageFramesState.getFrame(index))
+            imageListView.setImageBitmap(imageListView.imageFramesState.getScaledFrame(index))
         }
 
         override fun init(imageListView: ImageListView) {
-            val firstImage = imageListView.imageFramesState.getFrame(0)
+            val firstImage = imageListView.imageFramesState.getScaledFrame(0)
             imageListView.clearAnimation()
             imageListView.background = null
             imageListView.setImageBitmap(firstImage)
+            imageListView.imageFramesState.scaleChangeListener = {
+                imageListView.changeProgress(imageListView.imageFramesState.currentIndex + 1)
+            }
         }
     };
 

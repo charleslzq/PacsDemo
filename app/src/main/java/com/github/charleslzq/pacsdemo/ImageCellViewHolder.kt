@@ -39,11 +39,19 @@ class ImageCellViewHolder(
                         image.reset()
                     }
                 }
-                image.operationMode = ListMode(baseView.context, ImageAnimationGestureListener(image), ImageScaleGestureListener(image))
+                val imageGestureListener = ImageListViewGestureListener(image)
+                imageGestureListener.listModeGestureListener = ImageAnimationGestureListener(image)
+                imageGestureListener.listModeScaleGestureListener = ImageScaleGestureListener(image)
+                imageGestureListener.toListMode()
+                image.setOnTouchListener(imageGestureListener)
                 scaleBar.visibility = View.INVISIBLE
             }
             PresentationMode.SLIDE -> {
-                image.operationMode = ListMode(baseView.context, ImageSlideGestureListener(image), ImageScaleGestureListener(image))
+                val imageGestureListener = ImageListViewGestureListener(image)
+                imageGestureListener.listModeGestureListener = ImageSlideGestureListener(image)
+                imageGestureListener.listModeScaleGestureListener = ImageScaleGestureListener(image)
+                imageGestureListener.toListMode()
+                image.setOnTouchListener(imageGestureListener)
                 scaleBar.visibility = View.VISIBLE
             }
         }

@@ -2,6 +2,8 @@ package com.github.charleslzq.pacsdemo.image
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.GestureDetector
+import android.view.ScaleGestureDetector
 import android.widget.ImageView
 import java.net.URI
 
@@ -19,17 +21,6 @@ class ImageListView(
     lateinit var imageFramesState: ImageFramesState
     var duration: Int = 40
     var presentationMode = PresentationMode.SLIDE
-    var operationMode: OperationMode = ListMode(context)
-        set(value) {
-            if (field != value) {
-                field = value
-                this.setOnTouchListener(field)
-            }
-        }
-
-    init {
-        this.setOnTouchListener(operationMode)
-    }
 
     fun bindUrls(imageUrls: List<URI> = emptyList()) {
         imageFramesState = ImageFramesState(imageUrls)
@@ -41,7 +32,7 @@ class ImageListView(
             }
             false -> {
                 val firstImage = imageFramesState.getFrame(0)
-                layoutParams.width = Math.ceil(measuredHeight * firstImage.height / firstImage.width.toDouble()).toInt()
+                imageFramesState.rawScale = getRawScaleFactor(firstImage.width, firstImage.height)
                 requestLayout()
                 presentationMode.init(this)
             }
@@ -86,6 +77,19 @@ class ImageListView(
 
     override fun performClick(): Boolean {
         return super.performClick()
+    }
+
+    private fun getRawScaleFactor(imageWidth: Int, imageHeight: Int): Float {
+        val ratio = imageWidth.toFloat() / imageHeight.toFloat()
+        val desiredWidth = Math.ceil((measuredHeight * ratio).toDouble()).toInt()
+        return if (desiredWidth <= measuredWidth) {
+            layoutParams.width = desiredWidth
+            desiredWidth.toFloat() / imageWidth
+        } else {
+            val desiredHeight = Math.ceil((measuredWidth / ratio).toDouble()).toInt()
+            layoutParams.height = desiredHeight
+            desiredHeight.toFloat() / imageHeight
+        }
     }
 
     private fun getListAnimation(): IndexListenableAnimationDrawable {

@@ -1,7 +1,9 @@
 package com.github.charleslzq.pacsdemo.image
 
 import android.content.res.Resources
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
 import java.io.File
 import java.net.URI
@@ -13,8 +15,14 @@ class ImageFramesState(
         val frames: List<URI>
 ) {
     val size = frames.size
-    var indexChangeListener: (Int) -> Unit = {}
-    var finishListener: () -> Unit = {}
+    var rawScale = 1.0f
+    var scaleFactor = 1.0f
+        set(value) {
+            if (field != value) {
+                field = value
+                scaleChangeListener.invoke(field)
+            }
+        }
 
     var currentIndex: Int = 0
         set(value) {
@@ -25,9 +33,27 @@ class ImageFramesState(
             }
         }
 
+    var indexChangeListener: (Int) -> Unit = {}
+    var finishListener: () -> Unit = {}
+    var scaleChangeListener: (Float)-> Unit = {}
+
     fun isFinish() = currentIndex == size - 1
 
     fun getFrame(index: Int) = BitmapFactory.decodeFile(File(frames[index % size]).absolutePath)
+
+    fun getScaledFrame(index: Int): Bitmap {
+        val rawBitmap = getFrame(index)
+        val scale = rawScale * scaleFactor
+        return if (scale != 1.0f) {
+            val newWidth = (rawBitmap.width * scale).toInt()
+            val newHeight = (rawBitmap.height * scale).toInt()
+            val resizedBitmap = Bitmap.createScaledBitmap(rawBitmap, newWidth, newHeight, false)
+            rawBitmap.recycle()
+            resizedBitmap
+        } else {
+            rawBitmap
+        }
+    }
 
     fun getAnimation(resources: Resources, duration: Int): IndexListenableAnimationDrawable {
         val animation = IndexListenableAnimationDrawable(currentIndex, this::currentIndex::set)
