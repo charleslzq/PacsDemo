@@ -11,7 +11,7 @@ object ObserverUtil {
     fun <T> register(kProperty0: KProperty0<T>, observer: (T) -> Unit) {
         val delegate = kProperty0.apply { isAccessible = true }.getDelegate()
         if (delegate != null) {
-            (delegate as ObservablePropertyWithObservers<T>).register(observer)
+            (delegate as ObservablePropertyWithObservers<T>).registerObserver(observer)
         }
     }
 

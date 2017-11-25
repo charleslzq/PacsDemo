@@ -1,6 +1,5 @@
 package com.github.charleslzq.pacsdemo.observe
 
-import java.util.*
 import kotlin.properties.ObservableProperty
 import kotlin.reflect.KProperty
 
@@ -9,22 +8,24 @@ import kotlin.reflect.KProperty
  */
 class ObservablePropertyWithObservers<T>(
         initialValue: T
-): ObservableProperty<T>(initialValue) {
+): ObservableProperty<T>(initialValue), WithObservers<(T)->Unit> {
     private val observerMap: MutableMap<String, (T) -> Unit> = emptyMap<String, (T) -> Unit>().toMutableMap()
 
-    fun register(observer: (T) -> Unit, name: String = UUID.randomUUID().toString()) {
+    override fun registerObserver(observer: (T) -> Unit, name: String) {
         observerMap[name] = observer
     }
 
-    fun remove(name: String) {
+    override fun removeObserver(name: String) {
         observerMap.remove(name)
     }
 
-    fun clear() {
+    override fun clearObservers() {
         observerMap.clear()
     }
 
     override fun afterChange(property: KProperty<*>, oldValue: T, newValue: T) {
-        observerMap.values.forEach { it(newValue) }
+        if (oldValue != newValue) {
+            observerMap.values.forEach { it(newValue) }
+        }
     }
 }
