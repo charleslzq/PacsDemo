@@ -4,8 +4,11 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
+import android.util.Log
+import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
 import java.io.File
 import java.net.URI
+import kotlin.properties.Delegates
 
 /**
  * Created by charleslzq on 17-11-21.
@@ -23,14 +26,7 @@ class ImageFramesState(
             }
         }
 
-    var currentIndex: Int = 0
-        set(value) {
-            field = value % size
-            indexChangeListener.invoke(field)
-            if (isFinish()) {
-                finishListener.invoke()
-            }
-        }
+    var currentIndex: Int by ObservablePropertyWithObservers(0)
 
     var indexChangeListener: (Int) -> Unit = {}
     var finishListener: () -> Unit = {}
