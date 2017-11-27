@@ -79,7 +79,6 @@ class DicomImageViewBinder(
 
                 onModelChange(newModel::currentIndex) { _, newIndex ->
                     imageView.clearAnimation()
-                    newModel.currentIndex = newIndex
                     imageView.setImageBitmap(newModel.getScaledFrame(newIndex))
                 }
                 onModelChange(newModel::matrix) { _, newMatrix ->

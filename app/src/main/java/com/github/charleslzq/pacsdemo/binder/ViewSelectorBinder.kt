@@ -1,5 +1,6 @@
 package com.github.charleslzq.pacsdemo.binder
 
+import android.graphics.ColorMatrix
 import android.graphics.Matrix
 import android.widget.*
 import com.github.charleslzq.pacsdemo.ViewUtils
@@ -72,6 +73,7 @@ class ViewSelectorBinder(
         model.imageFramesViewModel.currentIndex = 0
         model.imageFramesViewModel.playing = false
         model.imageFramesViewModel.matrix = Matrix()
+        model.imageFramesViewModel.colorMatrix = ColorMatrix()
         model.imageFramesViewModel.scaleFactor = 1.0f
         model.imageFramesViewModel.startOffset = 0
     }
