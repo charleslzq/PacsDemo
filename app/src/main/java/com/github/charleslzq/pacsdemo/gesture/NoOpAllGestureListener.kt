@@ -6,7 +6,7 @@ import android.view.ScaleGestureDetector
 /**
  * Created by charleslzq on 17-11-27.
  */
-open class SimpleAllGestureListener : GestureDetector.SimpleOnGestureListener(), ScaleGestureDetector.OnScaleGestureListener {
+open class NoOpAllGestureListener : GestureDetector.SimpleOnGestureListener(), ScaleGestureDetector.OnScaleGestureListener {
 
     override fun onScaleBegin(p0: ScaleGestureDetector?): Boolean {
         return false

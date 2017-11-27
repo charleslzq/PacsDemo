@@ -4,12 +4,9 @@ import android.graphics.ColorMatrixColorFilter
 import android.util.Log
 import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.IndexListenableAnimationDrawable
-import com.github.charleslzq.pacsdemo.gesture.OperationMode
-import com.github.charleslzq.pacsdemo.gesture.PlayMode
-import com.github.charleslzq.pacsdemo.gesture.PlayModeGestureListener
+import com.github.charleslzq.pacsdemo.gesture.*
 import com.github.charleslzq.pacsdemo.gesture.PresentationMode.ANIMATE
 import com.github.charleslzq.pacsdemo.gesture.PresentationMode.SLIDE
-import com.github.charleslzq.pacsdemo.gesture.SimpleAllGestureListener
 import com.github.charleslzq.pacsdemo.vo.ImageFramesViewModel
 
 /**
@@ -18,7 +15,7 @@ import com.github.charleslzq.pacsdemo.vo.ImageFramesViewModel
 class DicomImageViewBinder(
         imageView: ImageView
 ) : ViewBinder<ImageView, ImageFramesViewModel>(imageView) {
-    var operationMode: OperationMode = PlayMode(view.context, SimpleAllGestureListener())
+    var operationMode: OperationMode = PlayMode(view.context, NoOpAllGestureListener())
         set(value) {
             field = value
             view.setOnTouchListener(operationMode)
@@ -83,6 +80,11 @@ class DicomImageViewBinder(
                 }
                 onModelChange(newModel::matrix) { _, newMatrix ->
                     view.imageMatrix = newMatrix
+                }
+                onModelChange(newModel::scaleFactor) { _, newScale ->
+                    if (newScale > 1 && operationMode is PlayMode) {
+                        operationMode = StudyMode(view.context, StudyModeGestureListenerPlayModeGestureListener(newModel))
+                    }
                 }
             }
         }

@@ -22,15 +22,15 @@ sealed class OperationMode(
 
 class PlayMode(
         context: Context,
-        allGestureListener: SimpleAllGestureListener
+        allGestureListener: NoOpAllGestureListener
 ) : OperationMode(GestureDetector(context, allGestureListener), ScaleGestureDetector(context, allGestureListener))
 
 class StudyMode(
         context: Context,
-        allGestureListener: SimpleAllGestureListener
+        allGestureListener: NoOpAllGestureListener
 ) : OperationMode(GestureDetector(context, allGestureListener), ScaleGestureDetector(context, allGestureListener))
 
 class MeasureMode(
         context: Context,
-        allGestureListener: SimpleAllGestureListener
+        allGestureListener: NoOpAllGestureListener
 ) : OperationMode(GestureDetector(context, allGestureListener), ScaleGestureDetector(context, allGestureListener))

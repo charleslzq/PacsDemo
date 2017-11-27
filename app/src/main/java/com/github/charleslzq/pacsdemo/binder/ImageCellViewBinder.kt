@@ -12,11 +12,13 @@ class ImageCellViewBinder(
 ) : ViewBinder<View, PatientSeriesViewModel>(baseView) {
     private val progressTextBinder = ProgressTextViewBinder(baseView.findViewById(R.id.imageProgress))
     private val imageBinder = DicomImageViewBinder(baseView.findViewById(R.id.imagesContainer))
+    private val imageScaleBar = ImageScaleBarBinder(baseView.findViewById(R.id.imageScaleBar))
 
     init {
         onNewModel {
             progressTextBinder.model = it?.imageFramesViewModel
             imageBinder.model = it?.imageFramesViewModel
+            imageScaleBar.model = it?.imageFramesViewModel
         }
     }
 }

@@ -14,7 +14,7 @@ class PlayModeGestureListener(
         val viewWidth: Int,
         val viewHeight: Int,
         val framesViewModel: ImageFramesViewModel
-) : SimpleAllGestureListener() {
+) : NoOpAllGestureListener() {
 
     override fun onSingleTapConfirmed(motionEvent: MotionEvent): Boolean {
         Log.i("click", "$viewHeight: $viewWidth / ${motionEvent.x}, ${framesViewModel.presentationMode}")
