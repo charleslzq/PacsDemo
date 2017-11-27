@@ -1,0 +1,41 @@
+package com.github.charleslzq.pacsdemo.binder
+
+import android.view.View
+import com.github.charleslzq.pacsdemo.R
+import com.github.charleslzq.pacsdemo.vo.PacsDemoViewModel
+
+/**
+ * Created by charleslzq on 17-11-27.
+ */
+class PacsMainViewBinder(
+        mainView: View
+) : ViewBinder<View, PacsDemoViewModel>(mainView) {
+    private val thumbListViewBinder = ThumbListViewBinder(view.findViewById(R.id.thumbList))
+    private val viewSelectorBinder = ViewSelectorBinder(view.findViewById(R.id.viewSelector))
+    private val imageProgressBarBinder = ImageProgressBarBinder(view.findViewById(R.id.imageSeekBar))
+
+    init {
+        onNewModel {
+            thumbListViewBinder.model = it
+            viewSelectorBinder.model = it
+            if (it != null) {
+                it.selected = 0
+//                onModelChange(it::selected) { _, _ ->
+//                    resetProgress()
+//                }
+            }
+//            if (it != null && it.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
+//                resetProgress()
+//            }
+        }
+    }
+
+//    fun resetProgress() {
+//        if (model != null && model!!.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
+//            val patientModel = viewSelectorBinder.getImageViewBindersFromPanel()[0].model
+//            if (patientModel != null) {
+//                imageProgressBarBinder.model = patientModel.imageFramesViewModel
+//            }
+//        }
+//    }
+}

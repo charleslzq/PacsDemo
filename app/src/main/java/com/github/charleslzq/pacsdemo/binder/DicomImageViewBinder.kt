@@ -31,9 +31,6 @@ class DicomImageViewBinder(
         onNewModel { newModel ->
             if (newModel != null && newModel.size != 0) {
                 newModel.autoAdjustScale(view)
-                onModelChange(newModel::presentationMode) { _, _ ->
-                    init(newModel, view)
-                }
                 init(newModel, view)
             } else {
                 view.clearAnimation()
@@ -44,7 +41,7 @@ class DicomImageViewBinder(
     }
 
     private fun init(newModel: ImageFramesViewModel, imageView: ImageView) {
-        operationMode = PlayMode(view.context, PlayModeGestureListener(view.measuredWidth, view.measuredHeight, newModel))
+        operationMode = PlayMode(view.context, PlayModeGestureListener(view.width, view.height, newModel))
 
         when (newModel.presentationMode) {
             ANIMATE -> {

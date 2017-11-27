@@ -1,7 +1,6 @@
 package com.github.charleslzq.pacsdemo.vo
 
 import com.github.charleslzq.dicom.data.DicomPatientMetaInfo
-import com.github.charleslzq.dicom.data.DicomSeries
 import com.github.charleslzq.dicom.data.DicomSeriesMetaInfo
 import com.github.charleslzq.dicom.data.DicomStudyMetaInfo
 import java.net.URI

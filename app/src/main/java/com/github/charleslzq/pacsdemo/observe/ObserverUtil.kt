@@ -1,5 +1,6 @@
 package com.github.charleslzq.pacsdemo.observe
 
+import java.util.*
 import kotlin.reflect.KProperty0
 import kotlin.reflect.jvm.isAccessible
 
@@ -8,10 +9,17 @@ import kotlin.reflect.jvm.isAccessible
  */
 object ObserverUtil {
 
-    fun <T> register(kProperty0: KProperty0<T>, observer: (T, T) -> Unit) {
+    fun <T> registerObserver(kProperty0: KProperty0<T>, observer: (T, T) -> Unit, name: String = UUID.randomUUID().toString()) {
         val delegate = kProperty0.apply { isAccessible = true }.getDelegate()
         if (delegate != null) {
-            (delegate as ObservablePropertyWithObservers<T>).registerObserver(observer)
+            (delegate as ObservablePropertyWithObservers<T>).registerObserver(observer, name)
+        }
+    }
+
+    fun removeObserver(kProperty0: KProperty0<*>, name: String) {
+        val delegate = kProperty0.apply { isAccessible = true }.getDelegate()
+        if (delegate != null) {
+            (delegate as ObservablePropertyWithObservers<*>).removeObserver(name)
         }
     }
 

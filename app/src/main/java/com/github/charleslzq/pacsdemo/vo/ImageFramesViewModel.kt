@@ -10,7 +10,7 @@ import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.IndexListenableAnimationDrawable
 import com.github.charleslzq.pacsdemo.gesture.PresentationMode
 import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
-import com.github.charleslzq.pacsdemo.observe.ObserverUtil.register
+import com.github.charleslzq.pacsdemo.observe.ObserverUtil.registerObserver
 import java.io.File
 import java.net.URI
 
@@ -22,8 +22,7 @@ data class ImageFramesViewModel(
 ) {
     val size = frames.size
     var duration: Int = 40
-    private var rawScale = 1.0f
-    var scaleFactor by ObservablePropertyWithObservers(1.0f)
+    var scaleFactor: Float by ObservablePropertyWithObservers(1.0f)
     var currentIndex: Int by ObservablePropertyWithObservers(0)
     var startOffset: Int = 0
     var presentationMode = PresentationMode.SLIDE
@@ -35,17 +34,17 @@ data class ImageFramesViewModel(
     var matrix by ObservablePropertyWithObservers(Matrix())
     var playing by ObservablePropertyWithObservers(false)
 
+    private var rawScale = 1.0f
+
     init {
         matrix.reset()
-        register(this::scaleFactor, { oldScale, newScale ->
+        registerObserver(this::scaleFactor, { oldScale, newScale ->
             val newMatrix = Matrix(matrix)
             val scale = newScale / oldScale
             newMatrix.postScale(scale, scale)
             matrix = newMatrix
         })
     }
-
-    fun isFinish() = currentIndex == size - 1
 
     fun autoAdjustScale(view: View) {
         if (frames.isNotEmpty()) {
@@ -93,7 +92,7 @@ data class ImageFramesViewModel(
         }
         animation.selectDrawable(0)
         animation.callback = null
-        register(animation::currentIndex, { _, newIndex ->
+        registerObserver(animation::currentIndex, { _, newIndex ->
             currentIndex = (startOffset + newIndex) % size
         })
         return animation

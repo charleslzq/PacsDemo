@@ -1,5 +1,6 @@
 package com.github.charleslzq.pacsdemo.gesture
 
+import android.util.Log
 import android.view.MotionEvent
 import com.github.charleslzq.pacsdemo.gesture.PresentationMode.ANIMATE
 import com.github.charleslzq.pacsdemo.gesture.PresentationMode.SLIDE
@@ -15,6 +16,7 @@ class PlayModeGestureListener(
 ) : SimpleAllGestureListener() {
 
     override fun onSingleTapConfirmed(motionEvent: MotionEvent): Boolean {
+        Log.i("click", "$viewHeight: $viewWidth / ${motionEvent.x}, ${framesViewModel.presentationMode}")
         when (framesViewModel.presentationMode) {
             ANIMATE -> framesViewModel.playing = !framesViewModel.playing
             SLIDE -> {
