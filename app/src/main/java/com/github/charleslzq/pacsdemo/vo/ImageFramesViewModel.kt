@@ -3,6 +3,7 @@ package com.github.charleslzq.pacsdemo.vo
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.ColorMatrix
 import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
 import android.view.View
@@ -32,6 +33,7 @@ data class ImageFramesViewModel(
             }
         }
     var matrix by ObservablePropertyWithObservers(Matrix())
+    var colorMatrix by ObservablePropertyWithObservers(ColorMatrix())
     var playing by ObservablePropertyWithObservers(false)
 
     private var rawScale = 1.0f

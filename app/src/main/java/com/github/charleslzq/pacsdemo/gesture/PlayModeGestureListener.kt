@@ -41,6 +41,7 @@ class PlayModeGestureListener(
         if (framesViewModel.presentationMode == ANIMATE) {
             framesViewModel.playing = false
         }
+        framesViewModel.colorMatrix.reset()
         framesViewModel.currentIndex = 0
         return true
     }

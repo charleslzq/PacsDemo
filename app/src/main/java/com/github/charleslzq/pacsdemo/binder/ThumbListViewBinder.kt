@@ -1,6 +1,7 @@
 package com.github.charleslzq.pacsdemo.binder
 
 import ItemClickSupport
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.github.charleslzq.pacsdemo.DicomSeriesThumbListAdpater
@@ -16,6 +17,7 @@ class ThumbListViewBinder(
 
     init {
         view.adapter = DicomSeriesThumbListAdpater(emptyList<PatientSeriesViewModel>().toMutableList())
+        view.layoutManager = LinearLayoutManager(recyclerView.context)
         onNewModel { newModel ->
             when (newModel != null && newModel.seriesList.isNotEmpty()) {
                 true -> {

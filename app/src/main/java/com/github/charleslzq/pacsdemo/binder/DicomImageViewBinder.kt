@@ -1,5 +1,6 @@
 package com.github.charleslzq.pacsdemo.binder
 
+import android.graphics.ColorMatrixColorFilter
 import android.util.Log
 import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.IndexListenableAnimationDrawable
@@ -42,6 +43,10 @@ class DicomImageViewBinder(
 
     private fun init(newModel: ImageFramesViewModel, imageView: ImageView) {
         operationMode = PlayMode(view.context, PlayModeGestureListener(view.width, view.height, newModel))
+
+        onModelChange(newModel::colorMatrix) { _, newMatrix ->
+            imageView.colorFilter = ColorMatrixColorFilter(newMatrix)
+        }
 
         when (newModel.presentationMode) {
             ANIMATE -> {

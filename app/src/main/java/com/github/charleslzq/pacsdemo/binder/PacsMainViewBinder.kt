@@ -13,11 +13,13 @@ class PacsMainViewBinder(
     private val thumbListViewBinder = ThumbListViewBinder(view.findViewById(R.id.thumbList))
     private val viewSelectorBinder = ViewSelectorBinder(view.findViewById(R.id.viewSelector))
     private val imageProgressBarBinder = ImageProgressBarBinder(view.findViewById(R.id.imageSeekBar))
+    private val buttonPanelBinder = ButtonPanelBinder(view.findViewById(R.id.buttonPanel))
 
     init {
         onNewModel {
             thumbListViewBinder.model = it
             viewSelectorBinder.model = it
+            buttonPanelBinder.model = it
             if (it != null) {
                 it.selected = 0
                 onModelChange(it::selected) { _, _ ->
