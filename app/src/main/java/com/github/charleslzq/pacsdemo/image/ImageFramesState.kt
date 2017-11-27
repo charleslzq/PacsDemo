@@ -4,11 +4,10 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
-import android.util.Log
 import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
+import com.github.charleslzq.pacsdemo.observe.ObserverUtil
 import java.io.File
 import java.net.URI
-import kotlin.properties.Delegates
 
 /**
  * Created by charleslzq on 17-11-21.
@@ -27,8 +26,8 @@ class ImageFramesState(
         }
 
     var currentIndex: Int by ObservablePropertyWithObservers(0)
+    var startOffset: Int = 0
 
-    var indexChangeListener: (Int) -> Unit = {}
     var finishListener: () -> Unit = {}
     var scaleChangeListener: (Float) -> Unit = {}
 
@@ -50,7 +49,8 @@ class ImageFramesState(
     }
 
     fun getAnimation(resources: Resources, duration: Int): IndexListenableAnimationDrawable {
-        val animation = IndexListenableAnimationDrawable(currentIndex, this::currentIndex::set)
+        startOffset = currentIndex
+        val animation = IndexListenableAnimationDrawable()
         animation.isOneShot = true
         frames.subList(currentIndex, size).forEachIndexed { index, _ ->
             animation.addFrame(
@@ -59,6 +59,9 @@ class ImageFramesState(
         }
         animation.selectDrawable(0)
         animation.callback = null
+        ObserverUtil.register(animation::currentIndex, { _, newIndex ->
+            currentIndex = startOffset + newIndex
+        })
         return animation
     }
 }

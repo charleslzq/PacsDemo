@@ -8,7 +8,7 @@ import kotlin.reflect.jvm.isAccessible
  */
 object ObserverUtil {
 
-    fun <T> register(kProperty0: KProperty0<T>, observer: (T) -> Unit) {
+    fun <T> register(kProperty0: KProperty0<T>, observer: (T, T) -> Unit) {
         val delegate = kProperty0.apply { isAccessible = true }.getDelegate()
         if (delegate != null) {
             (delegate as ObservablePropertyWithObservers<T>).registerObserver(observer)

@@ -102,6 +102,6 @@ enum class PresentationMode {
 
     abstract fun changeProgress(imageListView: ImageListView, progress: Int)
     protected fun newIndex(imageListView: ImageListView, progress: Int): Int {
-        return (progress + imageListView.imageFramesState.size - 1) % imageListView.imageFramesState.size
+        return progress
     }
 }

@@ -13,6 +13,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import com.github.charleslzq.pacsdemo.image.PresentationMode
+import com.github.charleslzq.pacsdemo.observe.ObserverUtil
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
@@ -128,13 +129,11 @@ class PacsDemoActivity : AppCompatActivity() {
             holder.bindData(patientSeriesViewModelList[position], PresentationMode.ANIMATE)
             if (holder.image.presentationMode == PresentationMode.ANIMATE) {
                 val animatedImage = holder.image
-                val originalIndexListener = animatedImage.imageFramesState.indexChangeListener
-                animatedImage.imageFramesState.indexChangeListener = {
-                    originalIndexListener.invoke(it)
-                    imageSeekBar.progress = it + 1
-                }
-                imageSeekBar.max = animatedImage.imageFramesState.size
-                imageSeekBar.progress = 1
+                ObserverUtil.register(animatedImage.imageFramesState::currentIndex, { _, newIndex ->
+                    imageSeekBar.progress = newIndex + 1
+                })
+                imageSeekBar.max = animatedImage.imageFramesState.size - 1
+                imageSeekBar.progress = 0
                 imageSeekBar.visibility = View.VISIBLE
                 imageSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(p0: SeekBar?, progress: Int, fromUser: Boolean) {

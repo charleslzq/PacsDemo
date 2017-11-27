@@ -3,10 +3,10 @@ package com.github.charleslzq.pacsdemo.observe
 /**
  * Created by charleslzq on 17-11-25.
  */
-open class ObservableMutableCollection<T, out C, O>(
+open class ObservableMutableCollection<T, C, O>(
         protected val internal: C
 ): MutableCollection<T>, WithObservers<O>
-where C: MutableCollection<T>, O: MutableCollectionObserver<T>
+where C: MutableCollection<T>, O: MutableCollectionObserver<C, T>
 {
     override val size: Int
         get() = internal.size
@@ -42,7 +42,7 @@ where C: MutableCollection<T>, O: MutableCollectionObserver<T>
 
     override fun clear() {
         internal.clear()
-        observers.values.forEach { it.collectionCleared() }
+        observers.values.forEach { it.onCollectionCleared() }
     }
 
     override fun iterator(): MutableIterator<T> = internal.iterator()

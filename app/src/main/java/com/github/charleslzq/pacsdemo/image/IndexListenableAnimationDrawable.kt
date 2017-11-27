@@ -1,21 +1,16 @@
 package com.github.charleslzq.pacsdemo.image
 
 import android.graphics.drawable.AnimationDrawable
+import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
 
 /**
  * Created by charleslzq on 17-11-20.
  */
-class IndexListenableAnimationDrawable(
-        private val startOffset: Int = 0,
-        private val indexChangeCallback: (Int) -> Unit
-) : AnimationDrawable() {
-    var currentIndex = 0
+class IndexListenableAnimationDrawable() : AnimationDrawable() {
+    var currentIndex by ObservablePropertyWithObservers(0)
 
     override fun selectDrawable(index: Int): Boolean {
         currentIndex = index
-        if (this.isRunning) {
-            indexChangeCallback.invoke(startOffset + index)
-        }
         return super.selectDrawable(index)
     }
 }

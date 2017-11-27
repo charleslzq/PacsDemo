@@ -11,7 +11,6 @@ import com.github.charleslzq.pacsdemo.image.gesture.ImageAnimationGestureListene
 import com.github.charleslzq.pacsdemo.image.gesture.ImageModeGestureListener
 import com.github.charleslzq.pacsdemo.image.gesture.ImageScaleGestureListener
 import com.github.charleslzq.pacsdemo.image.gesture.ImageSlideGestureListener
-import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
 import com.github.charleslzq.pacsdemo.observe.ObserverUtil
 
 /**
@@ -34,16 +33,15 @@ class ImageCellViewHolder(
         image.bindUrls(imageUrls)
 
         if (imageUrls.size > 1) {
-            image.imageFramesState.indexChangeListener = this::setProgress
+            ObserverUtil.register(image.imageFramesState::currentIndex, { _, newValue ->
+                setProgress(newValue)
+            })
         }
         setProgress(0)
         progress.visibility = View.VISIBLE
 
         imageGestureListener.imageModeGestureListener = ImageModeGestureListener(image)
         imageGestureListener.listModeScaleGestureListener = ImageScaleGestureListener(image)
-        ObserverUtil.register(image.imageFramesState::currentIndex, { newValue ->
-            Log.i("index", "$newValue received")
-        })
 
         when (image.presentationMode) {
             PresentationMode.ANIMATE -> {
