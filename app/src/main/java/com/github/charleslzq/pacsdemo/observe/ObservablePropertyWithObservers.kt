@@ -8,7 +8,7 @@ import kotlin.reflect.KProperty
  */
 class ObservablePropertyWithObservers<T>(
         initialValue: T
-): ObservableProperty<T>(initialValue), WithObservers<(T, T)->Unit> {
+) : ObservableProperty<T>(initialValue), WithObservers<(T, T) -> Unit> {
     private val observerMap: MutableMap<String, (T, T) -> Unit> = emptyMap<String, (T, T) -> Unit>().toMutableMap()
 
     override fun registerObserver(observer: (T, T) -> Unit, name: String) {

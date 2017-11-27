@@ -12,11 +12,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import com.github.charleslzq.pacsdemo.image.PresentationMode
-import com.github.charleslzq.pacsdemo.observe.ObserverUtil
+import com.github.charleslzq.pacsdemo.binder.ImageCellViewBinder
+import com.github.charleslzq.pacsdemo.gesture.PresentationMode
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
+import com.github.charleslzq.pacsdemo.vo.ImageFramesViewModel
+import com.github.charleslzq.pacsdemo.vo.PatientSeriesViewModel
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.layout_pacs_demo.*
 
@@ -102,9 +104,15 @@ class PacsDemoActivity : AppCompatActivity() {
             patientSeriesViewModelList.clear()
             val newSeries = patient.studies
                     .flatMap { study ->
-                        study.series.map { PatientSeriesViewModel(patient.metaInfo, study.metaInfo, it) }
+                        study.series.map { PatientSeriesViewModel(
+                                patient.metaInfo,
+                                study.metaInfo,
+                                it.metaInfo,
+                                ImageFramesViewModel(it.images.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[PatientSeriesViewModel.DEFAULT] }),
+                                it.images.sortedBy { it.instanceNumber?.toInt() }[0].files[PatientSeriesViewModel.THUMB]!!
+                        )}
                     }
-                    .sortedBy { it.dicomSeries.metaInfo.instanceUID }
+                    .sortedBy { it.dicomSeriesMetaInfo.instanceUID }
                     .toList()
             patientSeriesViewModelList.addAll(newSeries)
             Log.i("test", "fetch images ${newSeries.size}")
@@ -116,29 +124,32 @@ class PacsDemoActivity : AppCompatActivity() {
     }
 
     private fun changeSeries(position: Int) {
-        val holders = getImageViewHoldersFromPanel()
-        if (holders.size > 1) {
-            holders.filterIndexed { index, _ ->
+        val binders = getImageViewBindersFromPanel()
+        if (binders.size > 1) {
+            binders.filterIndexed { index, _ ->
                 index + position < patientSeriesViewModelList.size
             }.forEachIndexed { index, holder ->
-                holder.bindData(patientSeriesViewModelList[index + position])
+                holder.model = patientSeriesViewModelList[index + position]
+                holder.model!!.imageFramesViewModel.presentationMode = PresentationMode.SLIDE
             }
             imageSeekBar.visibility = View.INVISIBLE
-        } else if (holders.size == 1) {
-            val holder = holders[0]
-            holder.bindData(patientSeriesViewModelList[position], PresentationMode.ANIMATE)
-            if (holder.image.presentationMode == PresentationMode.ANIMATE) {
-                val animatedImage = holder.image
-                ObserverUtil.register(animatedImage.imageFramesState::currentIndex, { _, newIndex ->
-                    imageSeekBar.progress = newIndex + 1
-                })
-                imageSeekBar.max = animatedImage.imageFramesState.size - 1
+        } else if (binders.size == 1) {
+            val binder = binders[0]
+            binder.model = patientSeriesViewModelList[position]
+            val model = binder.model!!
+            model.imageFramesViewModel.presentationMode = PresentationMode.ANIMATE
+            if (model.imageFramesViewModel.presentationMode == PresentationMode.ANIMATE) {
+                binder.onModelChange(model.imageFramesViewModel::currentIndex) { _, newIndex ->
+                    imageSeekBar.progress = newIndex
+                }
+
+                imageSeekBar.max = model.imageFramesViewModel.size
                 imageSeekBar.progress = 0
                 imageSeekBar.visibility = View.VISIBLE
                 imageSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(p0: SeekBar?, progress: Int, fromUser: Boolean) {
                         if (fromUser) {
-                            animatedImage.changeProgress(progress)
+                            model.imageFramesViewModel.currentIndex = progress
                         }
                     }
 
@@ -156,20 +167,20 @@ class PacsDemoActivity : AppCompatActivity() {
         }
     }
 
-    private fun getImageViewHoldersFromPanel(): List<ImageCellViewHolder> {
+    private fun getImageViewBindersFromPanel(): List<ImageCellViewBinder> {
         val displayedChild = viewSelector.getChildAt(viewSelector.displayedChild)
         return when (Option.values()[viewSelector.displayedChild]) {
             Option.ONE_ONE -> {
-                listOf(ImageCellViewHolder(displayedChild))
+                listOf(ImageCellViewBinder(displayedChild))
             }
             Option.ONE_TWO -> {
                 ViewUtils.getTypedChildren(displayedChild as LinearLayout, RelativeLayout::class.java)
-                        .map { ImageCellViewHolder(it) }
+                        .map { ImageCellViewBinder(it) }
             }
             else -> {
                 ViewUtils.getTypedChildren(displayedChild as TableLayout, TableRow::class.java)
                         .flatMap { ViewUtils.getTypedChildren(it, RelativeLayout::class.java) }
-                        .map { ImageCellViewHolder(it) }
+                        .map { ImageCellViewBinder(it) }
             }
         }
     }

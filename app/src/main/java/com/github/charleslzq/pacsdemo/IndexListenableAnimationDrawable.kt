@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo.image
+package com.github.charleslzq.pacsdemo
 
 import android.graphics.drawable.AnimationDrawable
 import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers

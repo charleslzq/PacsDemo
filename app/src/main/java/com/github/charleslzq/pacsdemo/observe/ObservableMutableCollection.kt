@@ -5,9 +5,8 @@ package com.github.charleslzq.pacsdemo.observe
  */
 open class ObservableMutableCollection<T, C, O>(
         protected val internal: C
-): MutableCollection<T>, WithObservers<O>
-where C: MutableCollection<T>, O: MutableCollectionObserver<C, T>
-{
+) : MutableCollection<T>, WithObservers<O>
+        where C : MutableCollection<T>, O : MutableCollectionObserver<C, T> {
     override val size: Int
         get() = internal.size
     protected val observers: MutableMap<String, O> = emptyMap<String, O>().toMutableMap()

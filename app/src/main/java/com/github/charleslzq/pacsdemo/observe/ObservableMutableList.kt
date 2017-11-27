@@ -5,7 +5,7 @@ package com.github.charleslzq.pacsdemo.observe
  */
 class ObservableMutableList<T>(
         internalList: MutableList<T> = emptyList<T>().toMutableList()
-): ObservableMutableCollection<T, MutableList<T>, MutableListObserver<T>>(internalList), MutableList<T> {
+) : ObservableMutableCollection<T, MutableList<T>, MutableListObserver<T>>(internalList), MutableList<T> {
 
     override fun add(index: Int, element: T) {
         internal.add(index, element)
