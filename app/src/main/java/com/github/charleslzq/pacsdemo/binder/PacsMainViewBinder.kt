@@ -20,22 +20,17 @@ class PacsMainViewBinder(
             viewSelectorBinder.model = it
             if (it != null) {
                 it.selected = 0
-//                onModelChange(it::selected) { _, _ ->
-//                    resetProgress()
-//                }
+                onModelChange(it::selected) { _, _ ->
+                    resetProgress()
+                }
             }
-//            if (it != null && it.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
-//                resetProgress()
-//            }
+            resetProgress()
         }
     }
 
-//    fun resetProgress() {
-//        if (model != null && model!!.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
-//            val patientModel = viewSelectorBinder.getImageViewBindersFromPanel()[0].model
-//            if (patientModel != null) {
-//                imageProgressBarBinder.model = patientModel.imageFramesViewModel
-//            }
-//        }
-//    }
+    private fun resetProgress() {
+        if (model != null && model!!.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
+            imageProgressBarBinder.model = model!!.seriesList[model!!.selected].imageFramesViewModel
+        }
+    }
 }

@@ -26,7 +26,7 @@ class ProgressTextViewBinder(
         }
     }
 
-    fun setProgress(index: Int, size: Int) {
+    private fun setProgress(index: Int, size: Int) {
         view.post({
             view.text = "${index + 1} / ${size}"
         })
