@@ -10,7 +10,7 @@ import com.github.charleslzq.pacsdemo.vo.ImageFramesViewModel
  */
 class ImageScaleBarBinder(
         scaleBar: SeekBar
-): ViewBinder<SeekBar, ImageFramesViewModel>(scaleBar) {
+) : ViewBinder<SeekBar, ImageFramesViewModel>(scaleBar) {
 
     init {
         scaleBar.visibility = View.INVISIBLE
@@ -19,7 +19,7 @@ class ImageScaleBarBinder(
             if (it != null && it.presentationMode == PresentationMode.SLIDE) {
                 scaleBar.max = 40
                 scaleBar.progress = 0
-                scaleBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+                scaleBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(p0: SeekBar?, process: Int, fromUser: Boolean) {
                         if (fromUser) {
                             it.scaleFactor = 1.0f + process * 0.1f

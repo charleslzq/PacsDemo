@@ -9,8 +9,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.IndexListenableAnimationDrawable
-import com.github.charleslzq.pacsdemo.gesture.OperationMode
-import com.github.charleslzq.pacsdemo.gesture.PlayMode
 import com.github.charleslzq.pacsdemo.gesture.PresentationMode
 import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
 import com.github.charleslzq.pacsdemo.observe.ObserverUtil.registerObserver

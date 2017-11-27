@@ -83,7 +83,7 @@ class DicomImageViewBinder(
                 }
                 onModelChange(newModel::scaleFactor) { _, newScale ->
                     if (newScale > 1 && operationMode is PlayMode) {
-                        operationMode = StudyMode(view.context, StudyModeGestureListenerPlayModeGestureListener(newModel))
+                        operationMode = StudyMode(view.context, StudyModeGestureListener(view.width, view.height, newModel))
                     }
                 }
             }
