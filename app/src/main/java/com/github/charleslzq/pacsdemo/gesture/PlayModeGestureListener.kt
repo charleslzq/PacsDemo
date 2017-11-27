@@ -1,5 +1,6 @@
 package com.github.charleslzq.pacsdemo.gesture
 
+import android.graphics.ColorMatrix
 import android.util.Log
 import android.view.MotionEvent
 import com.github.charleslzq.pacsdemo.gesture.PresentationMode.ANIMATE
@@ -41,7 +42,7 @@ class PlayModeGestureListener(
         if (framesViewModel.presentationMode == ANIMATE) {
             framesViewModel.playing = false
         }
-        framesViewModel.colorMatrix.reset()
+        framesViewModel.colorMatrix = ColorMatrix()
         framesViewModel.currentIndex = 0
         return true
     }
