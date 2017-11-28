@@ -23,7 +23,9 @@ class PacsMainViewBinder(
             if (it != null) {
                 it.selected = 0
                 onModelChange(it::selected) { _, _ ->
-                    resetProgress()
+                    if (it.selected >= 0 && it.selected < it.seriesList.size) {
+                        resetProgress()
+                    }
                 }
             }
             resetProgress()

@@ -1,5 +1,6 @@
 package com.github.charleslzq.pacsdemo.gesture
 
+import android.graphics.ColorMatrix
 import android.graphics.Matrix
 import android.view.MotionEvent
 import com.github.charleslzq.pacsdemo.vo.ImageFramesViewModel
@@ -15,6 +16,7 @@ class StudyModeGestureListener(
     override fun onDoubleTap(motionEvent: MotionEvent?): Boolean {
         framesViewModel.scaleFactor = 1.0f
         framesViewModel.matrix = Matrix()
+        framesViewModel.colorMatrix = ColorMatrix()
         return true
     }
 

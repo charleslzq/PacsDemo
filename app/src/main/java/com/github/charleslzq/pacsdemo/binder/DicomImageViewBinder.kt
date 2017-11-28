@@ -1,7 +1,6 @@
 package com.github.charleslzq.pacsdemo.binder
 
 import android.graphics.ColorMatrixColorFilter
-import android.util.Log
 import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.IndexListenableAnimationDrawable
 import com.github.charleslzq.pacsdemo.gesture.*
@@ -57,7 +56,6 @@ class DicomImageViewBinder(
                     }
                 }
                 onModelChange(newModel::playing) { _, newStatus ->
-                    Log.i("image play", "$newStatus")
                     when (newStatus) {
                         true -> imageView.post(newModel.resetAnimation(imageView))
                         false -> {
@@ -84,6 +82,8 @@ class DicomImageViewBinder(
                 onModelChange(newModel::scaleFactor) { _, newScale ->
                     if (newScale > 1 && operationMode is PlayMode) {
                         operationMode = StudyMode(view.context, StudyModeGestureListener(view.width, view.height, newModel))
+                    } else if (newScale == 1.0f && operationMode is StudyMode) {
+                        operationMode = PlayMode(view.context, PlayModeGestureListener(view.width, view.height, newModel))
                     }
                 }
             }
