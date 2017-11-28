@@ -14,10 +14,4 @@ data class PatientSeriesViewModel(
         val dicomSeriesMetaInfo: DicomSeriesMetaInfo,
         val imageFramesViewModel: ImageFramesViewModel,
         val thumbUrl: URI
-) {
-    companion object {
-        val THUMB = "thumb"
-        val DEFAULT = "default"
-        val RAW = "raw"
-    }
-}
+)

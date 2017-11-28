@@ -42,8 +42,8 @@ class PacsDemoActivity : AppCompatActivity() {
                             patient.metaInfo,
                             study.metaInfo,
                             it.metaInfo,
-                            ImageFramesViewModel(it.images.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[PatientSeriesViewModel.DEFAULT] }),
-                            it.images.sortedBy { it.instanceNumber?.toInt() }[0].files[PatientSeriesViewModel.THUMB]!!
+                            ImageFramesViewModel(it.images.sortedBy { it.instanceNumber?.toInt() }),
+                            it.images.sortedBy { it.instanceNumber?.toInt() }[0].files[ImageFramesViewModel.THUMB]!!
                     )
                 }
             }.toMutableList())

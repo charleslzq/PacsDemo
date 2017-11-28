@@ -1,27 +1,26 @@
 package com.github.charleslzq.pacsdemo.vo
 
 import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.ColorMatrix
-import android.graphics.Matrix
+import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import com.github.charleslzq.dicom.data.DicomImageMetaInfo
 import com.github.charleslzq.pacsdemo.IndexListenableAnimationDrawable
 import com.github.charleslzq.pacsdemo.gesture.PresentationMode
 import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
 import com.github.charleslzq.pacsdemo.observe.ObserverUtil.registerObserver
 import java.io.File
-import java.net.URI
 
 /**
  * Created by charleslzq on 17-11-27.
  */
 data class ImageFramesViewModel(
-        private val frames: List<URI>
+        private val frames: List<DicomImageMetaInfo>
 ) {
     val size = frames.size
+    val frameUrls = frames.sortedBy { it.instanceNumber?.toInt() }.map { it.files[DEFAULT] }
     var duration: Int = 40
     var scaleFactor: Float by ObservablePropertyWithObservers(1.0f)
     var currentIndex: Int by ObservablePropertyWithObservers(0)
@@ -35,6 +34,7 @@ data class ImageFramesViewModel(
     var matrix by ObservablePropertyWithObservers(Matrix())
     var colorMatrix by ObservablePropertyWithObservers(ColorMatrix())
     var playing by ObservablePropertyWithObservers(false)
+    var pseudoColor by ObservablePropertyWithObservers(true)
 
     private var rawScale = 1.0f
 
@@ -68,7 +68,7 @@ data class ImageFramesViewModel(
         }
     }
 
-    fun getFrame(index: Int) = BitmapFactory.decodeFile(File(frames[index]).absolutePath)
+    fun getFrame(index: Int) = BitmapFactory.decodeFile(File(frameUrls[index]).absolutePath)
 
     fun getScaledFrame(index: Int): Bitmap {
         val rawBitmap = getFrame(index)
@@ -108,5 +108,43 @@ data class ImageFramesViewModel(
         imageView.background = animation
 
         return animation
+    }
+
+    private fun getPseudoColor(gray: Int): Int {
+        var valueR = 255
+        var valueG = 255
+        var valueB = 255
+        if (gray < 32) {
+            valueR = 0
+            valueB = (255 * gray / 32.0).toInt()
+            valueG = valueB
+        } else if (gray < 64) {
+            valueR = 0
+            valueB = 255
+            valueG = valueB
+        } else if (gray < 96) {
+            valueR = 0
+            valueB = (255 * (96 - gray) / 32.0).toInt()
+            valueG = valueB
+        } else if (gray < 128) {
+            valueR = (255 * (gray - 96) / 32.0).toInt()
+            valueB = (255 * (96 - gray) / 32.0).toInt()
+            valueG = valueB
+        } else if (gray < 192) {
+            valueR = 255
+            valueB = 0
+            valueG = valueB
+        } else if (gray < 255) {
+            valueR = 255
+            valueB = (255 * (gray - 192) / 63.0).toInt()
+            valueG = valueB
+        }
+        return Color.rgb(valueR, valueG, valueB)
+    }
+
+    companion object {
+        val THUMB = "thumb"
+        val DEFAULT = "default"
+        val RAW = "raw"
     }
 }
