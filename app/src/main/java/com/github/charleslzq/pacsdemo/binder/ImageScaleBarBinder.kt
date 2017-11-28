@@ -2,7 +2,6 @@ package com.github.charleslzq.pacsdemo.binder
 
 import android.view.View
 import android.widget.SeekBar
-import com.github.charleslzq.pacsdemo.gesture.PresentationMode
 import com.github.charleslzq.pacsdemo.vo.ImageFramesViewModel
 
 /**
@@ -16,7 +15,7 @@ class ImageScaleBarBinder(
         scaleBar.visibility = View.INVISIBLE
 
         onNewModel {
-            if (it != null && it.presentationMode == PresentationMode.SLIDE) {
+            if (it?.playable() == false) {
                 scaleBar.max = 40
                 scaleBar.progress = 0
                 scaleBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {

@@ -1,14 +1,15 @@
 package com.github.charleslzq.pacsdemo.vo
 
 import android.content.res.Resources
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ColorMatrix
+import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.dicom.data.DicomImageMetaInfo
 import com.github.charleslzq.pacsdemo.IndexListenableAnimationDrawable
-import com.github.charleslzq.pacsdemo.gesture.PresentationMode
 import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
 import com.github.charleslzq.pacsdemo.observe.ObserverUtil.registerObserver
 import java.io.File
@@ -25,16 +26,10 @@ data class ImageFramesViewModel(
     var scaleFactor: Float by ObservablePropertyWithObservers(1.0f)
     var currentIndex: Int by ObservablePropertyWithObservers(0)
     var startOffset: Int = 0
-    var presentationMode = PresentationMode.SLIDE
-        set(value) {
-            if (value != PresentationMode.ANIMATE || frames.size > 1) {
-                field = value
-            }
-        }
     var matrix by ObservablePropertyWithObservers(Matrix())
     var colorMatrix by ObservablePropertyWithObservers(ColorMatrix())
     var playing by ObservablePropertyWithObservers(false)
-    var pseudoColor by ObservablePropertyWithObservers(true)
+    var allowPlay = false
 
     private var rawScale = 1.0f
 
@@ -47,6 +42,8 @@ data class ImageFramesViewModel(
             matrix = newMatrix
         })
     }
+
+    fun playable() = size > 1 && allowPlay
 
     fun autoAdjustScale(view: View) {
         if (frames.isNotEmpty()) {
@@ -108,38 +105,6 @@ data class ImageFramesViewModel(
         imageView.background = animation
 
         return animation
-    }
-
-    private fun getPseudoColor(gray: Int): Int {
-        var valueR = 255
-        var valueG = 255
-        var valueB = 255
-        if (gray < 32) {
-            valueR = 0
-            valueB = (255 * gray / 32.0).toInt()
-            valueG = valueB
-        } else if (gray < 64) {
-            valueR = 0
-            valueB = 255
-            valueG = valueB
-        } else if (gray < 96) {
-            valueR = 0
-            valueB = (255 * (96 - gray) / 32.0).toInt()
-            valueG = valueB
-        } else if (gray < 128) {
-            valueR = (255 * (gray - 96) / 32.0).toInt()
-            valueB = (255 * (96 - gray) / 32.0).toInt()
-            valueG = valueB
-        } else if (gray < 192) {
-            valueR = 255
-            valueB = 0
-            valueG = valueB
-        } else if (gray < 255) {
-            valueR = 255
-            valueB = (255 * (gray - 192) / 63.0).toInt()
-            valueG = valueB
-        }
-        return Color.rgb(valueR, valueG, valueB)
     }
 
     companion object {

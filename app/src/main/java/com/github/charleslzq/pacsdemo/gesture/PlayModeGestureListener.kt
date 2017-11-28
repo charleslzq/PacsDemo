@@ -2,8 +2,6 @@ package com.github.charleslzq.pacsdemo.gesture
 
 import android.graphics.ColorMatrix
 import android.view.MotionEvent
-import com.github.charleslzq.pacsdemo.gesture.PresentationMode.ANIMATE
-import com.github.charleslzq.pacsdemo.gesture.PresentationMode.SLIDE
 import com.github.charleslzq.pacsdemo.vo.ImageFramesViewModel
 
 /**
@@ -16,9 +14,9 @@ class PlayModeGestureListener(
 ) : NoOpAllGestureListener() {
 
     override fun onSingleTapConfirmed(motionEvent: MotionEvent): Boolean {
-        when (framesViewModel.presentationMode) {
-            ANIMATE -> framesViewModel.playing = !framesViewModel.playing
-            SLIDE -> {
+        when (framesViewModel.playable()) {
+            true -> framesViewModel.playing = !framesViewModel.playing
+            false -> {
                 when (isRightSide(motionEvent)) {
                     true -> {
                         if (framesViewModel.currentIndex < framesViewModel.size - 1) {
@@ -37,7 +35,7 @@ class PlayModeGestureListener(
     }
 
     override fun onDoubleTap(motionEvent: MotionEvent?): Boolean {
-        if (framesViewModel.presentationMode == ANIMATE) {
+        if (framesViewModel.playable()) {
             framesViewModel.playing = false
         }
         framesViewModel.colorMatrix = ColorMatrix()

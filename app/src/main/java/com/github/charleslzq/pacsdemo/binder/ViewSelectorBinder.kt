@@ -4,7 +4,6 @@ import android.graphics.ColorMatrix
 import android.graphics.Matrix
 import android.widget.*
 import com.github.charleslzq.pacsdemo.ViewUtils
-import com.github.charleslzq.pacsdemo.gesture.PresentationMode
 import com.github.charleslzq.pacsdemo.vo.PacsDemoViewModel
 import com.github.charleslzq.pacsdemo.vo.PatientSeriesViewModel
 
@@ -57,13 +56,13 @@ class ViewSelectorBinder(
                 index + selected < seriesList.size
             }.forEachIndexed { index, holder ->
                 holder.model = seriesList[index + selected]
-                holder.model!!.imageFramesViewModel.presentationMode = PresentationMode.SLIDE
+                holder.model!!.imageFramesViewModel.allowPlay = false
                 resetModel(holder.model!!)
             }
         } else if (binders.size == 1) {
             val binder = binders[0]
             val model = seriesList[selected]
-            model.imageFramesViewModel.presentationMode = PresentationMode.ANIMATE
+            model.imageFramesViewModel.allowPlay = true
             binder.model = model
             resetModel(model)
         }

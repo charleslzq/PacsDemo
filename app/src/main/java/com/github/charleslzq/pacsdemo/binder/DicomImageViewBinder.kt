@@ -4,8 +4,6 @@ import android.graphics.ColorMatrixColorFilter
 import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.IndexListenableAnimationDrawable
 import com.github.charleslzq.pacsdemo.gesture.*
-import com.github.charleslzq.pacsdemo.gesture.PresentationMode.ANIMATE
-import com.github.charleslzq.pacsdemo.gesture.PresentationMode.SLIDE
 import com.github.charleslzq.pacsdemo.vo.ImageFramesViewModel
 
 /**
@@ -40,51 +38,41 @@ class DicomImageViewBinder(
     private fun init(newModel: ImageFramesViewModel, imageView: ImageView) {
         operationMode = PlayMode(view.context, PlayModeGestureListener(view.width, view.height, newModel))
 
+        val firstImage = newModel.getScaledFrame(0)
+        view.clearAnimation()
+        view.background = null
+        view.setImageBitmap(firstImage)
+
         onModelChange(newModel::colorMatrix) { _, newMatrix ->
             imageView.colorFilter = ColorMatrixColorFilter(newMatrix)
         }
 
-        when (newModel.presentationMode) {
-            ANIMATE -> {
-                view.clearAnimation()
-                view.setImageBitmap(null)
-                newModel.resetAnimation(imageView)
-
-                onModelChange(newModel::currentIndex) { _, _ ->
-                    if (!newModel.playing) {
-                        newModel.resetAnimation(imageView)
-                    }
-                }
-                onModelChange(newModel::playing) { _, newStatus ->
-                    when (newStatus) {
-                        true -> imageView.post(newModel.resetAnimation(imageView))
-                        false -> {
-                            val animation = imageView.background as IndexListenableAnimationDrawable
-                            animation.stop()
-                            animation.selectDrawable(animation.currentIndex)
-                        }
-                    }
-                }
+        onModelChange(newModel::currentIndex) { _, newIndex ->
+            if (!newModel.playing) {
+                imageView.clearAnimation()
+                imageView.background = null
+                imageView.setImageBitmap(newModel.getScaledFrame(newIndex))
             }
-            SLIDE -> {
-                val firstImage = newModel.getScaledFrame(0)
-                view.clearAnimation()
-                view.background = null
-                view.setImageBitmap(firstImage)
-
-                onModelChange(newModel::currentIndex) { _, newIndex ->
+        }
+        onModelChange(newModel::matrix) { _, newMatrix ->
+            view.imageMatrix = newMatrix
+        }
+        onModelChange(newModel::scaleFactor) { _, newScale ->
+            if (newScale > 1 && operationMode is PlayMode) {
+                operationMode = StudyMode(view.context, StudyModeGestureListener(view.width, view.height, newModel))
+            } else if (newScale == 1.0f && operationMode is StudyMode) {
+                operationMode = PlayMode(view.context, PlayModeGestureListener(view.width, view.height, newModel))
+            }
+        }
+        onModelChange(newModel::playing) { _, newStatus ->
+            when (newStatus) {
+                true -> imageView.post(newModel.resetAnimation(imageView))
+                false -> {
+                    val animation = imageView.background as IndexListenableAnimationDrawable
+                    animation.stop()
                     imageView.clearAnimation()
-                    imageView.setImageBitmap(newModel.getScaledFrame(newIndex))
-                }
-                onModelChange(newModel::matrix) { _, newMatrix ->
-                    view.imageMatrix = newMatrix
-                }
-                onModelChange(newModel::scaleFactor) { _, newScale ->
-                    if (newScale > 1 && operationMode is PlayMode) {
-                        operationMode = StudyMode(view.context, StudyModeGestureListener(view.width, view.height, newModel))
-                    } else if (newScale == 1.0f && operationMode is StudyMode) {
-                        operationMode = PlayMode(view.context, PlayModeGestureListener(view.width, view.height, newModel))
-                    }
+                    imageView.background = null
+                    imageView.setImageBitmap(newModel.getScaledFrame(newModel.currentIndex))
                 }
             }
         }

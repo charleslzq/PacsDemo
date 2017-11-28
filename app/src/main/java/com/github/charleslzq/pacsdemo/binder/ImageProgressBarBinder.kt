@@ -2,7 +2,6 @@ package com.github.charleslzq.pacsdemo.binder
 
 import android.view.View
 import android.widget.SeekBar
-import com.github.charleslzq.pacsdemo.gesture.PresentationMode
 import com.github.charleslzq.pacsdemo.vo.ImageFramesViewModel
 
 /**
@@ -15,7 +14,7 @@ class ImageProgressBarBinder(
     init {
         view.visibility = View.INVISIBLE
         onNewModel {
-            if (it != null && it.presentationMode == PresentationMode.ANIMATE) {
+            if (it?.playable() == true) {
                 view.max = it.size
                 view.progress = it.currentIndex
                 view.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
