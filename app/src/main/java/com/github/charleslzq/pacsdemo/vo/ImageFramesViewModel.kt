@@ -124,12 +124,30 @@ data class ImageFramesViewModel(
 
     private fun getPseudoColor(greyValue: Int): Int {
         return when (greyValue) {
-            in (0..31) -> Color.rgb(0, (255 * greyValue / 32.0).toInt(), (255 * greyValue / 32.0).toInt())
-            in (32..63) -> Color.rgb(0, 255, 255)
-            in (64..95) -> Color.rgb(0, (255 * (96 - greyValue) / 32.0).toInt(), (255 * (96 - greyValue) / 32.0).toInt())
-            in (96..127) -> Color.rgb((255 * (greyValue - 96) / 32.0).toInt(), (255 * (96 - greyValue) / 32.0).toInt(), (255 * (96 - greyValue) / 32.0).toInt())
-            in (128..191) -> Color.rgb(255, 0, 0)
-            in (192..255) -> Color.rgb(255, (255 * (greyValue - 192) / 63.0).toInt(), (255 * (greyValue - 192) / 63.0).toInt())
+            in (0..31) -> Color.rgb(
+                    0,
+                    (255 * greyValue / 32.0).toInt(),
+                    (255 * greyValue / 32.0).toInt())
+            in (32..63) -> Color.rgb(
+                    0,
+                    255,
+                    255)
+            in (64..95) -> Color.rgb(
+                    0,
+                    (255 * (96 - greyValue) / 32.0).toInt(),
+                    (255 * (96 - greyValue) / 32.0).toInt())
+            in (96..127) -> Color.rgb((
+                    255 * (greyValue - 96) / 64.0).toInt(),
+                    (255 * (greyValue - 96) / 32.0).toInt(),
+                    (255 * (greyValue - 96) / 32.0).toInt())
+            in (128..191) -> Color.rgb(
+                    (255 * (greyValue - 128) / 128.0 + 128).toInt(),
+                    0,
+                    0)
+            in (192..255) -> Color.rgb(
+                    255,
+                    (255 * (greyValue - 192) / 63.0).toInt(),
+                    (255 * (greyValue - 192) / 63.0).toInt())
             else -> throw IllegalArgumentException("$greyValue not in (0..255)")
         }
     }
