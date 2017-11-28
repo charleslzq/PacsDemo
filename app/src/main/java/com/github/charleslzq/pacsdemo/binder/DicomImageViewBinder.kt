@@ -76,5 +76,12 @@ class DicomImageViewBinder(
                 }
             }
         }
+        onModelChange(newModel::pseudoColor) { _, _ ->
+            if (newModel.playing) {
+                newModel.playing = false
+            } else {
+                imageView.setImageBitmap(newModel.getScaledFrame(newModel.currentIndex))
+            }
+        }
     }
 }

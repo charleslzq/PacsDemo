@@ -40,6 +40,7 @@ class PlayModeGestureListener(
         }
         framesViewModel.colorMatrix = ColorMatrix()
         framesViewModel.currentIndex = 0
+        framesViewModel.pseudoColor = false
         return true
     }
 

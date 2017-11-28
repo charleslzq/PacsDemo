@@ -1,10 +1,7 @@
 package com.github.charleslzq.pacsdemo.vo
 
 import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.ColorMatrix
-import android.graphics.Matrix
+import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import android.widget.ImageView
@@ -13,6 +10,7 @@ import com.github.charleslzq.pacsdemo.IndexListenableAnimationDrawable
 import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
 import com.github.charleslzq.pacsdemo.observe.ObserverUtil.registerObserver
 import java.io.File
+
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -29,6 +27,7 @@ data class ImageFramesViewModel(
     var matrix by ObservablePropertyWithObservers(Matrix())
     var colorMatrix by ObservablePropertyWithObservers(ColorMatrix())
     var playing by ObservablePropertyWithObservers(false)
+    var pseudoColor by ObservablePropertyWithObservers(false)
     var allowPlay = false
 
     private var rawScale = 1.0f
@@ -65,7 +64,18 @@ data class ImageFramesViewModel(
         }
     }
 
-    fun getFrame(index: Int) = BitmapFactory.decodeFile(File(frameUrls[index]).absolutePath)
+    fun getFrame(index: Int): Bitmap {
+        val rawBitmap = BitmapFactory.decodeFile(File(frameUrls[index]).absolutePath, BitmapFactory.Options().apply { inMutable = pseudoColor })
+        if (pseudoColor) {
+            val pixels = IntArray(rawBitmap.height * rawBitmap.width)
+            rawBitmap.getPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
+            (0..(pixels.size - 1)).forEach {
+                pixels[it] = calculateColor(pixels[it])
+            }
+            rawBitmap.setPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
+        }
+        return rawBitmap
+    }
 
     fun getScaledFrame(index: Int): Bitmap {
         val rawBitmap = getFrame(index)
@@ -105,6 +115,23 @@ data class ImageFramesViewModel(
         imageView.background = animation
 
         return animation
+    }
+
+    fun calculateColor(color: Int): Int {
+        return getPseudoColor((Color.red(color) + Color.green(color) + Color.blue(color) + Color.alpha(color)) / 4)
+    }
+
+
+    private fun getPseudoColor(greyValue: Int): Int {
+        return when (greyValue) {
+            in (0..31) -> Color.rgb(0, (255 * greyValue / 32.0).toInt(), (255 * greyValue / 32.0).toInt())
+            in (32..63) -> Color.rgb(0, 255, 255)
+            in (64..95) -> Color.rgb(0, (255 * (96 - greyValue) / 32.0).toInt(), (255 * (96 - greyValue) / 32.0).toInt())
+            in (96..127) -> Color.rgb((255 * (greyValue - 96) / 32.0).toInt(), (255 * (96 - greyValue) / 32.0).toInt(), (255 * (96 - greyValue) / 32.0).toInt())
+            in (128..191) -> Color.rgb(255, 0, 0)
+            in (192..255) -> Color.rgb(255, (255 * (greyValue - 192) / 63.0).toInt(), (255 * (greyValue - 192) / 63.0).toInt())
+            else -> throw IllegalArgumentException("$greyValue not in (0..255)")
+        }
     }
 
     companion object {

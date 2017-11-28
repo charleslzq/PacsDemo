@@ -17,6 +17,7 @@ class StudyModeGestureListener(
         framesViewModel.scaleFactor = 1.0f
         framesViewModel.matrix = Matrix()
         framesViewModel.colorMatrix = ColorMatrix()
+        framesViewModel.pseudoColor = false
         return true
     }
 

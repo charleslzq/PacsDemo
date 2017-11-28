@@ -25,12 +25,6 @@ class ButtonPanelBinder(
             0f, 0f, -1f, 0f, 255f,
             0f, 0f, 0f, 1f, 0f
     ))
-    private val pseudoMatrix = ColorMatrix(floatArrayOf(
-            -1f, 0f, 0f, 0f, 255f,
-            0f, -1f, 0f, 0f, 127f,
-            0f, 0f, -1f, 0f, 0f,
-            0f, 0f, 0f, 1f, 0f
-    ))
 
     init {
         layoutSelector.menu.add(Menu.NONE, R.id.one_one, Menu.NONE, "1 X 1")
@@ -57,9 +51,7 @@ class ButtonPanelBinder(
             if (model != null) {
                 if (model!!.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
                     val imageModel = model!!.seriesList[model!!.selected].imageFramesViewModel
-                    val newColorMatrix = ColorMatrix(imageModel.colorMatrix)
-                    newColorMatrix.postConcat(pseudoMatrix)
-                    imageModel.colorMatrix = newColorMatrix
+                    imageModel.pseudoColor = !imageModel.pseudoColor
                 }
             }
         }
