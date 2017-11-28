@@ -23,9 +23,7 @@ class PacsMainViewBinder(
             if (it != null) {
                 it.selected = 0
                 onModelChange(it::selected) { _, _ ->
-                    if (it.selected >= 0 && it.selected < it.seriesList.size) {
-                        resetProgress()
-                    }
+                    resetProgress()
                 }
             }
             resetProgress()
@@ -33,8 +31,13 @@ class PacsMainViewBinder(
     }
 
     private fun resetProgress() {
-        if (model != null && model!!.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
-            imageProgressBarBinder.model = model!!.seriesList[model!!.selected].imageFramesViewModel
+        if (model != null) {
+            val selected = model!!.selected
+            val layoutOption = model!!.layoutOption
+            val seriesList = model!!.seriesList
+            if (layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE && selected >= 0 && selected < seriesList.size) {
+                imageProgressBarBinder.model = seriesList[selected].imageFramesViewModel
+            }
         }
     }
 }
