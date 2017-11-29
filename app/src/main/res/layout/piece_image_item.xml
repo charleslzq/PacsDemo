@@ -21,16 +21,4 @@
         android:layout_alignTop="@id/imagesContainer"
         android:layout_centerHorizontal="true"/>
 
-    <SeekBar
-        android:id="@+id/imageScaleBar"
-        style="@style/Widget.AppCompat.SeekBar"
-        android:layout_alignBottom="@id/imagesContainer"
-        android:layout_alignLeft="@id/imagesContainer"
-        android:layout_alignStart="@id/imagesContainer"
-        android:layout_alignRight="@id/imagesContainer"
-        android:layout_alignEnd="@id/imagesContainer"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:visibility="invisible"/>
-
 </RelativeLayout>

@@ -8,10 +8,10 @@ import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel
  * Created by charleslzq on 17-11-27.
  */
 class PlayModeGestureListener(
-        val viewWidth: Int,
-        val viewHeight: Int,
-        val framesViewModel: ImageFramesViewModel
-) : NoOpAllGestureListener() {
+        viewWidth: Int,
+        viewHeight: Int,
+        framesViewModel: ImageFramesViewModel
+) : ScaleCompositeGestureListener(viewWidth, viewHeight, framesViewModel) {
 
     override fun onSingleTapConfirmed(motionEvent: MotionEvent): Boolean {
         when (framesViewModel.playable()) {

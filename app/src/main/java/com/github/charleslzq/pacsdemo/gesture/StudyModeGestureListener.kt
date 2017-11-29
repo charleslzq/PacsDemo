@@ -9,10 +9,11 @@ import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel
  * Created by charleslzq on 17-11-27.
  */
 class StudyModeGestureListener(
-        val viewWidth: Int,
-        val viewHeight: Int,
-        val framesViewModel: ImageFramesViewModel
-) : NoOpAllGestureListener() {
+        viewWidth: Int,
+        viewHeight: Int,
+        framesViewModel: ImageFramesViewModel
+) : ScaleCompositeGestureListener(viewWidth, viewHeight, framesViewModel) {
+
     override fun onDoubleTap(motionEvent: MotionEvent?): Boolean {
         framesViewModel.scaleFactor = 1.0f
         framesViewModel.matrix = Matrix()

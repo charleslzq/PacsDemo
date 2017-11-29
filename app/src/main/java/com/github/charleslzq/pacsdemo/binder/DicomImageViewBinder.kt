@@ -12,7 +12,7 @@ import com.github.charleslzq.pacsdemo.gesture.*
 class DicomImageViewBinder(
         imageView: ImageView
 ) : ViewBinder<ImageView, ImageFramesViewModel>(imageView, { ImageFramesViewModel() }) {
-    var operationMode: OperationMode = PlayMode(view.context, NoOpAllGestureListener())
+    var operationMode: OperationMode = PlayMode(view.context, NoOpCompositeGestureListener())
         set(value) {
             field = value
             view.setOnTouchListener(operationMode)

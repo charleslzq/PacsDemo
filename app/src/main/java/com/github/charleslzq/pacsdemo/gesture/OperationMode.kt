@@ -11,26 +11,27 @@ import android.view.View
  */
 sealed class OperationMode(
         private val gestureDetector: GestureDetector,
-        private val scaleGestureDetector: ScaleGestureDetector
+        private val scaleGestureDetector: ScaleGestureDetector,
+        private val additionalHandler: (View, MotionEvent) -> Boolean
 ) : View.OnTouchListener {
 
     override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
         view.performClick()
-        return gestureDetector.onTouchEvent(motionEvent) || scaleGestureDetector.onTouchEvent(motionEvent)
+        return gestureDetector.onTouchEvent(motionEvent) || scaleGestureDetector.onTouchEvent(motionEvent) || additionalHandler(view, motionEvent)
     }
 }
 
 class PlayMode(
         context: Context,
-        allGestureListener: NoOpAllGestureListener
-) : OperationMode(GestureDetector(context, allGestureListener), ScaleGestureDetector(context, allGestureListener))
+        compositeGestureListener: NoOpCompositeGestureListener
+) : OperationMode(GestureDetector(context, compositeGestureListener), ScaleGestureDetector(context, compositeGestureListener), compositeGestureListener::onOtherGesture)
 
 class StudyMode(
         context: Context,
-        allGestureListener: NoOpAllGestureListener
-) : OperationMode(GestureDetector(context, allGestureListener), ScaleGestureDetector(context, allGestureListener))
+        compositeGestureListener: NoOpCompositeGestureListener
+) : OperationMode(GestureDetector(context, compositeGestureListener), ScaleGestureDetector(context, compositeGestureListener), compositeGestureListener::onOtherGesture)
 
 class MeasureMode(
         context: Context,
-        allGestureListener: NoOpAllGestureListener
-) : OperationMode(GestureDetector(context, allGestureListener), ScaleGestureDetector(context, allGestureListener))
+        compositeGestureListener: NoOpCompositeGestureListener
+) : OperationMode(GestureDetector(context, compositeGestureListener), ScaleGestureDetector(context, compositeGestureListener), compositeGestureListener::onOtherGesture)
