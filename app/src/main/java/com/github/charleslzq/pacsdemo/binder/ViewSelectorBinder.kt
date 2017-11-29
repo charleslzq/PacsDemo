@@ -10,7 +10,7 @@ import com.github.charleslzq.pacsdemo.binder.vo.PacsDemoViewModel
 class ViewSelectorBinder(
         viewFlipper: ViewFlipper
 ) : ViewBinder<ViewFlipper, PacsDemoViewModel>(viewFlipper, { PacsDemoViewModel() }) {
-    private lateinit var binders: List<ImageCellViewBinder>
+    lateinit var binders: List<ImageCellViewBinder>
 
     init {
         onNewModel {
@@ -46,6 +46,12 @@ class ViewSelectorBinder(
         if (dataPosition >= 0 && dataPosition < model.seriesList.size && layoutPosition >= 0 && layoutPosition < binders.size) {
             val dataModel = model.seriesList[dataPosition]
             dataModel.imageFramesViewModel.allowPlay = binders.size == 1
+            if (binders.size == 1) {
+                if (model.selected == dataPosition) {
+                    model.selected = -1
+                }
+                model.selected = dataPosition
+            }
             binders[layoutPosition].model = dataModel.copy()
         }
     }

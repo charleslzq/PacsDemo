@@ -13,13 +13,13 @@ class PacsMainViewBinder(
     private val thumbListViewBinder = ThumbListViewBinder(view.findViewById(R.id.thumbList))
     private val viewSelectorBinder = ViewSelectorBinder(view.findViewById(R.id.viewSelector))
     private val imageProgressBarBinder = ImageProgressBarBinder(view.findViewById(R.id.imageSeekBar))
-    private val buttonPanelBinder = ButtonPanelBinder(view.findViewById(R.id.buttonPanel))
+    private val buttonPanelBinder = ButtonPanelBinder(view.findViewById(R.id.buttonPanel), { model.layoutOption = it })
 
     init {
         onNewModel {
             thumbListViewBinder.model = model
             viewSelectorBinder.model = model
-            buttonPanelBinder.model = model
+            buttonPanelBinder.model = ButtonPanelBinder.ViewModel()
             onModelChange(model::selected) {
                 resetProgress()
             }
@@ -33,11 +33,14 @@ class PacsMainViewBinder(
     }
 
     private fun resetProgress() {
-        val selected = model.selected
         val layoutOption = model.layoutOption
-        val seriesList = model.seriesList
-        if (layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE && selected >= 0 && selected < seriesList.size) {
-            imageProgressBarBinder.model = seriesList[selected].imageFramesViewModel
+        if (layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
+            val binder = viewSelectorBinder.binders[0]
+            imageProgressBarBinder.model = binder.model.imageFramesViewModel
+            val buttonViewModel = ButtonPanelBinder.ViewModel()
+            buttonViewModel.layoutOption = model.layoutOption
+            buttonViewModel.imageFramesViewModel = binder.model.imageFramesViewModel
+            buttonPanelBinder.model = buttonViewModel
         } else {
             imageProgressBarBinder.reset()
         }

@@ -7,14 +7,17 @@ import android.view.View
 import android.widget.Button
 import android.widget.PopupMenu
 import com.github.charleslzq.pacsdemo.R
+import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel
 import com.github.charleslzq.pacsdemo.binder.vo.PacsDemoViewModel
+import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
 
 /**
  * Created by charleslzq on 17-11-27.
  */
 class ButtonPanelBinder(
-        buttonPanel: View
-) : ViewBinder<View, PacsDemoViewModel>(buttonPanel, { PacsDemoViewModel() }) {
+        buttonPanel: View,
+        val resetLayout: (PacsDemoViewModel.LayoutOption) -> Unit
+) : ViewBinder<View, ButtonPanelBinder.ViewModel>(buttonPanel, { ButtonPanelBinder.ViewModel() }) {
     private val pseudoButton: Button = view.findViewById(R.id.pseudoColorButton)
     private val reverseButton: Button = view.findViewById(R.id.reverseButton)
     private val splitButton: Button = view.findViewById(R.id.spliteButton)
@@ -36,25 +39,26 @@ class ButtonPanelBinder(
             layoutSelector.show()
         }
 
-        reverseButton.setOnClickListener {
-            if (model.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
-                val imageModel = model.seriesList[model.selected].imageFramesViewModel
-                val newColorMatrix = ColorMatrix(imageModel.colorMatrix)
-                newColorMatrix.postConcat(reverseMatrix)
-                imageModel.colorMatrix = newColorMatrix
-            }
-        }
-
-        pseudoButton.setOnClickListener {
-            if (model.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
-                if (model.selected >= 0 && model.selected < model.seriesList.size) {
-                    val imageModel = model.seriesList[model.selected].imageFramesViewModel
-                    imageModel.pseudoColor = !imageModel.pseudoColor
+        onNewModel {
+            reverseButton.setOnClickListener {
+                if (model.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
+                    val imageModel = model.imageFramesViewModel
+                    if (imageModel != null) {
+                        val newColorMatrix = ColorMatrix(imageModel.colorMatrix)
+                        newColorMatrix.postConcat(reverseMatrix)
+                        imageModel.colorMatrix = newColorMatrix
+                    }
                 }
             }
-        }
 
-        onNewModel {
+            pseudoButton.setOnClickListener {
+                if (model.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
+                    val imageModel = model.imageFramesViewModel
+                    if (imageModel != null) {
+                        imageModel.pseudoColor = !imageModel.pseudoColor
+                    }
+                }
+            }
             onModelChange(model::layoutOption) {
                 val visible = when (model.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
                     true -> View.VISIBLE
@@ -62,6 +66,7 @@ class ButtonPanelBinder(
                 }
                 reverseButton.visibility = visible
                 pseudoButton.visibility = visible
+                resetLayout(model.layoutOption)
             }
         }
 
@@ -83,5 +88,10 @@ class ButtonPanelBinder(
             }
         }
         return true
+    }
+
+    class ViewModel {
+        var layoutOption by ObservablePropertyWithObservers(PacsDemoViewModel.LayoutOption.ONE_ONE)
+        var imageFramesViewModel: ImageFramesViewModel? = null
     }
 }
