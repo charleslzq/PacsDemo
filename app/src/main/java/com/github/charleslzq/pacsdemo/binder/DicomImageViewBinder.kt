@@ -44,6 +44,9 @@ class DicomImageViewBinder(
         view.setImageBitmap(firstImage)
 
         onModelChange(newModel::colorMatrix) { _, newMatrix ->
+            if (newModel.playing) {
+                newModel.playing = false
+            }
             imageView.colorFilter = ColorMatrixColorFilter(newMatrix)
         }
 

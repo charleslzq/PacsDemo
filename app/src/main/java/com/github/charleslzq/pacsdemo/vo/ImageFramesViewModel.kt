@@ -95,9 +95,9 @@ data class ImageFramesViewModel(
         val animation = IndexListenableAnimationDrawable()
         animation.isOneShot = true
         frames.subList(startOffset, size).forEachIndexed { index, _ ->
-            animation.addFrame(
-                    BitmapDrawable(resources, getFrame(currentIndex + index)),
-                    duration)
+            val bitmap = BitmapDrawable(resources, getFrame(currentIndex + index))
+            bitmap.colorFilter = ColorMatrixColorFilter(colorMatrix)
+            animation.addFrame(bitmap, duration)
         }
         animation.selectDrawable(0)
         animation.callback = null
