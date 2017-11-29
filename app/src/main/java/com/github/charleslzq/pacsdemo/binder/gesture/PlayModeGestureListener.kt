@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo.gesture
+package com.github.charleslzq.pacsdemo.binder.gesture
 
 import android.graphics.ColorMatrix
 import android.view.MotionEvent
@@ -19,8 +19,10 @@ class PlayModeGestureListener(
     }
 
     override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
-        val rawDistance = (distanceX / 10).toInt()
-        framesViewModel.currentIndex = Math.min(Math.max(framesViewModel.currentIndex - rawDistance, 0), framesViewModel.size - 1)
+        if (Math.abs(distanceX) > 3 * Math.abs(distanceY)) {
+            val rawDistance = (distanceX / 10).toInt()
+            framesViewModel.currentIndex = Math.min(Math.max(framesViewModel.currentIndex - rawDistance, 0), framesViewModel.size - 1)
+        }
         return true
     }
 

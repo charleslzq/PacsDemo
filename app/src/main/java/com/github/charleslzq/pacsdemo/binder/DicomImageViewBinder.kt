@@ -3,8 +3,8 @@ package com.github.charleslzq.pacsdemo.binder
 import android.graphics.ColorMatrixColorFilter
 import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.IndexListenableAnimationDrawable
+import com.github.charleslzq.pacsdemo.binder.gesture.*
 import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel
-import com.github.charleslzq.pacsdemo.gesture.*
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -19,10 +19,6 @@ class DicomImageViewBinder(
         }
 
     init {
-        view.clearAnimation()
-        view.background = null
-        view.setImageBitmap(null)
-
         onNewModel {
             if (model.size != 0) {
                 model.autoAdjustScale(view)

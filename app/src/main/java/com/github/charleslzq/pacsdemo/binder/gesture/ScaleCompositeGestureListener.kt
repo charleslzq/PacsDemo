@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo.gesture
+package com.github.charleslzq.pacsdemo.binder.gesture
 
 import android.view.ScaleGestureDetector
 import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel

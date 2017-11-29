@@ -1,6 +1,8 @@
 package com.github.charleslzq.pacsdemo.binder
 
 import ItemClickSupport
+import android.content.ClipData
+import android.content.ClipDescription
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -13,6 +15,7 @@ import com.github.charleslzq.pacsdemo.binder.vo.PacsDemoViewModel
 class ThumbListViewBinder(
         recyclerView: RecyclerView
 ) : ViewBinder<RecyclerView, PacsDemoViewModel>(recyclerView, { PacsDemoViewModel() }) {
+    private val tag = "thumbList"
 
     init {
         view.layoutManager = LinearLayoutManager(recyclerView.context)
@@ -22,6 +25,19 @@ class ThumbListViewBinder(
                 ItemClickSupport.addTo(view).setOnItemClickListener(object : ItemClickSupport.OnItemClickListener {
                     override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
                         model.selected = position
+                    }
+                })
+                ItemClickSupport.addTo(view).setOnItemLongClickListener(object : ItemClickSupport.OnItemLongClickListener {
+                    @Suppress("DEPRECATION")
+                    override fun onItemLongClicked(recyclerView: RecyclerView, position: Int, v: View): Boolean {
+                        if (position >= 0 && position < view.childCount) {
+                            val targetView = view.getChildAt(position)
+                            val dragBuilder = View.DragShadowBuilder(targetView)
+                            val clipDataItem = ClipData.Item(tag, position.toString())
+                            val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), clipDataItem)
+                            targetView.startDrag(clipData, dragBuilder, null, 0)
+                        }
+                        return true
                     }
                 })
 
