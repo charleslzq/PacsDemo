@@ -21,7 +21,7 @@ class PlayModeGestureListener(
     override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
         if (Math.abs(distanceX) > 3 * Math.abs(distanceY)) {
             val rawDistance = (distanceX / 10).toInt()
-            framesViewModel.currentIndex = Math.min(Math.max(framesViewModel.currentIndex - rawDistance, 0), framesViewModel.size - 1)
+            framesViewModel.currentIndex = Math.min(Math.max(framesViewModel.currentIndex - rawDistance, 0), framesViewModel.framesModel.size - 1)
         }
         return true
     }

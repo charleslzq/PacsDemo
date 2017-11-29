@@ -15,8 +15,7 @@ import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
  * Created by charleslzq on 17-11-27.
  */
 class ButtonPanelBinder(
-        buttonPanel: View,
-        val resetLayout: (PacsDemoViewModel.LayoutOption) -> Unit
+        buttonPanel: View
 ) : ViewBinder<View, PacsDemoViewModel>(buttonPanel, { PacsDemoViewModel() }) {
     private val pseudoButton: Button = view.findViewById(R.id.pseudoColorButton)
     private val reverseButton: Button = view.findViewById(R.id.reverseButton)
@@ -41,8 +40,8 @@ class ButtonPanelBinder(
 
         onNewModel {
             reverseButton.setOnClickListener {
-                if (model.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE && model.selected >= 0 && model.selected < model.seriesList.size) {
-                    val imageModel = model.seriesList[model.selected].imageFramesViewModel
+                if (model.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
+                    val imageModel = model.imageCells[0]
                     val newColorMatrix = ColorMatrix(imageModel.colorMatrix)
                     newColorMatrix.postConcat(reverseMatrix)
                     imageModel.colorMatrix = newColorMatrix
@@ -50,8 +49,8 @@ class ButtonPanelBinder(
             }
 
             pseudoButton.setOnClickListener {
-                if (model.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE && model.selected >= 0 && model.selected < model.seriesList.size) {
-                    val imageModel = model.seriesList[model.selected].imageFramesViewModel
+                if (model.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
+                    val imageModel = model.imageCells[0]
                     imageModel.pseudoColor = !imageModel.pseudoColor
                 }
             }
@@ -62,7 +61,6 @@ class ButtonPanelBinder(
                 }
                 reverseButton.visibility = visible
                 pseudoButton.visibility = visible
-                resetLayout(model.layoutOption)
             }
         }
 

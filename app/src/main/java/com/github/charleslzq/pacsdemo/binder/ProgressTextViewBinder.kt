@@ -13,10 +13,10 @@ class ProgressTextViewBinder(
 
     init {
         onNewModel {
-            if (model.size > 1) {
-                setProgress(0, model.size)
+            if (model.framesModel.size > 1) {
+                setProgress(0, model.framesModel.size)
                 onModelChange(model::currentIndex) {
-                    setProgress(it.second, model.size)
+                    setProgress(it.second, model.framesModel.size)
                 }
                 view.visibility = View.VISIBLE
             } else {

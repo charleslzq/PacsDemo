@@ -15,7 +15,7 @@ class ImageProgressBarBinder(
         view.visibility = View.INVISIBLE
         onNewModel {
             if (model.playable()) {
-                view.max = model.size
+                view.max = model.framesModel.size
                 view.progress = model.currentIndex
                 view.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(p0: SeekBar?, progress: Int, fromUser: Boolean) {

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.charleslzq.pacsdemo.binder.PacsMainViewBinder
+import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesModel
 import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel
 import com.github.charleslzq.pacsdemo.binder.vo.PacsDemoViewModel
 import com.github.charleslzq.pacsdemo.binder.vo.PatientSeriesViewModel
@@ -42,8 +43,7 @@ class PacsDemoActivity : AppCompatActivity() {
                             patient.metaInfo,
                             study.metaInfo,
                             it.metaInfo,
-                            ImageFramesViewModel(it.images.sortedBy { it.instanceNumber?.toInt() }),
-                            it.images.sortedBy { it.instanceNumber?.toInt() }[0].files[ImageFramesViewModel.THUMB]!!
+                            ImageFramesModel(it.images.sortedBy { it.instanceNumber?.toInt() })
                     )
                 }
             }.toMutableList())

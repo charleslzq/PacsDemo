@@ -12,7 +12,5 @@ data class PatientSeriesViewModel(
         var patientMetaInfo: DicomPatientMetaInfo = DicomPatientMetaInfo(),
         var studyMetaInfo: DicomStudyMetaInfo = DicomStudyMetaInfo(),
         var dicomSeriesMetaInfo: DicomSeriesMetaInfo = DicomSeriesMetaInfo(),
-        var imageFramesViewModel: ImageFramesViewModel = ImageFramesViewModel(),
-        var thumbUrl: URI? = null,
-        var layoutPosition: Int = -1
+        var imageFramesModel: ImageFramesModel = ImageFramesModel()
 )

@@ -20,7 +20,7 @@ class DicomImageViewBinder(
 
     init {
         onNewModel {
-            if (model.size != 0) {
+            if (model.framesModel.size != 0) {
                 model.autoAdjustScale(view)
                 init()
             } else {

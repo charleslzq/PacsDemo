@@ -10,6 +10,7 @@ data class PacsDemoViewModel(
 ) {
     var selected: Int by ObservablePropertyWithObservers(0)
     var layoutOption: LayoutOption by ObservablePropertyWithObservers(LayoutOption.ONE_ONE)
+    var imageCells: MutableList<ImageFramesViewModel> = emptyList<ImageFramesViewModel>().toMutableList()
 
     enum class LayoutOption {
         ONE_ONE,

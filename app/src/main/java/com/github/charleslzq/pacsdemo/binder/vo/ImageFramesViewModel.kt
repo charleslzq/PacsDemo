@@ -5,7 +5,6 @@ import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import android.widget.ImageView
-import com.github.charleslzq.dicom.data.DicomImageMetaInfo
 import com.github.charleslzq.pacsdemo.IndexListenableAnimationDrawable
 import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
 import com.github.charleslzq.pacsdemo.observe.ObserverUtil.registerObserver
@@ -16,10 +15,8 @@ import java.io.File
  * Created by charleslzq on 17-11-27.
  */
 data class ImageFramesViewModel(
-        private val frames: List<DicomImageMetaInfo> = emptyList()
+        var framesModel: ImageFramesModel = ImageFramesModel()
 ) {
-    val size = frames.size
-    val frameUrls = frames.sortedBy { it.instanceNumber?.toInt() }.map { it.files[DEFAULT] }
     var duration: Int = 40
     var scaleFactor: Float by ObservablePropertyWithObservers(1.0f)
     var currentIndex: Int by ObservablePropertyWithObservers(0)
@@ -42,10 +39,10 @@ data class ImageFramesViewModel(
         })
     }
 
-    fun playable() = size > 1 && allowPlay
+    fun playable() = framesModel.size > 1 && allowPlay
 
     fun autoAdjustScale(view: View) {
-        if (frames.isNotEmpty()) {
+        if (framesModel.frameUrls.isNotEmpty()) {
             val viewHeight = view.measuredHeight
             val viewWidth = view.measuredWidth
             val firstImage = getFrame(0)
@@ -65,7 +62,7 @@ data class ImageFramesViewModel(
     }
 
     fun getFrame(index: Int): Bitmap {
-        val rawBitmap = BitmapFactory.decodeFile(File(frameUrls[index]).absolutePath, BitmapFactory.Options().apply { inMutable = pseudoColor })
+        val rawBitmap = BitmapFactory.decodeFile(File(framesModel.frameUrls[index]).absolutePath, BitmapFactory.Options().apply { inMutable = pseudoColor })
         if (pseudoColor) {
             val pixels = IntArray(rawBitmap.height * rawBitmap.width)
             rawBitmap.getPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
@@ -94,7 +91,7 @@ data class ImageFramesViewModel(
         startOffset = currentIndex
         val animation = IndexListenableAnimationDrawable()
         animation.isOneShot = true
-        frames.subList(startOffset, size).forEachIndexed { index, _ ->
+        framesModel.frames.subList(startOffset, framesModel.size).forEachIndexed { index, _ ->
             val bitmap = BitmapDrawable(resources, getFrame(currentIndex + index))
             bitmap.colorFilter = ColorMatrixColorFilter(colorMatrix)
             animation.addFrame(bitmap, duration)
@@ -102,7 +99,7 @@ data class ImageFramesViewModel(
         animation.selectDrawable(0)
         animation.callback = null
         registerObserver(animation::currentIndex, { _, newIndex ->
-            currentIndex = (startOffset + newIndex) % size
+            currentIndex = (startOffset + newIndex) % framesModel.size
         })
         return animation
     }

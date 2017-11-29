@@ -18,7 +18,8 @@ class ViewSelectorBinder(
                 viewFlipper.displayedChild = model.layoutOption.ordinal
                 binders = getImageViewBindersFromPanel()
                 binders.forEachIndexed { index, imageCellViewBinder ->
-                    imageCellViewBinder.model.layoutPosition = index
+                    imageCellViewBinder.layoutPosition = index
+                    model.imageCells[index] = imageCellViewBinder.imageBinder.model
                 }
             }
         }
@@ -45,9 +46,12 @@ class ViewSelectorBinder(
     private fun bind(layoutPosition: Int, dataPosition: Int) {
         if (dataPosition >= 0 && dataPosition < model.seriesList.size && layoutPosition >= 0 && layoutPosition < binders.size) {
             val dataModel = model.seriesList[dataPosition]
-            dataModel.imageFramesViewModel.allowPlay = binders.size == 1
-            model.selected = dataPosition
-            binders[layoutPosition].model = dataModel
+            binders[layoutPosition].model = dataModel.copy(
+                    dataModel.patientMetaInfo.copy(),
+                    dataModel.studyMetaInfo.copy(),
+                    dataModel.dicomSeriesMetaInfo.copy(),
+                    dataModel.imageFramesModel.copy()
+            )
         }
     }
 }

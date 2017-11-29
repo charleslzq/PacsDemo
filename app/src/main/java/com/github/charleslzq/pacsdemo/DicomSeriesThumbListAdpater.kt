@@ -16,7 +16,7 @@ class DicomSeriesThumbListAdpater(
         val seriesViewModels: MutableList<PatientSeriesViewModel>
 ) : RecyclerView.Adapter<DicomSeriesThumbListAdpater.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.thumbView.setImageBitmap(BitmapFactory.decodeFile(File(seriesViewModels[position].thumbUrl).absolutePath))
+        holder.thumbView.setImageBitmap(BitmapFactory.decodeFile(File(seriesViewModels[position].imageFramesModel.thumbUrl).absolutePath))
     }
 
     override fun getItemCount(): Int {
