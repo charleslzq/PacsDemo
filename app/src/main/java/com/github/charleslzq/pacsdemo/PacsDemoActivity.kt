@@ -6,12 +6,12 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.charleslzq.pacsdemo.binder.PacsMainViewBinder
+import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel
+import com.github.charleslzq.pacsdemo.binder.vo.PacsDemoViewModel
+import com.github.charleslzq.pacsdemo.binder.vo.PatientSeriesViewModel
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
-import com.github.charleslzq.pacsdemo.vo.ImageFramesViewModel
-import com.github.charleslzq.pacsdemo.vo.PacsDemoViewModel
-import com.github.charleslzq.pacsdemo.vo.PatientSeriesViewModel
 import kotlinx.android.synthetic.main.layout_pacs_demo.*
 
 class PacsDemoActivity : AppCompatActivity() {

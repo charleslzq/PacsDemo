@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo.vo
+package com.github.charleslzq.pacsdemo.binder.vo
 
 import android.content.res.Resources
 import android.graphics.*
@@ -16,7 +16,7 @@ import java.io.File
  * Created by charleslzq on 17-11-27.
  */
 data class ImageFramesViewModel(
-        private val frames: List<DicomImageMetaInfo>
+        private val frames: List<DicomImageMetaInfo> = emptyList()
 ) {
     val size = frames.size
     val frameUrls = frames.sortedBy { it.instanceNumber?.toInt() }.map { it.files[DEFAULT] }

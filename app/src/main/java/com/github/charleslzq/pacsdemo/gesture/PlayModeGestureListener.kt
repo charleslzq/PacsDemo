@@ -2,7 +2,7 @@ package com.github.charleslzq.pacsdemo.gesture
 
 import android.graphics.ColorMatrix
 import android.view.MotionEvent
-import com.github.charleslzq.pacsdemo.vo.ImageFramesViewModel
+import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel
 
 /**
  * Created by charleslzq on 17-11-27.

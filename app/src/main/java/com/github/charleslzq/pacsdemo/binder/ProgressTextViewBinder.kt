@@ -2,22 +2,21 @@ package com.github.charleslzq.pacsdemo.binder
 
 import android.view.View
 import android.widget.TextView
-import com.github.charleslzq.pacsdemo.vo.ImageFramesViewModel
+import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel
 
 /**
  * Created by charleslzq on 17-11-27.
  */
 class ProgressTextViewBinder(
         textView: TextView
-) : ViewBinder<TextView, ImageFramesViewModel>(textView) {
+) : ViewBinder<TextView, ImageFramesViewModel>(textView, { ImageFramesViewModel() }) {
 
     init {
-        view.visibility = View.INVISIBLE
-        onNewModel { model ->
-            if (model != null && model.size > 1) {
+        onNewModel {
+            if (model.size > 1) {
                 setProgress(0, model.size)
-                onModelChange(model::currentIndex) { _, newIndex ->
-                    setProgress(newIndex, model.size)
+                onModelChange(model::currentIndex) {
+                    setProgress(it.second, model.size)
                 }
                 view.visibility = View.VISIBLE
             } else {

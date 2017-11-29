@@ -2,14 +2,14 @@ package com.github.charleslzq.pacsdemo.binder
 
 import android.view.View
 import com.github.charleslzq.pacsdemo.R
-import com.github.charleslzq.pacsdemo.vo.PacsDemoViewModel
+import com.github.charleslzq.pacsdemo.binder.vo.PacsDemoViewModel
 
 /**
  * Created by charleslzq on 17-11-27.
  */
 class PacsMainViewBinder(
         mainView: View
-) : ViewBinder<View, PacsDemoViewModel>(mainView) {
+) : ViewBinder<View, PacsDemoViewModel>(mainView, { PacsDemoViewModel() }) {
     private val thumbListViewBinder = ThumbListViewBinder(view.findViewById(R.id.thumbList))
     private val viewSelectorBinder = ViewSelectorBinder(view.findViewById(R.id.viewSelector))
     private val imageProgressBarBinder = ImageProgressBarBinder(view.findViewById(R.id.imageSeekBar))
@@ -17,27 +17,29 @@ class PacsMainViewBinder(
 
     init {
         onNewModel {
-            thumbListViewBinder.model = it
-            viewSelectorBinder.model = it
-            buttonPanelBinder.model = it
-            if (it != null) {
-                it.selected = 0
-                onModelChange(it::selected) { _, _ ->
-                    resetProgress()
+            thumbListViewBinder.model = model
+            viewSelectorBinder.model = model
+            buttonPanelBinder.model = model
+            onModelChange(model::selected) {
+                resetProgress()
+            }
+            onModelChange(model::layoutOption) {
+                when (model.layoutOption) {
+                    PacsDemoViewModel.LayoutOption.ONE_ONE -> resetProgress()
+                    else -> imageProgressBarBinder.reset()
                 }
             }
-            resetProgress()
         }
     }
 
     private fun resetProgress() {
-        if (model != null) {
-            val selected = model!!.selected
-            val layoutOption = model!!.layoutOption
-            val seriesList = model!!.seriesList
-            if (layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE && selected >= 0 && selected < seriesList.size) {
-                imageProgressBarBinder.model = seriesList[selected].imageFramesViewModel
-            }
+        val selected = model.selected
+        val layoutOption = model.layoutOption
+        val seriesList = model.seriesList
+        if (layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE && selected >= 0 && selected < seriesList.size) {
+            imageProgressBarBinder.model = seriesList[selected].imageFramesViewModel
+        } else {
+            imageProgressBarBinder.reset()
         }
     }
 }

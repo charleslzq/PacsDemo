@@ -3,15 +3,15 @@ package com.github.charleslzq.pacsdemo.binder
 import android.graphics.ColorMatrixColorFilter
 import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.IndexListenableAnimationDrawable
+import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel
 import com.github.charleslzq.pacsdemo.gesture.*
-import com.github.charleslzq.pacsdemo.vo.ImageFramesViewModel
 
 /**
  * Created by charleslzq on 17-11-27.
  */
 class DicomImageViewBinder(
         imageView: ImageView
-) : ViewBinder<ImageView, ImageFramesViewModel>(imageView) {
+) : ViewBinder<ImageView, ImageFramesViewModel>(imageView, { ImageFramesViewModel() }) {
     var operationMode: OperationMode = PlayMode(view.context, NoOpAllGestureListener())
         set(value) {
             field = value
@@ -23,10 +23,10 @@ class DicomImageViewBinder(
         view.background = null
         view.setImageBitmap(null)
 
-        onNewModel { newModel ->
-            if (newModel != null && newModel.size != 0) {
-                newModel.autoAdjustScale(view)
-                init(newModel, view)
+        onNewModel {
+            if (model.size != 0) {
+                model.autoAdjustScale(view)
+                init()
             } else {
                 view.clearAnimation()
                 view.background = null
@@ -35,55 +35,57 @@ class DicomImageViewBinder(
         }
     }
 
-    private fun init(newModel: ImageFramesViewModel, imageView: ImageView) {
-        operationMode = PlayMode(view.context, PlayModeGestureListener(view.layoutParams.width, view.layoutParams.height, newModel))
+    private fun init() {
+        operationMode = PlayMode(view.context, PlayModeGestureListener(view.layoutParams.width, view.layoutParams.height, model))
 
-        val firstImage = newModel.getScaledFrame(0)
+        val firstImage = model.getScaledFrame(0)
         view.clearAnimation()
         view.background = null
         view.setImageBitmap(firstImage)
 
-        onModelChange(newModel::colorMatrix) { _, newMatrix ->
-            if (newModel.playing) {
-                newModel.playing = false
+        onModelChange(model::colorMatrix) {
+            if (model.playing) {
+                model.playing = false
             }
-            imageView.colorFilter = ColorMatrixColorFilter(newMatrix)
+            view.colorFilter = ColorMatrixColorFilter(model.colorMatrix)
         }
 
-        onModelChange(newModel::currentIndex) { _, newIndex ->
-            if (!newModel.playing) {
-                imageView.clearAnimation()
-                imageView.background = null
-                imageView.setImageBitmap(newModel.getScaledFrame(newIndex))
+        onModelChange(model::currentIndex) {
+            if (!model.playing) {
+                view.clearAnimation()
+                view.background = null
+                view.setImageBitmap(model.getScaledFrame(model.currentIndex))
             }
         }
-        onModelChange(newModel::matrix) { _, newMatrix ->
-            view.imageMatrix = newMatrix
+        onModelChange(model::matrix) {
+            view.imageMatrix = model.matrix
         }
-        onModelChange(newModel::scaleFactor) { _, newScale ->
-            if (newScale > 1 && operationMode is PlayMode) {
-                operationMode = StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, newModel))
-            } else if (newScale == 1.0f && operationMode is StudyMode) {
-                operationMode = PlayMode(view.context, PlayModeGestureListener(view.layoutParams.width, view.layoutParams.height, newModel))
+        onModelChange(model::scaleFactor) {
+            if (model.scaleFactor > 1 && operationMode is PlayMode) {
+                operationMode = StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, model))
+            } else if (model.scaleFactor == 1.0f && operationMode is StudyMode) {
+                operationMode = PlayMode(view.context, PlayModeGestureListener(view.layoutParams.width, view.layoutParams.height, model))
             }
         }
-        onModelChange(newModel::playing) { _, newStatus ->
-            when (newStatus) {
-                true -> imageView.post(newModel.resetAnimation(imageView))
+        onModelChange(model::playing) {
+            when (model.playing) {
+                true -> view.post(model.resetAnimation(view))
                 false -> {
-                    val animation = imageView.background as IndexListenableAnimationDrawable
-                    animation.stop()
-                    imageView.clearAnimation()
-                    imageView.background = null
-                    imageView.setImageBitmap(newModel.getScaledFrame(newModel.currentIndex))
+                    if (view.background != null) {
+                        val animation = view.background as IndexListenableAnimationDrawable
+                        animation.stop()
+                        view.clearAnimation()
+                        view.background = null
+                    }
+                    view.setImageBitmap(model.getScaledFrame(model.currentIndex))
                 }
             }
         }
-        onModelChange(newModel::pseudoColor) { _, _ ->
-            if (newModel.playing) {
-                newModel.playing = false
+        onModelChange(model::pseudoColor) {
+            if (model.playing) {
+                model.playing = false
             } else {
-                imageView.setImageBitmap(newModel.getScaledFrame(newModel.currentIndex))
+                view.setImageBitmap(model.getScaledFrame(model.currentIndex))
             }
         }
     }

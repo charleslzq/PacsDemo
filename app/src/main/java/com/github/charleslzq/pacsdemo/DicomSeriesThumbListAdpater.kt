@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import com.github.charleslzq.pacsdemo.vo.PatientSeriesViewModel
+import com.github.charleslzq.pacsdemo.binder.vo.PatientSeriesViewModel
 import java.io.File
 
 /**

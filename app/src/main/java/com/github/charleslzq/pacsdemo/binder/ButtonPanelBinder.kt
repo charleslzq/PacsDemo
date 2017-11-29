@@ -7,14 +7,14 @@ import android.view.View
 import android.widget.Button
 import android.widget.PopupMenu
 import com.github.charleslzq.pacsdemo.R
-import com.github.charleslzq.pacsdemo.vo.PacsDemoViewModel
+import com.github.charleslzq.pacsdemo.binder.vo.PacsDemoViewModel
 
 /**
  * Created by charleslzq on 17-11-27.
  */
 class ButtonPanelBinder(
         buttonPanel: View
-) : ViewBinder<View, PacsDemoViewModel>(buttonPanel) {
+) : ViewBinder<View, PacsDemoViewModel>(buttonPanel, { PacsDemoViewModel() }) {
     private val pseudoButton: Button = view.findViewById(R.id.pseudoColorButton)
     private val reverseButton: Button = view.findViewById(R.id.reverseButton)
     private val splitButton: Button = view.findViewById(R.id.spliteButton)
@@ -37,42 +37,49 @@ class ButtonPanelBinder(
         }
 
         reverseButton.setOnClickListener {
-            if (model != null) {
-                if (model!!.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
-                    val imageModel = model!!.seriesList[model!!.selected].imageFramesViewModel
-                    val newColorMatrix = ColorMatrix(imageModel.colorMatrix)
-                    newColorMatrix.postConcat(reverseMatrix)
-                    imageModel.colorMatrix = newColorMatrix
-                }
+            if (model.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
+                val imageModel = model.seriesList[model.selected].imageFramesViewModel
+                val newColorMatrix = ColorMatrix(imageModel.colorMatrix)
+                newColorMatrix.postConcat(reverseMatrix)
+                imageModel.colorMatrix = newColorMatrix
             }
         }
 
         pseudoButton.setOnClickListener {
-            if (model != null) {
-                if (model!!.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
-                    val imageModel = model!!.seriesList[model!!.selected].imageFramesViewModel
+            if (model.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
+                if (model.selected >= 0 && model.selected < model.seriesList.size) {
+                    val imageModel = model.seriesList[model.selected].imageFramesViewModel
                     imageModel.pseudoColor = !imageModel.pseudoColor
                 }
+            }
+        }
+
+        onNewModel {
+            onModelChange(model::layoutOption) {
+                val visible = when (model.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
+                    true -> View.VISIBLE
+                    false -> View.INVISIBLE
+                }
+                reverseButton.visibility = visible
+                pseudoButton.visibility = visible
             }
         }
 
     }
 
     private fun onLayoutSelected(item: MenuItem): Boolean {
-        if (model != null) {
-            when (item.itemId) {
-                R.id.one_one -> {
-                    model!!.layoutOption = PacsDemoViewModel.LayoutOption.ONE_ONE
-                }
-                R.id.one_two -> {
-                    model!!.layoutOption = PacsDemoViewModel.LayoutOption.ONE_TWO
-                }
-                R.id.two_two -> {
-                    model!!.layoutOption = PacsDemoViewModel.LayoutOption.TWO_TWO
-                }
-                R.id.three_three -> {
-                    model!!.layoutOption = PacsDemoViewModel.LayoutOption.THREE_THREE
-                }
+        when (item.itemId) {
+            R.id.one_one -> {
+                model.layoutOption = PacsDemoViewModel.LayoutOption.ONE_ONE
+            }
+            R.id.one_two -> {
+                model.layoutOption = PacsDemoViewModel.LayoutOption.ONE_TWO
+            }
+            R.id.two_two -> {
+                model.layoutOption = PacsDemoViewModel.LayoutOption.TWO_TWO
+            }
+            R.id.three_three -> {
+                model.layoutOption = PacsDemoViewModel.LayoutOption.THREE_THREE
             }
         }
         return true

@@ -2,26 +2,26 @@ package com.github.charleslzq.pacsdemo.binder
 
 import android.view.View
 import android.widget.SeekBar
-import com.github.charleslzq.pacsdemo.vo.ImageFramesViewModel
+import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel
 
 /**
  * Created by charleslzq on 17-11-27.
  */
 class ImageScaleBarBinder(
         scaleBar: SeekBar
-) : ViewBinder<SeekBar, ImageFramesViewModel>(scaleBar) {
+) : ViewBinder<SeekBar, ImageFramesViewModel>(scaleBar, { ImageFramesViewModel() }) {
 
     init {
-        scaleBar.visibility = View.INVISIBLE
-
         onNewModel {
-            if (it?.playable() == false) {
+            if (isInit(it) || model.playable()) {
+                scaleBar.visibility = View.INVISIBLE
+            } else {
                 scaleBar.max = 40
                 scaleBar.progress = 0
                 scaleBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(p0: SeekBar?, process: Int, fromUser: Boolean) {
                         if (fromUser) {
-                            it.scaleFactor = 1.0f + process * 0.1f
+                            model.scaleFactor = 1.0f + process * 0.1f
                         }
                     }
 
@@ -34,12 +34,10 @@ class ImageScaleBarBinder(
                     }
 
                 })
-                onModelChange(it::scaleFactor) { _, newScale ->
-                    scaleBar.progress = ((newScale - 1.0f) * 10).toInt()
+                onModelChange(model::scaleFactor) {
+                    scaleBar.progress = ((model.scaleFactor - 1.0f) * 10).toInt()
                 }
                 scaleBar.visibility = View.VISIBLE
-            } else {
-                scaleBar.visibility = View.INVISIBLE
             }
         }
     }

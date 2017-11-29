@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo.vo
+package com.github.charleslzq.pacsdemo.binder.vo
 
 import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
 
@@ -6,9 +6,9 @@ import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
  * Created by charleslzq on 17-11-27.
  */
 data class PacsDemoViewModel(
-        var seriesList: MutableList<PatientSeriesViewModel>
+        var seriesList: MutableList<PatientSeriesViewModel> = emptyList<PatientSeriesViewModel>().toMutableList()
 ) {
-    var selected: Int by ObservablePropertyWithObservers(-1)
+    var selected: Int by ObservablePropertyWithObservers(0)
     var layoutOption: LayoutOption by ObservablePropertyWithObservers(LayoutOption.ONE_ONE)
 
     enum class LayoutOption {
