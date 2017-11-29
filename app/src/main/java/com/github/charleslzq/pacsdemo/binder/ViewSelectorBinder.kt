@@ -46,13 +46,8 @@ class ViewSelectorBinder(
         if (dataPosition >= 0 && dataPosition < model.seriesList.size && layoutPosition >= 0 && layoutPosition < binders.size) {
             val dataModel = model.seriesList[dataPosition]
             dataModel.imageFramesViewModel.allowPlay = binders.size == 1
-            if (binders.size == 1) {
-                if (model.selected == dataPosition) {
-                    model.selected = -1
-                }
-                model.selected = dataPosition
-            }
-            binders[layoutPosition].model = dataModel.copy()
+            model.selected = dataPosition
+            binders[layoutPosition].model = dataModel
         }
     }
 }
