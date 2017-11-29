@@ -8,29 +8,19 @@ import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel
  * Created by charleslzq on 17-11-27.
  */
 class PlayModeGestureListener(
-        viewWidth: Int,
-        viewHeight: Int,
         framesViewModel: ImageFramesViewModel
-) : ScaleCompositeGestureListener(viewWidth, viewHeight, framesViewModel) {
+) : ScaleCompositeGestureListener(framesViewModel) {
 
     override fun onSingleTapConfirmed(motionEvent: MotionEvent): Boolean {
-        when (framesViewModel.playable()) {
-            true -> framesViewModel.playing = !framesViewModel.playing
-            false -> {
-                when (isRightSide(motionEvent)) {
-                    true -> {
-                        if (framesViewModel.currentIndex < framesViewModel.size - 1) {
-                            framesViewModel.currentIndex += 1
-                        }
-                    }
-                    false -> {
-                        if (framesViewModel.currentIndex > 0) {
-                            framesViewModel.currentIndex -= 1
-                        }
-                    }
-                }
-            }
+        if (framesViewModel.playable()) {
+            framesViewModel.playing = !framesViewModel.playing
         }
+        return true
+    }
+
+    override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
+        val rawDistance = (distanceX / 10).toInt()
+        framesViewModel.currentIndex = Math.min(Math.max(framesViewModel.currentIndex - rawDistance, 0), framesViewModel.size - 1)
         return true
     }
 
@@ -43,6 +33,4 @@ class PlayModeGestureListener(
         framesViewModel.pseudoColor = false
         return true
     }
-
-    private fun isRightSide(motionEvent: MotionEvent) = motionEvent.x > viewWidth / 2
 }

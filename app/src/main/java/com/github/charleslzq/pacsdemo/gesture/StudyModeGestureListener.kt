@@ -9,10 +9,10 @@ import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel
  * Created by charleslzq on 17-11-27.
  */
 class StudyModeGestureListener(
-        viewWidth: Int,
-        viewHeight: Int,
+        val viewWidth: Int,
+        val viewHeight: Int,
         framesViewModel: ImageFramesViewModel
-) : ScaleCompositeGestureListener(viewWidth, viewHeight, framesViewModel) {
+) : ScaleCompositeGestureListener(framesViewModel) {
 
     override fun onDoubleTap(motionEvent: MotionEvent?): Boolean {
         framesViewModel.scaleFactor = 1.0f
@@ -22,11 +22,9 @@ class StudyModeGestureListener(
         return true
     }
 
-    override fun onFling(startMotion: MotionEvent, currentMotion: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-        val motionX = currentMotion.x - startMotion.x
-        val motionY = currentMotion.y - startMotion.y
+    override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
         val newMatrix = Matrix(framesViewModel.matrix)
-        newMatrix.postTranslate(motionX, motionY)
+        newMatrix.postTranslate(distanceX, distanceY)
         framesViewModel.matrix = newMatrix
         return true
     }

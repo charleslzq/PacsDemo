@@ -36,7 +36,7 @@ class DicomImageViewBinder(
     }
 
     private fun init() {
-        operationMode = PlayMode(view.context, PlayModeGestureListener(view.layoutParams.width, view.layoutParams.height, model))
+        operationMode = PlayMode(view.context, PlayModeGestureListener(model))
 
         val firstImage = model.getScaledFrame(0)
         view.clearAnimation()
@@ -64,7 +64,7 @@ class DicomImageViewBinder(
             if (model.scaleFactor > 1 && operationMode is PlayMode) {
                 operationMode = StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, model))
             } else if (model.scaleFactor == 1.0f && operationMode is StudyMode) {
-                operationMode = PlayMode(view.context, PlayModeGestureListener(view.layoutParams.width, view.layoutParams.height, model))
+                operationMode = PlayMode(view.context, PlayModeGestureListener(model))
             }
         }
         onModelChange(model::playing) {
