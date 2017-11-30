@@ -29,7 +29,7 @@
             android:exported="true" />
 
         <receiver
-            android:name=".StartupReceiver"
+            android:name=".support.StartupReceiver"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">

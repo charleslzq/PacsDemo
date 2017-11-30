@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo
+package com.github.charleslzq.pacsdemo.support
 
 import android.graphics.BitmapFactory
 import android.support.v7.widget.RecyclerView
@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import com.github.charleslzq.pacsdemo.R
 import com.github.charleslzq.pacsdemo.component.state.PatientSeriesModel
 import java.io.File
 
@@ -25,7 +26,7 @@ class DicomSeriesThumbListAdpater(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.piece_thumb_item, parent, false)
-        return DicomSeriesThumbListAdpater.ViewHolder(view)
+        return ViewHolder(view)
     }
 
     class ViewHolder(

@@ -6,7 +6,7 @@ import android.content.ClipDescription
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import com.github.charleslzq.pacsdemo.DicomSeriesThumbListAdpater
+import com.github.charleslzq.pacsdemo.support.DicomSeriesThumbListAdpater
 import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 
 /**

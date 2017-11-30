@@ -5,7 +5,7 @@ import android.content.ClipDescription
 import android.graphics.ColorMatrixColorFilter
 import android.view.View
 import android.widget.ImageView
-import com.github.charleslzq.pacsdemo.IndexListenableAnimationDrawable
+import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesModel
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState

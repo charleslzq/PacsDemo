@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo
+package com.github.charleslzq.pacsdemo.support
 
 import android.view.View
 import android.view.ViewGroup
