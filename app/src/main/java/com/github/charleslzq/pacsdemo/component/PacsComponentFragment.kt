@@ -6,7 +6,7 @@ import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 /**
  * Created by charleslzq on 17-11-30.
  */
-abstract class PacsComponentFragment<V, S>(
+abstract class PacsComponentFragment<out V, out S>(
         view: V,
         globalState: PacsViewState,
         mapGlobalToLocal: (PacsViewState) -> S
