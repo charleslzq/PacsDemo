@@ -20,23 +20,22 @@ class PacsDemoActivity : AppCompatActivity() {
     private var dicomDataService: DicomDataService? = null
     private val patientList = listOf("03117795").toMutableList()
     private var patientId = "03117795"
-    private lateinit var pacsMainViewBinder: PacsMain
+    private lateinit var pacs: PacsMain
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_pacs_demo)
         Log.d("PacsDemoActivity", "onCreate execute")
 
-        pacsMainViewBinder = PacsMain(pacsPanel)
+        pacs = PacsMain(pacsPanel)
         bindService(Intent(this, DicomDataServiceBackgroud::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
-        refresh()
         refreshButton.setOnClickListener { refresh() }
     }
 
     private fun refresh() {
         val patient = dicomDataService?.findPatient(patientId)
         if (patient != null) {
-            pacsMainViewBinder.state = PacsViewState(patient.studies.flatMap { study ->
+            pacs.state = PacsViewState(patient.studies.flatMap { study ->
                 study.series.sortedBy { it.metaInfo.instanceUID }.map {
                     PatientSeriesModel(
                             patient.metaInfo,

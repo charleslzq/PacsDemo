@@ -16,23 +16,21 @@ abstract class Component<out V, D>(
     var state: D by ObservablePropertyWithObservers(initialState())
     private val monitoredProperties: MutableSet<KProperty0<*>> = emptySet<KProperty0<*>>().toMutableSet()
 
-    fun onNewState(handler: (Pair<D, D>) -> Unit) {
-        handler(state to state)
+    fun onNewState(handler: (Triple<D, D, Boolean>) -> Unit) {
+        handler(Triple(state, state, true))
         registerObserver(this::state, { oldModel, newModel ->
             if (oldModel != newModel) {
                 clearOldStateMonitor()
-                handler(oldModel to newModel)
+                handler(Triple(oldModel, newModel, false))
             }
         })
     }
 
-    fun <T> onStateChange(kProperty0: KProperty0<T>, handler: (Pair<T, T>) -> Unit) {
+    fun <T> onStateChange(kProperty0: KProperty0<T>, handler: (Triple<T, T, Boolean>) -> Unit) {
         monitoredProperties.add(kProperty0)
-        handler(kProperty0.get() to kProperty0.get())
-        registerObserver(kProperty0, { old, new -> if (old != new) handler(old to new) }, this::class.java.name)
+        handler(Triple(kProperty0.get(), kProperty0.get(), true))
+        registerObserver(kProperty0, { old, new -> if (old != new) handler(Triple(old, new, false)) }, this::class.java.name)
     }
-
-    fun <T> isInit(pair: Pair<T, T>) = pair.first == pair.second
 
     fun reset() {
         state = initialState()

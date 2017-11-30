@@ -14,11 +14,16 @@ class ViewSelector(
 
     init {
         onNewState {
+            changeLayout()
             onStateChange(state::layoutOption) {
-                viewFlipper.displayedChild = state.layoutOption.ordinal
-                imageCells = getImageCellsFromPanel()
+                changeLayout()
             }
         }
+    }
+
+    private fun changeLayout() {
+        view.displayedChild = state.layoutOption.ordinal
+        imageCells = getImageCellsFromPanel()
     }
 
     private fun getImageCellsFromPanel(): List<ImageCell> {
