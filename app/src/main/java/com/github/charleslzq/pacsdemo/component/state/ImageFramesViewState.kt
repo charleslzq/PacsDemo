@@ -14,9 +14,8 @@ import java.io.File
 /**
  * Created by charleslzq on 17-11-27.
  */
-data class ImageFramesViewState(
-        var framesModel: ImageFramesModel = ImageFramesModel()
-) {
+class ImageFramesViewState {
+    var framesModel by ObservablePropertyWithObservers(ImageFramesModel())
     var duration: Int = 40
     var scaleFactor: Float by ObservablePropertyWithObservers(1.0f)
     var currentIndex: Int by ObservablePropertyWithObservers(0)

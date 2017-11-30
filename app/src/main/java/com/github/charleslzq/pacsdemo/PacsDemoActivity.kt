@@ -27,7 +27,7 @@ class PacsDemoActivity : AppCompatActivity() {
         setContentView(R.layout.layout_pacs_demo)
         Log.d("PacsDemoActivity", "onCreate execute")
 
-        pacs = PacsMain(pacsPanel)
+        pacs = PacsMain(pacsPanel, PacsViewState())
         bindService(Intent(this, DicomDataServiceBackgroud::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
         refreshButton.setOnClickListener { refresh() }
     }
@@ -35,7 +35,7 @@ class PacsDemoActivity : AppCompatActivity() {
     private fun refresh() {
         val patient = dicomDataService?.findPatient(patientId)
         if (patient != null) {
-            pacs.state = PacsViewState(patient.studies.flatMap { study ->
+            pacs.state.seriesList = patient.studies.flatMap { study ->
                 study.series.sortedBy { it.metaInfo.instanceUID }.map {
                     PatientSeriesModel(
                             patient.metaInfo,
@@ -44,7 +44,7 @@ class PacsDemoActivity : AppCompatActivity() {
                             ImageFramesModel(it.images.sortedBy { it.instanceNumber?.toInt() })
                     )
                 }
-            }.toMutableList())
+            }.toMutableList()
         }
     }
 }

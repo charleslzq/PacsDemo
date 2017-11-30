@@ -2,22 +2,27 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.widget.*
 import com.github.charleslzq.pacsdemo.ViewUtils
+import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
 import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 
 /**
  * Created by charleslzq on 17-11-27.
  */
 class ViewSelector(
-        viewFlipper: ViewFlipper
-) : Component<ViewFlipper, PacsViewState>(viewFlipper, { PacsViewState() }) {
+        viewFlipper: ViewFlipper,
+        pacsViewState: PacsViewState
+) : PacsComponent<ViewFlipper>(viewFlipper, pacsViewState) {
     lateinit var imageCells: List<ImageCell>
 
     init {
-        onNewState {
-            changeLayout()
-            onStateChange(state::layoutOption) {
-                changeLayout()
+        onStateChange(state::layoutOption) {
+            state.imageCells = when (state.layoutOption) {
+                PacsViewState.LayoutOption.ONE_ONE -> generateImageViewStateArray(1)
+                PacsViewState.LayoutOption.ONE_TWO -> generateImageViewStateArray(2)
+                PacsViewState.LayoutOption.TWO_TWO -> generateImageViewStateArray(4)
+                PacsViewState.LayoutOption.THREE_THREE -> generateImageViewStateArray(9)
             }
+            changeLayout()
         }
     }
 
@@ -34,7 +39,7 @@ class ViewSelector(
             }
             PacsViewState.LayoutOption.ONE_TWO -> {
                 ViewUtils.getTypedChildren(displayedChild as LinearLayout, RelativeLayout::class.java)
-                        .mapIndexed { index, relativeLayout ->  ImageCell(relativeLayout, index, state) }
+                        .mapIndexed { index, relativeLayout -> ImageCell(relativeLayout, index, state) }
             }
             else -> {
                 ViewUtils.getTypedChildren(displayedChild as TableLayout, TableRow::class.java)
@@ -42,5 +47,9 @@ class ViewSelector(
                         .mapIndexed { index, relativeLayout -> ImageCell(relativeLayout, index, state) }
             }
         }
+    }
+
+    private fun generateImageViewStateArray(number: Int): Array<ImageFramesViewState> {
+        return (1..number).map { ImageFramesViewState() }.toTypedArray()
     }
 }

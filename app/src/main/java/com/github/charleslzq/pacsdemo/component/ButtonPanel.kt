@@ -13,8 +13,9 @@ import com.github.charleslzq.pacsdemo.component.state.PacsViewState
  * Created by charleslzq on 17-11-27.
  */
 class ButtonPanel(
-        buttonPanel: View
-) : Component<View, PacsViewState>(buttonPanel, { PacsViewState() }) {
+        buttonPanel: View,
+        pacsViewState: PacsViewState
+) : PacsComponent<View>(buttonPanel, pacsViewState) {
     private val pseudoButton: Button = view.findViewById(R.id.pseudoColorButton)
     private val reverseButton: Button = view.findViewById(R.id.reverseButton)
     private val splitButton: Button = view.findViewById(R.id.spliteButton)
@@ -36,34 +37,33 @@ class ButtonPanel(
             layoutSelector.show()
         }
 
-        onNewState {
-            reverseButton.setOnClickListener {
-                if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
-                    val imageModel = state.imageCells[0]
-                    if (imageModel != null) {
-                        val newColorMatrix = ColorMatrix(imageModel.colorMatrix)
-                        newColorMatrix.postConcat(reverseMatrix)
-                        imageModel.colorMatrix = newColorMatrix
-                    }
+        reverseButton.setOnClickListener {
+            if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
+                val imageModel = state.imageCells[0]
+                if (imageModel != null) {
+                    val newColorMatrix = ColorMatrix(imageModel.colorMatrix)
+                    newColorMatrix.postConcat(reverseMatrix)
+                    imageModel.colorMatrix = newColorMatrix
                 }
             }
+        }
 
-            pseudoButton.setOnClickListener {
-                if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
-                    val imageModel = state.imageCells[0]
-                    if (imageModel != null) {
-                        imageModel.pseudoColor = !imageModel.pseudoColor
-                    }
+        pseudoButton.setOnClickListener {
+            if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
+                val imageModel = state.imageCells[0]
+                if (imageModel != null) {
+                    imageModel.pseudoColor = !imageModel.pseudoColor
                 }
             }
-            onStateChange(state::layoutOption) {
-                val visible = when (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
-                    true -> View.VISIBLE
-                    false -> View.INVISIBLE
-                }
-                reverseButton.visibility = visible
-                pseudoButton.visibility = visible
+        }
+
+        onStateChange(state::layoutOption) {
+            val visible = when (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
+                true -> View.VISIBLE
+                false -> View.INVISIBLE
             }
+            reverseButton.visibility = visible
+            pseudoButton.visibility = visible
         }
 
     }

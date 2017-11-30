@@ -13,14 +13,22 @@ import com.github.charleslzq.pacsdemo.component.state.PacsViewState
  * Created by charleslzq on 17-11-27.
  */
 class ThumbList(
-        recyclerView: RecyclerView
-) : Component<RecyclerView, PacsViewState>(recyclerView, { PacsViewState() }) {
+        recyclerView: RecyclerView,
+        pacsViewState: PacsViewState
+) : PacsComponent<RecyclerView>(recyclerView, pacsViewState) {
     private val tag = "thumbList"
 
     init {
         view.layoutManager = LinearLayoutManager(recyclerView.context)
-        onNewState {
-            view.adapter = DicomSeriesThumbListAdpater(state.seriesList)
+        onStateChange(state::seriesList) {
+            val adapter = view.adapter
+            if (adapter != null && adapter is DicomSeriesThumbListAdpater) {
+                adapter.seriesModels.clear()
+                adapter.seriesModels.addAll(state.seriesList)
+            } else {
+                view.adapter = DicomSeriesThumbListAdpater(state.seriesList)
+            }
+            view.adapter.notifyDataSetChanged()
             if (state.seriesList.isNotEmpty()) {
                 ItemClickSupport.addTo(view).setOnItemClickListener(object : ItemClickSupport.OnItemClickListener {
                     override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
@@ -40,17 +48,16 @@ class ThumbList(
                         return true
                     }
                 })
-
-                onStateChange(state::selected) {
-                    if (it.first >= 0 && it.first < view.childCount) {
-                        view.getChildAt(it.first).isSelected = false
-                    }
-                    if (it.second >= 0 && it.second < view.childCount) {
-                        view.getChildAt(it.second).isSelected = true
-                    }
-                }
             }
-            view.invalidate()
+        }
+
+        onStateChange(state::selected) {
+            if (it.first >= 0 && it.first < view.childCount) {
+                view.getChildAt(it.first).isSelected = false
+            }
+            if (it.second >= 0 && it.second < view.childCount) {
+                view.getChildAt(it.second).isSelected = true
+            }
         }
     }
 }

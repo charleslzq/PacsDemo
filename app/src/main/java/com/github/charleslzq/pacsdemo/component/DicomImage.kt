@@ -5,13 +5,16 @@ import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.IndexListenableAnimationDrawable
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
+import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 
 /**
  * Created by charleslzq on 17-11-27.
  */
 class DicomImage(
-        imageView: ImageView
-) : Component<ImageView, ImageFramesViewState>(imageView, { ImageFramesViewState() }) {
+        imageView: ImageView,
+        position: Int,
+        pacsViewState: PacsViewState
+) : PacsComponentFragment<ImageView, ImageFramesViewState>(imageView, pacsViewState, { it.imageCells[position] }) {
     var operationMode: OperationMode = PlayMode(view.context, NoOpCompositeGestureListener())
         set(value) {
             field = value
@@ -19,7 +22,7 @@ class DicomImage(
         }
 
     init {
-        onNewState {
+        onStateChange(state::framesModel) {
             if (state.framesModel.size != 0) {
                 state.autoAdjustScale(view)
                 init()

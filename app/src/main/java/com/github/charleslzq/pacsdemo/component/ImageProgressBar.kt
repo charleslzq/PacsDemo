@@ -3,17 +3,22 @@ package com.github.charleslzq.pacsdemo.component
 import android.view.View
 import android.widget.SeekBar
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
+import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 
 /**
  * Created by charleslzq on 17-11-27.
  */
 class ImageProgressBar(
-        imageProgressBar: SeekBar
-) : Component<SeekBar, ImageFramesViewState>(imageProgressBar, { ImageFramesViewState() }) {
+        imageProgressBar: SeekBar,
+        pacsViewState: PacsViewState
+) : PacsComponentFragment<SeekBar, ImageFramesViewState>(imageProgressBar, pacsViewState, { it.imageCells[0] }) {
 
     init {
         view.visibility = View.INVISIBLE
-        onNewState {
+        onStateChange(state::framesModel) {
+            if (globalState.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
+                state.allowPlay = true
+            }
             if (state.playable()) {
                 view.max = state.framesModel.size
                 view.progress = state.currentIndex
