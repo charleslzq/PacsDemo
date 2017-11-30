@@ -32,7 +32,11 @@ class ImageCell(
         }
 
         onNewState {
-            dicomImage.state = ImageFramesViewState(state.imageFramesModel)
+            val imageState = ImageFramesViewState(state.imageFramesModel)
+            if (pacsViewState.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
+                imageState.allowPlay = true
+            }
+            dicomImage.state = imageState
             pacsViewState.imageCells[layoutPosition] = dicomImage.state
             progressText.state = dicomImage.state
         }
