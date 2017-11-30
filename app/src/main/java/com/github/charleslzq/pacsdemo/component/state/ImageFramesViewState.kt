@@ -26,13 +26,17 @@ class ImageFramesViewState {
     var pseudoColor by ObservablePropertyWithObservers(false)
     var allowPlay = false
     var measureLine by ObservablePropertyWithObservers(false)
-    var paintColor = Color.YELLOW
-    var paintStroke = 3f
+    var linePaint = Paint()
+    var stringPaint = Paint()
 
     private var rawScale = 1.0f
 
     init {
         matrix.reset()
+        linePaint.strokeWidth = 5f
+        stringPaint.strokeWidth = 1f
+        stringPaint.letterSpacing = 0.5f
+        stringPaint.isLinearText = true
         registerObserver(this::scaleFactor, { oldScale, newScale ->
             val newMatrix = Matrix(matrix)
             val scale = newScale / oldScale
@@ -64,7 +68,7 @@ class ImageFramesViewState {
     }
 
     fun getFrame(index: Int): Bitmap {
-        val rawBitmap = BitmapFactory.decodeFile(File(framesModel.frameUrls[index]).absolutePath, BitmapFactory.Options().apply { inMutable = pseudoColor || measureLine })
+        val rawBitmap = BitmapFactory.decodeFile(File(framesModel.frameUrls[index]).absolutePath, BitmapFactory.Options().apply { inMutable = pseudoColor })
         if (pseudoColor) {
             val pixels = IntArray(rawBitmap.height * rawBitmap.width)
             rawBitmap.getPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
@@ -72,6 +76,8 @@ class ImageFramesViewState {
                 pixels[it] = calculateColor(pixels[it])
             }
             rawBitmap.setPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
+        } else if (measureLine) {
+            return rawBitmap.copy(Bitmap.Config.ARGB_8888, true)
         }
         return rawBitmap
     }

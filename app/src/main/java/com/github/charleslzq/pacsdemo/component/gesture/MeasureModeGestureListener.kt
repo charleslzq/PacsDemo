@@ -15,7 +15,6 @@ class MeasureModeGestureListener(
         val imageView: ImageView,
         framesViewState: ImageFramesViewState
 ) : ScaleCompositeGestureListener(framesViewState) {
-    private lateinit var paint: Paint
     private lateinit var canvas: Canvas
     private lateinit var startPoint: PointF
     private var init = false
@@ -25,8 +24,6 @@ class MeasureModeGestureListener(
     override fun onOtherGesture(view: View, motionEvent: MotionEvent): Boolean {
         when (motionEvent.action) {
             MotionEvent.ACTION_DOWN -> {
-                paint = Paint(framesViewState.paintColor)
-                paint.strokeWidth = framesViewState.paintStroke
                 startPoint = getPoint(motionEvent)
                 if (!init) {
                     resetCanvas()
@@ -36,7 +33,7 @@ class MeasureModeGestureListener(
             MotionEvent.ACTION_MOVE -> {
                 resetCanvas()
                 val currentPoint = getPoint(motionEvent)
-                canvas.drawLine(startPoint.x, startPoint.y, currentPoint.x, currentPoint.y, paint)
+                canvas.drawLine(startPoint.x, startPoint.y, currentPoint.x, currentPoint.y, framesViewState.linePaint)
                 imageView.invalidate()
             }
             MotionEvent.ACTION_UP -> {
@@ -46,7 +43,7 @@ class MeasureModeGestureListener(
                     historyLines.add(startPoint to currentPoint)
                     val text = length.toString()
                     historyMeasure.add(currentPoint to text)
-                    canvas.drawText(text, currentPoint.x, currentPoint.y, paint)
+                    canvas.drawText(text, currentPoint.x, currentPoint.y, framesViewState.stringPaint)
                     imageView.invalidate()
                 }
             }
@@ -75,10 +72,10 @@ class MeasureModeGestureListener(
         imageView.setImageBitmap(bitmap)
 
         historyLines.forEach {
-            canvas.drawLine(it.first.x, it.first.y, it.second.x, it.second.y, paint)
+            canvas.drawLine(it.first.x, it.first.y, it.second.x, it.second.y, framesViewState.linePaint)
         }
         historyMeasure.forEach {
-            canvas.drawText(it.second, it.first.x, it.first.x, paint)
+            canvas.drawText(it.second, it.first.x, it.first.x, framesViewState.stringPaint)
         }
     }
 }
