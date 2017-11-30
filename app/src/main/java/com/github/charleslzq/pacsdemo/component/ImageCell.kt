@@ -25,6 +25,7 @@ class ImageCell(
                     val dataPosition = dragEvent.clipData.getItemAt(0).htmlText.toInt()
                     if (dataPosition >= 0 && dataPosition < pacsViewState.seriesList.size) {
                         state = pacsViewState.seriesList[dataPosition].clone()
+                        pacsViewState.singleBinding = pacsViewState.layoutOption == PacsViewState.LayoutOption.ONE_ONE
                     }
                 }
             }
