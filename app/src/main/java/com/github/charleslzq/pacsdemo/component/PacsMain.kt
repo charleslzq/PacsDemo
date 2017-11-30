@@ -2,6 +2,7 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.view.View
 import com.github.charleslzq.pacsdemo.R
+import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
 import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 
 /**
@@ -22,9 +23,12 @@ class PacsMain(
             buttonPanel.state = state
 
             onStateChange(state::singleBinding) {
-                if (state.singleBinding) {
-                    imageProgressBar.state = state.imageCells[0]
+                if (state.singleBinding && state.imageCells[0] != null) {
+                    imageProgressBar.state = state.imageCells[0]!!
                 }
+            }
+            onStateChange(state::layoutOption) {
+                state.imageCells = arrayOfNulls<ImageFramesViewState>(9).toMutableList()
             }
         }
     }

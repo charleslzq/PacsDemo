@@ -12,11 +12,11 @@ import com.github.charleslzq.pacsdemo.component.state.PatientSeriesModel
  */
 class ImageCell(
         baseView: View,
+        val layoutPosition: Int,
         private val pacsViewState: PacsViewState
 ) : Component<View, PatientSeriesModel>(baseView, { PatientSeriesModel() }) {
     private val progressText = ProgressText(baseView.findViewById(R.id.imageProgress))
     private val dicomImage = DicomImage(baseView.findViewById(R.id.imagesContainer))
-    var layoutPosition = -1
 
     init {
         view.setOnDragListener { _, dragEvent ->

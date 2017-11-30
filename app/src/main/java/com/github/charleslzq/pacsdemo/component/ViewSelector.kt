@@ -10,32 +10,31 @@ import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 class ViewSelector(
         viewFlipper: ViewFlipper
 ) : Component<ViewFlipper, PacsViewState>(viewFlipper, { PacsViewState() }) {
+    lateinit var imageCells: List<ImageCell>
+
     init {
         onNewState {
             onStateChange(state::layoutOption) {
                 viewFlipper.displayedChild = state.layoutOption.ordinal
-                getImageViewBindersFromPanel().forEachIndexed { index, imageCell ->
-                    imageCell.layoutPosition = index
-                }
-                state.imageCells.clear()
+                imageCells = getImageCellsFromPanel()
             }
         }
     }
 
-    private fun getImageViewBindersFromPanel(): List<ImageCell> {
+    private fun getImageCellsFromPanel(): List<ImageCell> {
         val displayedChild = view.getChildAt(view.displayedChild)
         return when (PacsViewState.LayoutOption.values()[view.displayedChild]) {
             PacsViewState.LayoutOption.ONE_ONE -> {
-                listOf(ImageCell(displayedChild, state))
+                listOf(ImageCell(displayedChild, 0, state))
             }
             PacsViewState.LayoutOption.ONE_TWO -> {
                 ViewUtils.getTypedChildren(displayedChild as LinearLayout, RelativeLayout::class.java)
-                        .map { ImageCell(it, state) }
+                        .mapIndexed { index, relativeLayout ->  ImageCell(relativeLayout, index, state) }
             }
             else -> {
                 ViewUtils.getTypedChildren(displayedChild as TableLayout, TableRow::class.java)
                         .flatMap { ViewUtils.getTypedChildren(it, RelativeLayout::class.java) }
-                        .map { ImageCell(it, state) }
+                        .mapIndexed { index, relativeLayout -> ImageCell(relativeLayout, index, state) }
             }
         }
     }

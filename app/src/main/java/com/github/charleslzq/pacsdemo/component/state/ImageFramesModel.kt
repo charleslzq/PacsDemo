@@ -10,5 +10,8 @@ data class ImageFramesModel(
         val frames: List<DicomImageMetaInfo> = emptyList(),
         val size: Int = frames.size,
         val frameUrls: List<URI> = frames.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[ImageFramesViewState.DEFAULT] },
-        var thumbUrl: URI? = frames.sortedBy { it.instanceNumber?.toInt() }[0].files[ImageFramesViewState.THUMB]
+        var thumbUrl: URI? = when(frames.isNotEmpty()) {
+            true -> frames.sortedBy { it.instanceNumber?.toInt() }[0].files[ImageFramesViewState.THUMB]
+            false -> null
+        }
 )

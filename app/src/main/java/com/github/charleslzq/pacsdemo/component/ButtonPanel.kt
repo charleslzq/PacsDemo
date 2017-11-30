@@ -40,16 +40,20 @@ class ButtonPanel(
             reverseButton.setOnClickListener {
                 if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
                     val imageModel = state.imageCells[0]
-                    val newColorMatrix = ColorMatrix(imageModel.colorMatrix)
-                    newColorMatrix.postConcat(reverseMatrix)
-                    imageModel.colorMatrix = newColorMatrix
+                    if (imageModel != null) {
+                        val newColorMatrix = ColorMatrix(imageModel.colorMatrix)
+                        newColorMatrix.postConcat(reverseMatrix)
+                        imageModel.colorMatrix = newColorMatrix
+                    }
                 }
             }
 
             pseudoButton.setOnClickListener {
                 if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
                     val imageModel = state.imageCells[0]
-                    imageModel.pseudoColor = !imageModel.pseudoColor
+                    if (imageModel != null) {
+                        imageModel.pseudoColor = !imageModel.pseudoColor
+                    }
                 }
             }
             onStateChange(state::layoutOption) {
