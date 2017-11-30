@@ -5,11 +5,11 @@ import android.content.ClipDescription
 import android.graphics.ColorMatrixColorFilter
 import android.view.View
 import android.widget.ImageView
-import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesModel
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
 import com.github.charleslzq.pacsdemo.component.state.PacsViewState
+import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -56,6 +56,21 @@ class DicomImage(
         view.clearAnimation()
         view.background = null
         view.setImageBitmap(firstImage)
+
+        onStateChange(state::measureLine) {
+            operationMode = when (state.measureLine && state.framesModel.frames.isNotEmpty()) {
+                true -> {
+                    MeasureMode(view.context, MeasureModeGestureListener(view, state))
+                }
+                false -> {
+                    if (state.scaleFactor > 1.0f) {
+                        StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, state))
+                    } else {
+                        PlayMode(view.context, PlayModeGestureListener(state, this::onDrag))
+                    }
+                }
+            }
+        }
 
         onStateChange(state::colorMatrix) {
             if (state.playing) {

@@ -16,6 +16,7 @@ class ButtonPanel(
         buttonPanel: View,
         pacsViewState: PacsViewState
 ) : PacsComponent<View>(buttonPanel, pacsViewState) {
+    private val measureLineButton: Button = view.findViewById(R.id.measeureLineButton)
     private val pseudoButton: Button = view.findViewById(R.id.pseudoColorButton)
     private val reverseButton: Button = view.findViewById(R.id.reverseButton)
     private val splitButton: Button = view.findViewById(R.id.spliteButton)
@@ -35,6 +36,13 @@ class ButtonPanel(
         layoutSelector.setOnMenuItemClickListener(this::onLayoutSelected)
         splitButton.setOnClickListener {
             layoutSelector.show()
+        }
+
+        measureLineButton.setOnClickListener {
+            if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
+                val imageModel = state.imageCells[0]
+                imageModel.measureLine = !imageModel.measureLine
+            }
         }
 
         reverseButton.setOnClickListener {
@@ -58,6 +66,7 @@ class ButtonPanel(
                 true -> View.VISIBLE
                 false -> View.INVISIBLE
             }
+            measureLineButton.visibility = visible
             reverseButton.visibility = visible
             pseudoButton.visibility = visible
         }

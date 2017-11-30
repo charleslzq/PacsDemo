@@ -110,6 +110,12 @@
             android:orientation="horizontal"
             >
             <Button
+                android:id="@+id/measeureLineButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_normal"
+                android:text="测量线"/>
+            <Button
                 android:id="@+id/pseudoColorButton"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"

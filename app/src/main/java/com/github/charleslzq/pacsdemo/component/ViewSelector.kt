@@ -1,9 +1,9 @@
 package com.github.charleslzq.pacsdemo.component
 
 import android.widget.*
-import com.github.charleslzq.pacsdemo.support.ViewUtils
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
 import com.github.charleslzq.pacsdemo.component.state.PacsViewState
+import com.github.charleslzq.pacsdemo.support.ViewUtils
 
 /**
  * Created by charleslzq on 17-11-27.

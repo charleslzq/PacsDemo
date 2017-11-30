@@ -5,9 +5,9 @@ import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import android.widget.ImageView
-import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
 import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
 import com.github.charleslzq.pacsdemo.observe.ObserverUtil.registerObserver
+import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
 import java.io.File
 
 
@@ -25,6 +25,9 @@ class ImageFramesViewState {
     var playing by ObservablePropertyWithObservers(false)
     var pseudoColor by ObservablePropertyWithObservers(false)
     var allowPlay = false
+    var measureLine by ObservablePropertyWithObservers(false)
+    var paintColor = Color.YELLOW
+    var paintStroke = 3f
 
     private var rawScale = 1.0f
 
@@ -61,7 +64,7 @@ class ImageFramesViewState {
     }
 
     fun getFrame(index: Int): Bitmap {
-        val rawBitmap = BitmapFactory.decodeFile(File(framesModel.frameUrls[index]).absolutePath, BitmapFactory.Options().apply { inMutable = pseudoColor })
+        val rawBitmap = BitmapFactory.decodeFile(File(framesModel.frameUrls[index]).absolutePath, BitmapFactory.Options().apply { inMutable = pseudoColor || measureLine })
         if (pseudoColor) {
             val pixels = IntArray(rawBitmap.height * rawBitmap.width)
             rawBitmap.getPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
