@@ -1,16 +1,17 @@
-package com.github.charleslzq.pacsdemo.binder.vo
+package com.github.charleslzq.pacsdemo.component.state
 
 import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
 
 /**
  * Created by charleslzq on 17-11-27.
  */
-data class PacsDemoViewModel(
-        var seriesList: MutableList<PatientSeriesViewModel> = emptyList<PatientSeriesViewModel>().toMutableList()
+data class PacsViewState(
+        var seriesList: MutableList<PatientSeriesModel> = emptyList<PatientSeriesModel>().toMutableList()
 ) {
     var selected: Int by ObservablePropertyWithObservers(0)
     var layoutOption: LayoutOption by ObservablePropertyWithObservers(LayoutOption.ONE_ONE)
-    var imageCells: MutableList<ImageFramesViewModel> = emptyList<ImageFramesViewModel>().toMutableList()
+    var imageCells: MutableList<ImageFramesViewState> = emptyList<ImageFramesViewState>().toMutableList()
+    var singleBinding by ObservablePropertyWithObservers(false)
 
     enum class LayoutOption {
         ONE_ONE,

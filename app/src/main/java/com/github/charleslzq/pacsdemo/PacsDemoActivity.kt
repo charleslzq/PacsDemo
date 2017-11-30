@@ -5,11 +5,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import com.github.charleslzq.pacsdemo.binder.PacsMainViewBinder
-import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesModel
-import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel
-import com.github.charleslzq.pacsdemo.binder.vo.PacsDemoViewModel
-import com.github.charleslzq.pacsdemo.binder.vo.PatientSeriesViewModel
+import com.github.charleslzq.pacsdemo.component.PacsMain
+import com.github.charleslzq.pacsdemo.component.state.ImageFramesModel
+import com.github.charleslzq.pacsdemo.component.state.PacsViewState
+import com.github.charleslzq.pacsdemo.component.state.PatientSeriesModel
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
@@ -21,14 +20,14 @@ class PacsDemoActivity : AppCompatActivity() {
     private var dicomDataService: DicomDataService? = null
     private val patientList = listOf("03117795").toMutableList()
     private var patientId = "03117795"
-    private lateinit var pacsMainViewBinder: PacsMainViewBinder
+    private lateinit var pacsMainViewBinder: PacsMain
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_pacs_demo)
         Log.d("PacsDemoActivity", "onCreate execute")
 
-        pacsMainViewBinder = PacsMainViewBinder(pacsPanel)
+        pacsMainViewBinder = PacsMain(pacsPanel)
         bindService(Intent(this, DicomDataServiceBackgroud::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
         refresh()
         refreshButton.setOnClickListener { refresh() }
@@ -37,9 +36,9 @@ class PacsDemoActivity : AppCompatActivity() {
     private fun refresh() {
         val patient = dicomDataService?.findPatient(patientId)
         if (patient != null) {
-            pacsMainViewBinder.model = PacsDemoViewModel(patient.studies.flatMap { study ->
+            pacsMainViewBinder.state = PacsViewState(patient.studies.flatMap { study ->
                 study.series.sortedBy { it.metaInfo.instanceUID }.map {
-                    PatientSeriesViewModel(
+                    PatientSeriesModel(
                             patient.metaInfo,
                             study.metaInfo,
                             it.metaInfo,

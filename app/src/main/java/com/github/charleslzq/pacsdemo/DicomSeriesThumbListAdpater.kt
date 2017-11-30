@@ -6,21 +6,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import com.github.charleslzq.pacsdemo.binder.vo.PatientSeriesViewModel
+import com.github.charleslzq.pacsdemo.component.state.PatientSeriesModel
 import java.io.File
 
 /**
  * Created by charleslzq on 17-11-20.
  */
 class DicomSeriesThumbListAdpater(
-        val seriesViewModels: MutableList<PatientSeriesViewModel>
+        val seriesModels: MutableList<PatientSeriesModel>
 ) : RecyclerView.Adapter<DicomSeriesThumbListAdpater.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.thumbView.setImageBitmap(BitmapFactory.decodeFile(File(seriesViewModels[position].imageFramesModel.thumbUrl).absolutePath))
+        holder.thumbView.setImageBitmap(BitmapFactory.decodeFile(File(seriesModels[position].imageFramesModel.thumbUrl).absolutePath))
     }
 
     override fun getItemCount(): Int {
-        return seriesViewModels.size
+        return seriesModels.size
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

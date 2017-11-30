@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo.binder.gesture
+package com.github.charleslzq.pacsdemo.component.gesture
 
 import android.content.Context
 import android.view.GestureDetector

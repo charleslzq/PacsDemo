@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo.binder
+package com.github.charleslzq.pacsdemo.component
 
 import android.view.View
 import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
@@ -9,24 +9,24 @@ import kotlin.reflect.KProperty0
 /**
  * Created by charleslzq on 17-11-27.
  */
-abstract class ViewBinder<out V, D>(
+abstract class Component<out V, D>(
         val view: V,
-        private val initialModel: () -> D
+        private val initialState: () -> D
 ) where V : View {
-    var model: D by ObservablePropertyWithObservers(initialModel())
+    var state: D by ObservablePropertyWithObservers(initialState())
     private val monitoredProperties: MutableSet<KProperty0<*>> = emptySet<KProperty0<*>>().toMutableSet()
 
-    fun onNewModel(handler: (Pair<D, D>) -> Unit) {
-        handler(model to model)
-        registerObserver(this::model, { oldModel, newModel ->
+    fun onNewState(handler: (Pair<D, D>) -> Unit) {
+        handler(state to state)
+        registerObserver(this::state, { oldModel, newModel ->
             if (oldModel != newModel) {
-                clearOldModelMonitor()
+                clearOldStateMonitor()
                 handler(oldModel to newModel)
             }
         })
     }
 
-    fun <T> onModelChange(kProperty0: KProperty0<T>, handler: (Pair<T, T>) -> Unit) {
+    fun <T> onStateChange(kProperty0: KProperty0<T>, handler: (Pair<T, T>) -> Unit) {
         monitoredProperties.add(kProperty0)
         handler(kProperty0.get() to kProperty0.get())
         registerObserver(kProperty0, { old, new -> if (old != new) handler(old to new) }, this::class.java.name)
@@ -35,10 +35,10 @@ abstract class ViewBinder<out V, D>(
     fun <T> isInit(pair: Pair<T, T>) = pair.first == pair.second
 
     fun reset() {
-        model = initialModel()
+        state = initialState()
     }
 
-    private fun clearOldModelMonitor() {
+    private fun clearOldStateMonitor() {
         monitoredProperties.forEach {
             ObserverUtil.removeObserver(it, this::class.java.name)
         }

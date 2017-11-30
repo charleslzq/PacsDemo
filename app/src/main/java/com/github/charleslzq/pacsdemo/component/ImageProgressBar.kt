@@ -1,26 +1,26 @@
-package com.github.charleslzq.pacsdemo.binder
+package com.github.charleslzq.pacsdemo.component
 
 import android.view.View
 import android.widget.SeekBar
-import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel
+import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
 
 /**
  * Created by charleslzq on 17-11-27.
  */
-class ImageProgressBarBinder(
+class ImageProgressBar(
         imageProgressBar: SeekBar
-) : ViewBinder<SeekBar, ImageFramesViewModel>(imageProgressBar, { ImageFramesViewModel() }) {
+) : Component<SeekBar, ImageFramesViewState>(imageProgressBar, { ImageFramesViewState() }) {
 
     init {
         view.visibility = View.INVISIBLE
-        onNewModel {
-            if (model.playable()) {
-                view.max = model.framesModel.size
-                view.progress = model.currentIndex
+        onNewState {
+            if (state.playable()) {
+                view.max = state.framesModel.size
+                view.progress = state.currentIndex
                 view.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(p0: SeekBar?, progress: Int, fromUser: Boolean) {
                         if (fromUser) {
-                            model.currentIndex = progress
+                            state.currentIndex = progress
                         }
                     }
 
@@ -32,8 +32,8 @@ class ImageProgressBarBinder(
 
                 })
 
-                onModelChange(model::currentIndex) {
-                    view.progress = model.currentIndex
+                onStateChange(state::currentIndex) {
+                    view.progress = state.currentIndex
                 }
 
                 view.visibility = View.VISIBLE

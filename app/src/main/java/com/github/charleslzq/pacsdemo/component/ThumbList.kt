@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo.binder
+package com.github.charleslzq.pacsdemo.component
 
 import ItemClickSupport
 import android.content.ClipData
@@ -7,24 +7,24 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.github.charleslzq.pacsdemo.DicomSeriesThumbListAdpater
-import com.github.charleslzq.pacsdemo.binder.vo.PacsDemoViewModel
+import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 
 /**
  * Created by charleslzq on 17-11-27.
  */
-class ThumbListViewBinder(
+class ThumbList(
         recyclerView: RecyclerView
-) : ViewBinder<RecyclerView, PacsDemoViewModel>(recyclerView, { PacsDemoViewModel() }) {
+) : Component<RecyclerView, PacsViewState>(recyclerView, { PacsViewState() }) {
     private val tag = "thumbList"
 
     init {
         view.layoutManager = LinearLayoutManager(recyclerView.context)
-        onNewModel {
-            view.adapter = DicomSeriesThumbListAdpater(model.seriesList)
-            if (model.seriesList.isNotEmpty()) {
+        onNewState {
+            view.adapter = DicomSeriesThumbListAdpater(state.seriesList)
+            if (state.seriesList.isNotEmpty()) {
                 ItemClickSupport.addTo(view).setOnItemClickListener(object : ItemClickSupport.OnItemClickListener {
                     override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
-                        model.selected = position
+                        state.selected = position
                     }
                 })
                 ItemClickSupport.addTo(view).setOnItemLongClickListener(object : ItemClickSupport.OnItemLongClickListener {
@@ -41,7 +41,7 @@ class ThumbListViewBinder(
                     }
                 })
 
-                onModelChange(model::selected) {
+                onStateChange(state::selected) {
                     if (it.first >= 0 && it.first < view.childCount) {
                         view.getChildAt(it.first).isSelected = false
                     }

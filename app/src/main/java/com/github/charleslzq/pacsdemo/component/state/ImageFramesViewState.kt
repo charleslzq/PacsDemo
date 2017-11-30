@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo.binder.vo
+package com.github.charleslzq.pacsdemo.component.state
 
 import android.content.res.Resources
 import android.graphics.*
@@ -14,7 +14,7 @@ import java.io.File
 /**
  * Created by charleslzq on 17-11-27.
  */
-data class ImageFramesViewModel(
+data class ImageFramesViewState(
         var framesModel: ImageFramesModel = ImageFramesModel()
 ) {
     var duration: Int = 40

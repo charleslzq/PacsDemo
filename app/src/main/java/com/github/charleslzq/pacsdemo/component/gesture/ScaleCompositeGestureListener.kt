@@ -1,18 +1,18 @@
-package com.github.charleslzq.pacsdemo.binder.gesture
+package com.github.charleslzq.pacsdemo.component.gesture
 
 import android.view.ScaleGestureDetector
-import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel
+import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
 
 /**
  * Created by charleslzq on 17-11-29.
  */
 open class ScaleCompositeGestureListener(
-        val framesViewModel: ImageFramesViewModel
+        val framesViewState: ImageFramesViewState
 ) : NoOpCompositeGestureListener() {
 
     override fun onScale(scaleGestureDetector: ScaleGestureDetector): Boolean {
         val rawScaleFactor = scaleGestureDetector.scaleFactor
-        framesViewModel.scaleFactor *= Math.max(1.0f, Math.min(rawScaleFactor, 5.0f))
+        framesViewState.scaleFactor *= Math.max(1.0f, Math.min(rawScaleFactor, 5.0f))
         return true
     }
 }

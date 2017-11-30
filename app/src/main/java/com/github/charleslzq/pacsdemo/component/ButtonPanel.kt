@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo.binder
+package com.github.charleslzq.pacsdemo.component
 
 import android.graphics.ColorMatrix
 import android.view.Menu
@@ -7,16 +7,14 @@ import android.view.View
 import android.widget.Button
 import android.widget.PopupMenu
 import com.github.charleslzq.pacsdemo.R
-import com.github.charleslzq.pacsdemo.binder.vo.ImageFramesViewModel
-import com.github.charleslzq.pacsdemo.binder.vo.PacsDemoViewModel
-import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
+import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 
 /**
  * Created by charleslzq on 17-11-27.
  */
-class ButtonPanelBinder(
+class ButtonPanel(
         buttonPanel: View
-) : ViewBinder<View, PacsDemoViewModel>(buttonPanel, { PacsDemoViewModel() }) {
+) : Component<View, PacsViewState>(buttonPanel, { PacsViewState() }) {
     private val pseudoButton: Button = view.findViewById(R.id.pseudoColorButton)
     private val reverseButton: Button = view.findViewById(R.id.reverseButton)
     private val splitButton: Button = view.findViewById(R.id.spliteButton)
@@ -38,10 +36,10 @@ class ButtonPanelBinder(
             layoutSelector.show()
         }
 
-        onNewModel {
+        onNewState {
             reverseButton.setOnClickListener {
-                if (model.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
-                    val imageModel = model.imageCells[0]
+                if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
+                    val imageModel = state.imageCells[0]
                     val newColorMatrix = ColorMatrix(imageModel.colorMatrix)
                     newColorMatrix.postConcat(reverseMatrix)
                     imageModel.colorMatrix = newColorMatrix
@@ -49,13 +47,13 @@ class ButtonPanelBinder(
             }
 
             pseudoButton.setOnClickListener {
-                if (model.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
-                    val imageModel = model.imageCells[0]
+                if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
+                    val imageModel = state.imageCells[0]
                     imageModel.pseudoColor = !imageModel.pseudoColor
                 }
             }
-            onModelChange(model::layoutOption) {
-                val visible = when (model.layoutOption == PacsDemoViewModel.LayoutOption.ONE_ONE) {
+            onStateChange(state::layoutOption) {
+                val visible = when (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
                     true -> View.VISIBLE
                     false -> View.INVISIBLE
                 }
@@ -69,16 +67,16 @@ class ButtonPanelBinder(
     private fun onLayoutSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.one_one -> {
-                model.layoutOption = PacsDemoViewModel.LayoutOption.ONE_ONE
+                state.layoutOption = PacsViewState.LayoutOption.ONE_ONE
             }
             R.id.one_two -> {
-                model.layoutOption = PacsDemoViewModel.LayoutOption.ONE_TWO
+                state.layoutOption = PacsViewState.LayoutOption.ONE_TWO
             }
             R.id.two_two -> {
-                model.layoutOption = PacsDemoViewModel.LayoutOption.TWO_TWO
+                state.layoutOption = PacsViewState.LayoutOption.TWO_TWO
             }
             R.id.three_three -> {
-                model.layoutOption = PacsDemoViewModel.LayoutOption.THREE_THREE
+                state.layoutOption = PacsViewState.LayoutOption.THREE_THREE
             }
         }
         return true
