@@ -1,7 +1,7 @@
 package com.github.charleslzq.pacsdemo.component.gesture
 
 import android.graphics.Canvas
-import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.PointF
 import android.view.MotionEvent
 import android.view.View
@@ -17,9 +17,10 @@ class MeasureModeGestureListener(
 ) : ScaleCompositeGestureListener(framesViewState) {
     private lateinit var canvas: Canvas
     private lateinit var startPoint: PointF
+    private var path = Path()
     private var init = false
-    private val historyLines: MutableList<Pair<PointF, PointF>> = mutableListOf()
-    private val historyMeasure: MutableList<Pair<PointF, String>> = mutableListOf()
+    private val pathList = mutableListOf<Path>()
+    private val textList = mutableListOf<Pair<PointF, String>>()
 
     override fun onOtherGesture(view: View, motionEvent: MotionEvent): Boolean {
         when (motionEvent.action) {
@@ -33,18 +34,28 @@ class MeasureModeGestureListener(
             MotionEvent.ACTION_MOVE -> {
                 resetCanvas()
                 val currentPoint = getPoint(motionEvent)
-                canvas.drawLine(startPoint.x, startPoint.y, currentPoint.x, currentPoint.y, framesViewState.linePaint)
+                path.reset()
+                path.moveTo(startPoint.x, startPoint.y)
+                path.lineTo(currentPoint.x, currentPoint.y)
+                canvas.drawPath(path, framesViewState.linePaint)
                 imageView.invalidate()
             }
             MotionEvent.ACTION_UP -> {
+                resetCanvas()
                 val currentPoint = getPoint(motionEvent)
                 val length = length(startPoint, currentPoint)
                 if (length > 5.0f) {
-                    historyLines.add(startPoint to currentPoint)
                     val text = length.toString()
-                    historyMeasure.add(currentPoint to text)
+                    path.reset()
+                    path.moveTo(startPoint.x, startPoint.y)
+                    path.lineTo(currentPoint.x, currentPoint.y)
+                    canvas.drawPath(path, framesViewState.linePaint)
                     canvas.drawText(text, currentPoint.x, currentPoint.y, framesViewState.stringPaint)
                     imageView.invalidate()
+
+                    textList.add(currentPoint to text)
+                    pathList.add(path)
+                    path = Path()
                 }
             }
         }
@@ -52,8 +63,8 @@ class MeasureModeGestureListener(
     }
 
     override fun onDoubleTap(e: MotionEvent?): Boolean {
-        historyMeasure.clear()
-        historyLines.clear()
+        pathList.clear()
+        textList.clear()
         resetCanvas()
         return true
     }
@@ -71,11 +82,12 @@ class MeasureModeGestureListener(
         canvas = Canvas(bitmap)
         imageView.setImageBitmap(bitmap)
 
-        historyLines.forEach {
-            canvas.drawLine(it.first.x, it.first.y, it.second.x, it.second.y, framesViewState.linePaint)
+        pathList.forEach {
+            canvas.drawPath(it, framesViewState.linePaint)
         }
-        historyMeasure.forEach {
-            canvas.drawText(it.second, it.first.x, it.first.x, framesViewState.stringPaint)
+
+        textList.forEach {
+            canvas.drawText(it.second, it.first.x, it.first.y, framesViewState.stringPaint)
         }
     }
 }

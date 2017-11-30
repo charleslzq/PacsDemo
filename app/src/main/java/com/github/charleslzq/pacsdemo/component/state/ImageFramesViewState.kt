@@ -33,9 +33,13 @@ class ImageFramesViewState {
 
     init {
         matrix.reset()
-        linePaint.strokeWidth = 5f
+        linePaint.color = Color.RED
+        linePaint.strokeWidth = 3f
+        linePaint.isAntiAlias = true
+        linePaint.strokeJoin = Paint.Join.ROUND
+        linePaint.style = Paint.Style.STROKE
         stringPaint.strokeWidth = 1f
-        stringPaint.letterSpacing = 0.5f
+        stringPaint.color = Color.RED
         stringPaint.isLinearText = true
         registerObserver(this::scaleFactor, { oldScale, newScale ->
             val newMatrix = Matrix(matrix)
