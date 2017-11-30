@@ -29,6 +29,7 @@ class ImageCell(
                         state.dicomSeriesMetaInfo = newState.dicomSeriesMetaInfo
                         state.imageFramesModel = newState.imageFramesModel
 
+                        dicomImage.dataPosition = dataPosition
                         dicomImage.state.framesModel = newState.imageFramesModel
                         globalState.imageCells[layoutPosition] = dicomImage.state
                     }

@@ -1,9 +1,13 @@
 package com.github.charleslzq.pacsdemo.component
 
+import android.content.ClipData
+import android.content.ClipDescription
 import android.graphics.ColorMatrixColorFilter
+import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.IndexListenableAnimationDrawable
 import com.github.charleslzq.pacsdemo.component.gesture.*
+import com.github.charleslzq.pacsdemo.component.state.ImageFramesModel
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
 import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 
@@ -12,9 +16,11 @@ import com.github.charleslzq.pacsdemo.component.state.PacsViewState
  */
 class DicomImage(
         imageView: ImageView,
-        position: Int,
+        val position: Int,
         pacsViewState: PacsViewState
 ) : PacsComponentFragment<ImageView, ImageFramesViewState>(imageView, pacsViewState, { it.imageCells[position] }) {
+    val tag = "image$position"
+    var dataPosition = -1
     var operationMode: OperationMode = PlayMode(view.context, NoOpCompositeGestureListener())
         set(value) {
             field = value
@@ -34,8 +40,17 @@ class DicomImage(
         }
     }
 
+    private fun onDrag() {
+        val dragBuilder = View.DragShadowBuilder(view)
+        val clipDataItem = ClipData.Item(tag, dataPosition.toString())
+        val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), clipDataItem)
+        @Suppress("DEPRECATION")
+        view.startDrag(clipData, dragBuilder, null, 0)
+        state.framesModel = ImageFramesModel()
+    }
+
     private fun init() {
-        operationMode = PlayMode(view.context, PlayModeGestureListener(state))
+        operationMode = PlayMode(view.context, PlayModeGestureListener(state, this::onDrag))
 
         val firstImage = state.getScaledFrame(0)
         view.clearAnimation()
@@ -63,7 +78,7 @@ class DicomImage(
             if (state.scaleFactor > 1 && operationMode is PlayMode) {
                 operationMode = StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, state))
             } else if (state.scaleFactor == 1.0f && operationMode is StudyMode) {
-                operationMode = PlayMode(view.context, PlayModeGestureListener(state))
+                operationMode = PlayMode(view.context, PlayModeGestureListener(state, this::onDrag))
             }
         }
         onStateChange(state::playing) {
