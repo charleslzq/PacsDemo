@@ -16,9 +16,7 @@ class ImageProgressBar(
     init {
         view.visibility = View.INVISIBLE
         onStateChange(state::framesModel) {
-            if (globalState.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
-                state.allowPlay = true
-            }
+            state.allowPlay = globalState.layoutOption == PacsViewState.LayoutOption.ONE_ONE
             if (state.playable()) {
                 view.max = state.framesModel.size
                 view.progress = state.currentIndex

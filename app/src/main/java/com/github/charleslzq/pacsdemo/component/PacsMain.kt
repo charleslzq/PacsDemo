@@ -13,6 +13,12 @@ class PacsMain(
 ) : PacsComponent<View>(mainView, pacsViewState) {
     private val thumbList = ThumbList(view.findViewById(R.id.thumbList), pacsViewState)
     private val viewSelector = ViewSelector(view.findViewById(R.id.viewSelector), pacsViewState)
-    private val imageProgressBar = ImageProgressBar(view.findViewById(R.id.imageSeekBar), pacsViewState)
+    private var imageProgressBar = ImageProgressBar(view.findViewById(R.id.imageSeekBar), pacsViewState)
     private val buttonPanel = ButtonPanel(view.findViewById(R.id.buttonPanel), pacsViewState)
+
+    init {
+        onStateChange(state::layoutOption) {
+            imageProgressBar = ImageProgressBar(view.findViewById(R.id.imageSeekBar), pacsViewState)
+        }
+    }
 }
