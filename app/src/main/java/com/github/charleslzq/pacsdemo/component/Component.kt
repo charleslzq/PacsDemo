@@ -16,20 +16,20 @@ abstract class Component<out V, D>(
     var state: D by ObservablePropertyWithObservers(initialState())
     private val monitoredState: MutableSet<KProperty0<*>> = mutableSetOf()
 
-    fun onNewState(handler: (Triple<D, D, Boolean>) -> Unit) {
+    fun onNewState(ignoreUnchanged: Boolean = true, handler: (Triple<D, D, Boolean>) -> Unit) {
         handler(Triple(state, state, true))
         registerObserver(this::state, { oldModel, newModel ->
-            if (oldModel != newModel) {
+            if (ignoreUnchanged && oldModel != newModel) {
                 clearOldStateMonitor()
                 handler(Triple(oldModel, newModel, false))
             }
         })
     }
 
-    fun <T> onStateChange(kProperty0: KProperty0<T>, handler: (Triple<T, T, Boolean>) -> Unit) {
+    fun <T> onStateChange(kProperty0: KProperty0<T>, ignoreUnchanged: Boolean = true,handler: (Triple<T, T, Boolean>) -> Unit) {
         monitoredState.add(kProperty0)
         handler(Triple(kProperty0.get(), kProperty0.get(), true))
-        registerObserver(kProperty0, { old, new -> if (old != new) handler(Triple(old, new, false)) }, this.hashCode().toString())
+        registerObserver(kProperty0, { old, new -> if (ignoreUnchanged && old != new) handler(Triple(old, new, false)) }, this.hashCode().toString())
     }
 
     fun reset() {
