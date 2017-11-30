@@ -14,7 +14,7 @@ abstract class Component<out V, D>(
         private val initialState: () -> D
 ) where V : View {
     var state: D by ObservablePropertyWithObservers(initialState())
-    private val monitoredProperties: MutableSet<KProperty0<*>> = emptySet<KProperty0<*>>().toMutableSet()
+    private val monitoredState: MutableSet<KProperty0<*>> = mutableSetOf()
 
     fun onNewState(handler: (Triple<D, D, Boolean>) -> Unit) {
         handler(Triple(state, state, true))
@@ -27,9 +27,9 @@ abstract class Component<out V, D>(
     }
 
     fun <T> onStateChange(kProperty0: KProperty0<T>, handler: (Triple<T, T, Boolean>) -> Unit) {
-        monitoredProperties.add(kProperty0)
+        monitoredState.add(kProperty0)
         handler(Triple(kProperty0.get(), kProperty0.get(), true))
-        registerObserver(kProperty0, { old, new -> if (old != new) handler(Triple(old, new, false)) }, this::class.java.name)
+        registerObserver(kProperty0, { old, new -> if (old != new) handler(Triple(old, new, false)) }, this.hashCode().toString())
     }
 
     fun reset() {
@@ -37,8 +37,8 @@ abstract class Component<out V, D>(
     }
 
     private fun clearOldStateMonitor() {
-        monitoredProperties.forEach {
-            ObserverUtil.removeObserver(it, this::class.java.name)
+        monitoredState.forEach {
+            ObserverUtil.removeObserver(it, this.hashCode().toString())
         }
     }
 }
