@@ -1,14 +1,14 @@
 package com.github.charleslzq.pacsdemo.component.state
 
-import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
+import com.github.charleslzq.pacsdemo.observe.ObservableStatus
 
 /**
  * Created by charleslzq on 17-11-27.
  */
 class PacsViewState {
-    var seriesList by ObservablePropertyWithObservers(mutableListOf<PatientSeriesModel>())
-    var selected: Int by ObservablePropertyWithObservers(0)
-    var layoutOption: LayoutOption by ObservablePropertyWithObservers(LayoutOption.ONE_ONE)
+    var seriesList by ObservableStatus(mutableListOf<PatientSeriesModel>())
+    var selected: Int by ObservableStatus(0)
+    var layoutOption: LayoutOption by ObservableStatus(LayoutOption.ONE_ONE)
     var imageCells: List<ImageFramesViewState> = (1..9).map { ImageFramesViewState() }
 
     fun resetImageStates() {

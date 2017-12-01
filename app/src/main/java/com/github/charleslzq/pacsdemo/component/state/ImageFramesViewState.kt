@@ -5,7 +5,7 @@ import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import android.widget.ImageView
-import com.github.charleslzq.pacsdemo.observe.ObservablePropertyWithObservers
+import com.github.charleslzq.pacsdemo.observe.ObservableStatus
 import com.github.charleslzq.pacsdemo.observe.ObserverUtil.registerObserver
 import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
 import java.io.File
@@ -15,17 +15,17 @@ import java.io.File
  * Created by charleslzq on 17-11-27.
  */
 class ImageFramesViewState {
-    var framesModel by ObservablePropertyWithObservers(ImageFramesModel())
+    var framesModel by ObservableStatus(ImageFramesModel())
     var duration: Int = 40
-    var scaleFactor: Float by ObservablePropertyWithObservers(1.0f)
-    var currentIndex: Int by ObservablePropertyWithObservers(0)
+    var scaleFactor: Float by ObservableStatus(1.0f)
+    var currentIndex: Int by ObservableStatus(0)
     var startOffset: Int = 0
-    var matrix by ObservablePropertyWithObservers(Matrix())
-    var colorMatrix by ObservablePropertyWithObservers(ColorMatrix())
-    var playing by ObservablePropertyWithObservers(false)
-    var pseudoColor by ObservablePropertyWithObservers(false)
+    var matrix by ObservableStatus(Matrix())
+    var colorMatrix by ObservableStatus(ColorMatrix())
+    var playing by ObservableStatus(false)
+    var pseudoColor by ObservableStatus(false)
     var allowPlay = false
-    var measureLine by ObservablePropertyWithObservers(false)
+    var measureLine by ObservableStatus(false)
     var linePaint = Paint()
     var stringPaint = Paint()
 

@@ -12,14 +12,14 @@ object ObserverUtil {
     fun <T> registerObserver(kProperty0: KProperty0<T>, observer: (T, T) -> Unit, name: String = UUID.randomUUID().toString()) {
         val delegate = kProperty0.apply { isAccessible = true }.getDelegate()
         if (delegate != null) {
-            (delegate as ObservablePropertyWithObservers<T>).registerObserver(observer, name)
+            (delegate as ObservableStatus<T>).registerObserver(observer, name)
         }
     }
 
     fun removeObserver(kProperty0: KProperty0<*>, name: String) {
         val delegate = kProperty0.apply { isAccessible = true }.getDelegate()
         if (delegate != null) {
-            (delegate as ObservablePropertyWithObservers<*>).removeObserver(name)
+            (delegate as ObservableStatus<*>).removeObserver(name)
         }
     }
 
