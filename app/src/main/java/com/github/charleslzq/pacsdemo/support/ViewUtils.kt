@@ -13,6 +13,7 @@ object ViewUtils {
     }
 
     fun <T : View> getTypedChildren(viewGroup: ViewGroup, klass: Class<T>): List<T> {
+        @Suppress("UNCHECKED_CAST")
         return getAllChildren(viewGroup).filter { it::class.java == klass }.map { it as T }
     }
 }

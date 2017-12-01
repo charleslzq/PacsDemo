@@ -10,8 +10,8 @@ import com.github.charleslzq.pacsdemo.component.state.ImageFramesModel
 import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 import com.github.charleslzq.pacsdemo.component.state.PatientSeriesModel
 import com.github.charleslzq.pacsdemo.service.DicomDataService
-import com.github.charleslzq.pacsdemo.service.SimpleServiceConnection
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
+import com.github.charleslzq.pacsdemo.support.SimpleServiceConnection
 import kotlinx.android.synthetic.main.layout_pacs_demo.*
 
 class PacsDemoActivity : AppCompatActivity() {

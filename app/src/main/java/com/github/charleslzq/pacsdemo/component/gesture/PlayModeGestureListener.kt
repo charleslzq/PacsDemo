@@ -27,7 +27,7 @@ class PlayModeGestureListener(
         return true
     }
 
-    override fun onLongPress(e: MotionEvent?) {
+    override fun onLongPress(e: MotionEvent) {
         onDrag()
     }
 

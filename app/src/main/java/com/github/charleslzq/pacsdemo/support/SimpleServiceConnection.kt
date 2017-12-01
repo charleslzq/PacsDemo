@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo.service
+package com.github.charleslzq.pacsdemo.support
 
 import android.content.ComponentName
 import android.content.ServiceConnection
@@ -14,6 +14,7 @@ class SimpleServiceConnection<T>(
     private val logTag = this.javaClass.name
 
     override fun onServiceConnected(componentName: ComponentName, binder: IBinder) {
+        @Suppress("UNCHECKED_CAST")
         setter.invoke(binder as T)
         Log.i(logTag, "$componentName connected")
     }

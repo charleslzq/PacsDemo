@@ -12,6 +12,7 @@ object ObserverUtil {
     fun <T> registerObserver(kProperty0: KProperty0<T>, observer: (T, T) -> Unit, name: String = UUID.randomUUID().toString()) {
         val delegate = kProperty0.apply { isAccessible = true }.getDelegate()
         if (delegate != null) {
+            @Suppress("UNCHECKED_CAST")
             (delegate as ObservableStatus<T>).registerObserver(observer, name)
         }
     }
