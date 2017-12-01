@@ -1,6 +1,7 @@
 package com.github.charleslzq.pacsdemo.component
 
 import android.view.View
+import com.github.charleslzq.pacsdemo.component.base.ComponentFragment
 import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 
 /**

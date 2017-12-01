@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo.component
+package com.github.charleslzq.pacsdemo.component.base
 
 import android.view.View
 

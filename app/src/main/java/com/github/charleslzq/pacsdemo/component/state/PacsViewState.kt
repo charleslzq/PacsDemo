@@ -9,7 +9,11 @@ class PacsViewState {
     var seriesList by ObservablePropertyWithObservers(mutableListOf<PatientSeriesModel>())
     var selected: Int by ObservablePropertyWithObservers(0)
     var layoutOption: LayoutOption by ObservablePropertyWithObservers(LayoutOption.ONE_ONE)
-    var imageCells: Array<ImageFramesViewState> = arrayOf(ImageFramesViewState())
+    var imageCells: List<ImageFramesViewState> = (1..9).map { ImageFramesViewState() }
+
+    fun resetImageStates() {
+        imageCells.forEach { it.reset() }
+    }
 
     enum class LayoutOption {
         ONE_ONE,

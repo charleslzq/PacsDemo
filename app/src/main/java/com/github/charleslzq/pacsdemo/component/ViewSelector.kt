@@ -1,7 +1,6 @@
 package com.github.charleslzq.pacsdemo.component
 
 import android.widget.*
-import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
 import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 import com.github.charleslzq.pacsdemo.support.ViewUtils
 
@@ -16,12 +15,7 @@ class ViewSelector(
 
     init {
         onStateChange(state::layoutOption) {
-            state.imageCells = when (state.layoutOption) {
-                PacsViewState.LayoutOption.ONE_ONE -> generateImageViewStateArray(1)
-                PacsViewState.LayoutOption.ONE_TWO -> generateImageViewStateArray(2)
-                PacsViewState.LayoutOption.TWO_TWO -> generateImageViewStateArray(4)
-                PacsViewState.LayoutOption.THREE_THREE -> generateImageViewStateArray(9)
-            }
+            state.resetImageStates()
             changeLayout()
         }
     }
@@ -47,9 +41,5 @@ class ViewSelector(
                         .mapIndexed { index, relativeLayout -> ImageCell(relativeLayout, index, state) }
             }
         }
-    }
-
-    private fun generateImageViewStateArray(number: Int): Array<ImageFramesViewState> {
-        return (1..number).map { ImageFramesViewState() }.toTypedArray()
     }
 }

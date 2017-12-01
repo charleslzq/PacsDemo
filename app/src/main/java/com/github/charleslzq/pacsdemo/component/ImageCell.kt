@@ -31,7 +31,6 @@ class ImageCell(
 
                         dicomImage.dataPosition = dataPosition
                         dicomImage.state.framesModel = newState.imageFramesModel
-                        globalState.imageCells[layoutPosition] = dicomImage.state
                     }
                 }
             }

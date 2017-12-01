@@ -1,6 +1,5 @@
 package com.github.charleslzq.pacsdemo.component
 
-import android.graphics.ColorMatrix
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -21,12 +20,6 @@ class ButtonPanel(
     private val reverseButton: Button = view.findViewById(R.id.reverseButton)
     private val splitButton: Button = view.findViewById(R.id.spliteButton)
     private val layoutSelector: PopupMenu = PopupMenu(buttonPanel.context, splitButton)
-    private val reverseMatrix = ColorMatrix(floatArrayOf(
-            -1f, 0f, 0f, 0f, 255f,
-            0f, -1f, 0f, 0f, 255f,
-            0f, 0f, -1f, 0f, 255f,
-            0f, 0f, 0f, 1f, 0f
-    ))
 
     init {
         layoutSelector.menu.add(Menu.NONE, R.id.one_one, Menu.NONE, "1 X 1")
@@ -47,10 +40,8 @@ class ButtonPanel(
 
         reverseButton.setOnClickListener {
             if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
-                val imageModel = state.imageCells[0]
-                val newColorMatrix = ColorMatrix(imageModel.colorMatrix)
-                newColorMatrix.postConcat(reverseMatrix)
-                imageModel.colorMatrix = newColorMatrix
+                state.imageCells[0].reverseColor()
+
             }
         }
 

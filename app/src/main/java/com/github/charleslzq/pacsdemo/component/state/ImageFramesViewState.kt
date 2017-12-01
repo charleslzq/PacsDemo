@@ -32,7 +32,29 @@ class ImageFramesViewState {
     private var rawScale = 1.0f
 
     init {
-        matrix.reset()
+        reset()
+        registerObserver(this::scaleFactor, { oldScale, newScale ->
+            val newMatrix = Matrix(matrix)
+            val scale = newScale / oldScale
+            newMatrix.postScale(scale, scale)
+            matrix = newMatrix
+        })
+    }
+
+    fun reset() {
+        framesModel = ImageFramesModel()
+        scaleFactor = 1.0f
+        currentIndex = 0
+        startOffset = 0
+        matrix = Matrix()
+        colorMatrix = ColorMatrix()
+        playing = false
+        pseudoColor = false
+        allowPlay = false
+        measureLine = false
+        linePaint = Paint()
+        stringPaint = Paint()
+
         linePaint.color = Color.RED
         linePaint.strokeWidth = 3f
         linePaint.isAntiAlias = true
@@ -41,12 +63,6 @@ class ImageFramesViewState {
         stringPaint.strokeWidth = 1f
         stringPaint.color = Color.RED
         stringPaint.isLinearText = true
-        registerObserver(this::scaleFactor, { oldScale, newScale ->
-            val newMatrix = Matrix(matrix)
-            val scale = newScale / oldScale
-            newMatrix.postScale(scale, scale)
-            matrix = newMatrix
-        })
     }
 
     fun playable() = framesModel.size > 1 && allowPlay
@@ -70,6 +86,13 @@ class ImageFramesViewState {
             }
         }
     }
+
+    fun reverseColor() {
+        val newColorMatrix = ColorMatrix(colorMatrix)
+        newColorMatrix.postConcat(reverseMatrix)
+        colorMatrix = newColorMatrix
+    }
+
 
     fun getFrame(index: Int): Bitmap {
         val rawBitmap = BitmapFactory.decodeFile(File(framesModel.frameUrls[index]).absolutePath, BitmapFactory.Options().apply { inMutable = pseudoColor })
@@ -165,5 +188,11 @@ class ImageFramesViewState {
         val THUMB = "thumb"
         val DEFAULT = "default"
         val RAW = "raw"
+        private val reverseMatrix = ColorMatrix(floatArrayOf(
+                -1f, 0f, 0f, 0f, 255f,
+                0f, -1f, 0f, 0f, 255f,
+                0f, 0f, -1f, 0f, 255f,
+                0f, 0f, 0f, 1f, 0f
+        ))
     }
 }
