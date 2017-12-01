@@ -3,6 +3,7 @@ package com.github.charleslzq.pacsdemo.component.gesture
 import android.graphics.Canvas
 import android.graphics.Path
 import android.graphics.PointF
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
@@ -30,12 +31,10 @@ class MeasureModeGestureListener(
                     resetCanvas()
                     init = true
                 }
+                path.moveTo(startPoint.x, startPoint.y)
             }
             MotionEvent.ACTION_MOVE -> {
-                resetCanvas()
                 val currentPoint = getPoint(motionEvent)
-                path.reset()
-                path.moveTo(startPoint.x, startPoint.y)
                 path.lineTo(currentPoint.x, currentPoint.y)
                 canvas.drawPath(path, framesViewState.linePaint)
                 imageView.invalidate()
@@ -58,8 +57,13 @@ class MeasureModeGestureListener(
                     path = Path()
                 }
             }
+            else -> Log.i("measure", "${motionEvent.action} detected")
         }
         return true
+    }
+
+    override fun onLongPress(e: MotionEvent?) {
+        Log.i("measure", "long press detected")
     }
 
     override fun onDoubleTap(e: MotionEvent?): Boolean {
