@@ -5,8 +5,8 @@ import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import android.widget.ImageView
-import com.github.charleslzq.pacsdemo.observe.ObservableStatus
-import com.github.charleslzq.pacsdemo.observe.ObserverUtil.registerObserver
+import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus
+import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus.Companion.getDelegate
 import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
 import java.io.File
 
@@ -35,16 +35,15 @@ class ImageFramesViewState(val layoutPosition: Int) {
 
     init {
         reset()
-        registerObserver(this::scaleFactor, { oldScale, newScale ->
+        getDelegate(this::scaleFactor)?.onChange {
             val newMatrix = Matrix(matrix)
-            val scale = newScale / oldScale
+            val scale = it.second / it.first
             newMatrix.postScale(scale, scale)
             matrix = newMatrix
-        })
+        }
     }
 
     fun reset() {
-        framesModel = ImageFramesModel()
         scaleFactor = 1.0f
         currentIndex = 0
         startOffset = 0
@@ -70,7 +69,7 @@ class ImageFramesViewState(val layoutPosition: Int) {
     fun playable() = framesModel.size > 1 && allowPlay
 
     fun autoAdjustScale(view: View) {
-        if (framesModel.frameUrls.isNotEmpty()) {
+        if (framesModel.size > 0) {
             val viewHeight = view.measuredHeight
             val viewWidth = view.measuredWidth
             val firstImage = getFrame(0)
@@ -135,9 +134,9 @@ class ImageFramesViewState(val layoutPosition: Int) {
         }
         animation.selectDrawable(0)
         animation.callback = null
-        registerObserver(animation::currentIndex, { _, newIndex ->
-            currentIndex = (startOffset + newIndex) % framesModel.size
-        })
+        getDelegate(animation::currentIndex)?.onChange {
+            currentIndex = (startOffset + it.second) % framesModel.size
+        }
         return animation
     }
 

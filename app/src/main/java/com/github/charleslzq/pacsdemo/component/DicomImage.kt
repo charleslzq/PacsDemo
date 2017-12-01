@@ -33,6 +33,7 @@ class DicomImage(
         EventBus.onEvent<DragEvent.StartAtCell> { onDragStart(it) }
 
         onStateChange(state::framesModel) {
+            state.reset()
             if (state.framesModel.size != 0) {
                 state.autoAdjustScale(view)
                 init()

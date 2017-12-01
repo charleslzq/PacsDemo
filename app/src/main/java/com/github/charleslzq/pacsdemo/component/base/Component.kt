@@ -1,7 +1,7 @@
 package com.github.charleslzq.pacsdemo.component.base
 
 import android.view.View
-import com.github.charleslzq.pacsdemo.observe.ObserverUtil.registerObserver
+import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus.Companion.getDelegate
 import kotlin.reflect.KProperty0
 
 /**
@@ -14,17 +14,21 @@ abstract class Component<out V, out S>(
 
     fun <T> onStateChange(kProperty0: KProperty0<T>, ignoreUnchanged: Boolean = true, handler: (Triple<T, T, Boolean>) -> Unit) {
         handler(Triple(kProperty0.get(), kProperty0.get(), true))
-        registerObserver(kProperty0, { old, new -> if (ignoreUnchanged && old != new) handler(Triple(old, new, false)) }, this.hashCode().toString())
+        getDelegate(kProperty0)?.onChange {
+            if (!ignoreUnchanged || it.first != it.second) {
+                handler(Triple(it.first, it.second, false))
+            }
+        }
     }
 
     fun onStatesChange(vararg kProperty0: KProperty0<*>, ignoreUnchanged: Boolean = true, handler: (Boolean) -> Unit) {
         handler(true)
         kProperty0.forEach {
-            registerObserver(it, { old, new ->
-                if (ignoreUnchanged && old != new) {
+            getDelegate(it)?.onChange {
+                if (!ignoreUnchanged || it.first != it.second) {
                     handler(false)
                 }
-            })
+            }
         }
     }
 }

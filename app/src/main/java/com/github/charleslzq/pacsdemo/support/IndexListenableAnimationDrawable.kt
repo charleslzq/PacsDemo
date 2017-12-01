@@ -1,7 +1,7 @@
 package com.github.charleslzq.pacsdemo.support
 
 import android.graphics.drawable.AnimationDrawable
-import com.github.charleslzq.pacsdemo.observe.ObservableStatus
+import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus
 
 /**
  * Created by charleslzq on 17-11-20.

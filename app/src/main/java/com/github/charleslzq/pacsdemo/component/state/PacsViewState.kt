@@ -1,6 +1,6 @@
 package com.github.charleslzq.pacsdemo.component.state
 
-import com.github.charleslzq.pacsdemo.observe.ObservableStatus
+import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -12,7 +12,10 @@ class PacsViewState {
     var imageCells: List<ImageFramesViewState> = (0..8).map { ImageFramesViewState(it) }
 
     fun resetImageStates() {
-        imageCells.forEach { it.reset() }
+        imageCells.forEach {
+            it.reset()
+            it.framesModel = ImageFramesModel()
+        }
     }
 
     enum class LayoutOption {
