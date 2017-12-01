@@ -5,6 +5,7 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import com.github.charleslzq.pacsdemo.component.event.WithEventBus
 
 /**
  * Created by charleslzq on 17-11-24.
@@ -13,7 +14,7 @@ sealed class OperationMode(
         private val gestureDetector: GestureDetector,
         private val scaleGestureDetector: ScaleGestureDetector,
         private val additionalHandler: (View, MotionEvent) -> Boolean
-) : View.OnTouchListener {
+) : View.OnTouchListener, WithEventBus {
 
     override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
         view.performClick()

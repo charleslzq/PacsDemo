@@ -23,7 +23,9 @@ class DicomImage(
     var dataPosition = -1
     var operationMode: OperationMode = PlayMode(view.context, NoOpCompositeGestureListener())
         set(value) {
+            field.unregister()
             field = value
+            field.register()
             view.setOnTouchListener(operationMode)
         }
 
