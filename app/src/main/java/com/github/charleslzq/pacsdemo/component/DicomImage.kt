@@ -5,6 +5,8 @@ import android.content.ClipDescription
 import android.graphics.ColorMatrixColorFilter
 import android.view.View
 import android.widget.ImageView
+import com.github.charleslzq.pacsdemo.component.event.DragEvent
+import com.github.charleslzq.pacsdemo.component.event.EventBus
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesModel
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
@@ -28,6 +30,8 @@ class DicomImage(
         }
 
     init {
+        EventBus.onEvent<DragEvent.StartAtCell> { onDragStart(it) }
+
         onStateChange(state::framesModel) {
             if (state.framesModel.size != 0) {
                 state.autoAdjustScale(view)
@@ -40,17 +44,20 @@ class DicomImage(
         }
     }
 
-    private fun onDrag() {
-        val dragBuilder = View.DragShadowBuilder(view)
-        val clipDataItem = ClipData.Item(tag, dataPosition.toString())
-        val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), clipDataItem)
-        @Suppress("DEPRECATION")
-        view.startDrag(clipData, dragBuilder, null, 0)
-        state.framesModel = ImageFramesModel()
+    private fun onDragStart(dragAtCell: DragEvent.StartAtCell) {
+        if (dragAtCell.layoutPosition == state.layoutPosition) {
+            val dragBuilder = View.DragShadowBuilder(view)
+            val clipDataItem = ClipData.Item(tag, dataPosition.toString())
+            val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), clipDataItem)
+            @Suppress("DEPRECATION")
+            view.startDrag(clipData, dragBuilder, null, 0)
+            state.framesModel = ImageFramesModel()
+            state.dataPosition = -1
+        }
     }
 
     private fun init() {
-        operationMode = PlayMode(view.context, PlayModeGestureListener(state, this::onDrag))
+        operationMode = PlayMode(view.context, PlayModeGestureListener(state))
 
         val firstImage = state.getScaledFrame(0)
         view.clearAnimation()
@@ -66,7 +73,7 @@ class DicomImage(
                     if (state.scaleFactor > 1.0f) {
                         StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, state))
                     } else {
-                        PlayMode(view.context, PlayModeGestureListener(state, this::onDrag))
+                        PlayMode(view.context, PlayModeGestureListener(state))
                     }
                 }
             }
@@ -93,7 +100,7 @@ class DicomImage(
             if (state.scaleFactor > 1 && operationMode is PlayMode) {
                 operationMode = StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, state))
             } else if (state.scaleFactor == 1.0f && operationMode is StudyMode) {
-                operationMode = PlayMode(view.context, PlayModeGestureListener(state, this::onDrag))
+                operationMode = PlayMode(view.context, PlayModeGestureListener(state))
             }
         }
         onStateChange(state::playing) {

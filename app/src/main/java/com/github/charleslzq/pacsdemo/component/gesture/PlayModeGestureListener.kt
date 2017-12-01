@@ -2,14 +2,15 @@ package com.github.charleslzq.pacsdemo.component.gesture
 
 import android.graphics.ColorMatrix
 import android.view.MotionEvent
+import com.github.charleslzq.pacsdemo.component.event.DragEvent
+import com.github.charleslzq.pacsdemo.component.event.EventBus
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
 
 /**
  * Created by charleslzq on 17-11-27.
  */
 class PlayModeGestureListener(
-        framesViewState: ImageFramesViewState,
-        private val onDrag: () -> Unit
+        framesViewState: ImageFramesViewState
 ) : ScaleCompositeGestureListener(framesViewState) {
 
     override fun onSingleTapConfirmed(motionEvent: MotionEvent): Boolean {
@@ -28,7 +29,7 @@ class PlayModeGestureListener(
     }
 
     override fun onLongPress(e: MotionEvent) {
-        onDrag()
+        EventBus.send(DragEvent.StartAtCell(framesViewState.layoutPosition, framesViewState.dataPosition))
     }
 
     override fun onDoubleTap(motionEvent: MotionEvent?): Boolean {

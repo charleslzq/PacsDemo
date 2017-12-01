@@ -14,7 +14,7 @@ import java.io.File
 /**
  * Created by charleslzq on 17-11-27.
  */
-class ImageFramesViewState {
+class ImageFramesViewState(val layoutPosition: Int) {
     var framesModel by ObservableStatus(ImageFramesModel())
     var duration: Int = 40
     var scaleFactor: Float by ObservableStatus(1.0f)
@@ -28,6 +28,8 @@ class ImageFramesViewState {
     var measureLine by ObservableStatus(false)
     var linePaint = Paint()
     var stringPaint = Paint()
+
+    var dataPosition = -1
 
     private var rawScale = 1.0f
 
