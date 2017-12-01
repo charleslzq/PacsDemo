@@ -25,7 +25,7 @@ class ImageFramesViewState(val layoutPosition: Int) {
     var playing by ObservableStatus(false)
     var pseudoColor by ObservableStatus(false)
     var allowPlay = false
-    var measureLine by ObservableStatus(false)
+    var measure by ObservableStatus(Measure.NONE)
     var linePaint = Paint()
     var stringPaint = Paint()
 
@@ -52,7 +52,7 @@ class ImageFramesViewState(val layoutPosition: Int) {
         playing = false
         pseudoColor = false
         allowPlay = false
-        measureLine = false
+        measure = Measure.NONE
         linePaint = Paint()
         stringPaint = Paint()
 
@@ -96,7 +96,8 @@ class ImageFramesViewState(val layoutPosition: Int) {
 
 
     fun getFrame(index: Int): Bitmap {
-        val rawBitmap = BitmapFactory.decodeFile(File(framesModel.frameUrls[index]).absolutePath, BitmapFactory.Options().apply { inMutable = pseudoColor })
+        val rawBitmap = BitmapFactory.decodeFile(File(framesModel.frameUrls[index]).absolutePath,
+                BitmapFactory.Options().apply { inMutable = pseudoColor || measure != Measure.NONE })
         if (pseudoColor) {
             val pixels = IntArray(rawBitmap.height * rawBitmap.width)
             rawBitmap.getPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
@@ -104,8 +105,6 @@ class ImageFramesViewState(val layoutPosition: Int) {
                 pixels[it] = calculateColor(pixels[it])
             }
             rawBitmap.setPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
-        } else if (measureLine) {
-            return rawBitmap.copy(Bitmap.Config.ARGB_8888, true)
         }
         return rawBitmap
     }
@@ -195,5 +194,11 @@ class ImageFramesViewState(val layoutPosition: Int) {
                 0f, 0f, -1f, 0f, 255f,
                 0f, 0f, 0f, 1f, 0f
         ))
+    }
+
+    enum class Measure {
+        NONE,
+        LINE,
+        ANGEL
     }
 }

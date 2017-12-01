@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.PopupMenu
 import com.github.charleslzq.pacsdemo.R
+import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
 import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 
 /**
@@ -15,7 +16,8 @@ class ButtonPanel(
         buttonPanel: View,
         pacsViewState: PacsViewState
 ) : PacsComponent<View>(buttonPanel, pacsViewState) {
-    private val measureLineButton: Button = view.findViewById(R.id.measeureLineButton)
+    private val measureAngleButton: Button = view.findViewById(R.id.measureAngleButton)
+    private val measureLineButton: Button = view.findViewById(R.id.measureLineButton)
     private val pseudoButton: Button = view.findViewById(R.id.pseudoColorButton)
     private val reverseButton: Button = view.findViewById(R.id.reverseButton)
     private val splitButton: Button = view.findViewById(R.id.spliteButton)
@@ -31,10 +33,17 @@ class ButtonPanel(
             layoutSelector.show()
         }
 
+        measureAngleButton.setOnClickListener {
+            if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
+                val imageModel = state.imageCells[0]
+                imageModel.measure = ImageFramesViewState.Measure.ANGEL
+            }
+        }
+
         measureLineButton.setOnClickListener {
             if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
                 val imageModel = state.imageCells[0]
-                imageModel.measureLine = !imageModel.measureLine
+                imageModel.measure = ImageFramesViewState.Measure.LINE
             }
         }
 

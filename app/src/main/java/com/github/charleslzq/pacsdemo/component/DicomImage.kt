@@ -65,8 +65,8 @@ class DicomImage(
         view.background = null
         view.setImageBitmap(firstImage)
 
-        onStateChange(state::measureLine) {
-            operationMode = when (state.measureLine && state.framesModel.frames.isNotEmpty()) {
+        onStateChange(state::measure) {
+            operationMode = when (state.measure != ImageFramesViewState.Measure.NONE && state.framesModel.frames.isNotEmpty()) {
                 true -> {
                     MeasureMode(view.context, MeasureModeGestureListener(view, state))
                 }

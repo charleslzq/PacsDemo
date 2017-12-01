@@ -21,6 +21,7 @@ class MeasureModeGestureListener(
     private var init = false
     private val pathList = mutableListOf<Path>()
     private val textList = mutableListOf<Pair<PointF, String>>()
+    private val points = mutableListOf<PointF>()
 
     override fun onOtherGesture(view: View, motionEvent: MotionEvent): Boolean {
         when (motionEvent.action) {
@@ -34,6 +35,9 @@ class MeasureModeGestureListener(
             }
             MotionEvent.ACTION_MOVE -> {
                 val currentPoint = getPoint(motionEvent)
+                if (framesViewState.measure == ImageFramesViewState.Measure.ANGEL) {
+                    points.add(currentPoint)
+                }
                 path.lineTo(currentPoint.x, currentPoint.y)
                 canvas.drawPath(path, framesViewState.linePaint)
                 imageView.invalidate()
@@ -41,19 +45,51 @@ class MeasureModeGestureListener(
             MotionEvent.ACTION_UP -> {
                 resetCanvas()
                 val currentPoint = getPoint(motionEvent)
-                val length = length(startPoint, currentPoint)
-                if (length > 5.0f) {
-                    val text = length.toString()
-                    path.reset()
-                    path.moveTo(startPoint.x, startPoint.y)
-                    path.lineTo(currentPoint.x, currentPoint.y)
-                    canvas.drawPath(path, framesViewState.linePaint)
-                    canvas.drawText(text, currentPoint.x, currentPoint.y, framesViewState.stringPaint)
-                    imageView.invalidate()
+                when (framesViewState.measure) {
+                    ImageFramesViewState.Measure.NONE -> {
+                    }
+                    ImageFramesViewState.Measure.LINE -> {
+                        val length = length(startPoint, currentPoint)
+                        if (length > 5.0f) {
+                            val text = length.toString()
+                            path.reset()
+                            path.moveTo(startPoint.x, startPoint.y)
+                            path.lineTo(currentPoint.x, currentPoint.y)
 
-                    textList.add(currentPoint to text)
-                    pathList.add(path)
-                    path = Path()
+                            canvas.drawPath(path, framesViewState.linePaint)
+                            canvas.drawText(text, currentPoint.x, currentPoint.y, framesViewState.stringPaint)
+                            imageView.invalidate()
+
+                            textList.add(currentPoint to text)
+                            pathList.add(path)
+                        }
+                        path = Path()
+                    }
+                    ImageFramesViewState.Measure.ANGEL -> {
+                        val a = currentPoint.y - startPoint.y
+                        val b = startPoint.x - currentPoint.x
+                        val c = currentPoint.x * startPoint.y - startPoint.x * currentPoint.y
+                        val result = points.map { it to a * it.x + b * it.y + c }
+                        if (result.all { it.second > 0 } || result.all { it.second < 0 }) {
+                            val anglePoint = result.map { it.first to Math.abs(it.second) }.maxBy { it.second }
+                            if (anglePoint != null) {
+                                path.reset()
+                                path.moveTo(startPoint.x, startPoint.y)
+                                path.lineTo(anglePoint.first.x, anglePoint.first.y)
+                                path.lineTo(currentPoint.x, currentPoint.y)
+
+                                val angle = calculateAngle(anglePoint.first, currentPoint)
+                                canvas.drawText(angle.toString(), anglePoint.first.x, anglePoint.first.y, framesViewState.stringPaint)
+                                canvas.drawPath(path, framesViewState.linePaint)
+                                imageView.invalidate()
+
+                                pathList.add(path)
+                                textList.add(anglePoint.first to angle.toString())
+                            }
+                            path = Path()
+                        }
+                        points.clear()
+                    }
                 }
             }
         }
@@ -73,6 +109,15 @@ class MeasureModeGestureListener(
 
     private fun length(point1: PointF, point2: PointF): Float {
         return Math.sqrt(((point1.x - point2.x) * (point1.x - point2.x) + (point1.y - point2.y) * (point1.y - point2.y)).toDouble()).toFloat()
+    }
+
+    private fun calculateAngle(anglePoint: PointF, endPoint: PointF): Float {
+        val offsetStart = PointF(startPoint.x - anglePoint.x, startPoint.y - endPoint.y)
+        val offsetEnd = PointF(endPoint.x - anglePoint.x, endPoint.y - anglePoint.y)
+        val distanceStart = Math.sqrt((offsetStart.x * offsetStart.x + offsetStart.y * offsetStart.y).toDouble())
+        val distanceEnd = Math.sqrt((offsetEnd.x * offsetEnd.x + offsetEnd.y * offsetEnd.y).toDouble())
+        val cos = (offsetStart.x * offsetEnd.x + offsetEnd.y * offsetStart.y) / (distanceStart * distanceEnd)
+        return (Math.acos(cos).toFloat() * 180 / Math.PI).toFloat()
     }
 
     private fun resetCanvas() {
