@@ -20,7 +20,6 @@ class ViewSelector(
     init {
         onStateChange(state::layoutOption) {
             view.displayedChild = state.layoutOption.ordinal
-            state.resetImageStates()
             rebind()
         }
 

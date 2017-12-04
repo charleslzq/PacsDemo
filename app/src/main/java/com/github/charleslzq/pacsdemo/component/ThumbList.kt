@@ -56,6 +56,9 @@ class ThumbList(
             }
             if (it.second >= 0 && it.second < view.childCount) {
                 view.getChildAt(it.second).isSelected = true
+                if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
+                    state.imageCells[0].patientSeriesModel = state.seriesList[it.second]
+                }
             }
         }
     }

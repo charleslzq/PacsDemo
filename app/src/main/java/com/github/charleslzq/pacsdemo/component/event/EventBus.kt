@@ -10,11 +10,7 @@ object EventBus {
     private val registry = mutableMapOf<String, PublishSubject<Any>>()
 
     fun get(name: String = "DEFAULT"): Observable<Any> {
-        return when (registry.containsKey(name)) {
-            true -> registry[name] as Observable<Any>
-            false -> registerNew(name)
-        }
-
+        return registry.getOrDefault(name, registerNew(name))
     }
 
     fun send(event: Any, name: String = "DEFAULT") {
