@@ -2,12 +2,14 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.content.ClipData
 import android.content.ClipDescription
+import android.graphics.Canvas
 import android.graphics.ColorMatrixColorFilter
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.component.base.Component
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.event.EventBus
+import com.github.charleslzq.pacsdemo.component.event.RequireRedrawCanvas
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
 import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
@@ -24,9 +26,11 @@ class DicomImage(
             field = value
             view.setOnTouchListener(operationMode)
         }
+    lateinit var canvas: Canvas
 
     init {
         EventBus.onEvent<DragEventMessage.StartCopyCell> { onDragStart(it) }
+        EventBus.onEvent<RequireRedrawCanvas> { redrawCanvas() }
 
         onStateChange(state::framesModel) {
             state.reset()
@@ -62,7 +66,8 @@ class DicomImage(
         onStateChange(state::measure) {
             operationMode = when (state.measure != ImageFramesViewState.Measure.NONE && state.framesModel.frames.isNotEmpty()) {
                 true -> {
-                    MeasureMode(view.context, MeasureModeGestureListener(view, state))
+                    redrawCanvas()
+                    MeasureMode(view.context, MeasureModeGestureListener(state))
                 }
                 false -> {
                     if (state.scaleFactor > 1.0f) {
@@ -119,6 +124,24 @@ class DicomImage(
                 view.setImageBitmap(state.getScaledFrame(state.currentIndex))
             }
         }
+    }
+
+    private fun redrawCanvas() {
+        val bitmap = state.getScaledFrame(state.currentIndex)
+        canvas = Canvas(bitmap)
+        view.setImageBitmap(bitmap)
+
+        state.pathList.forEach {
+            canvas.drawPath(it, state.linePaint)
+        }
+
+        canvas.drawPath(state.currentPath, state.linePaint)
+
+        state.textList.forEach {
+            canvas.drawText(it.second, it.first.x, it.first.y, state.stringPaint)
+        }
+
+        view.invalidate()
     }
 
     companion object {

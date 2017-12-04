@@ -29,7 +29,11 @@ class ImageFramesViewState(val layoutPosition: Int) {
     var linePaint = Paint()
     var stringPaint = Paint()
 
-    var dataPosition = -1
+    var currentPath = Path()
+    val pathList = mutableListOf<Path>()
+    val textList = mutableListOf<Pair<PointF, String>>()
+    var firstPath = true
+
 
     private var rawScale = 1.0f
 
@@ -64,6 +68,10 @@ class ImageFramesViewState(val layoutPosition: Int) {
         stringPaint.strokeWidth = 1f
         stringPaint.color = Color.RED
         stringPaint.isLinearText = true
+
+        pathList.clear()
+        textList.clear()
+        currentPath = Path()
     }
 
     fun copyFrom(imageFramesViewState: ImageFramesViewState) {
@@ -75,6 +83,12 @@ class ImageFramesViewState(val layoutPosition: Int) {
         measure = imageFramesViewState.measure
         linePaint = imageFramesViewState.linePaint
         stringPaint = imageFramesViewState.stringPaint
+
+        pathList.clear()
+        pathList.addAll(imageFramesViewState.pathList)
+        textList.clear()
+        textList.addAll(imageFramesViewState.textList)
+        currentPath = imageFramesViewState.currentPath
 
         currentIndex = imageFramesViewState.currentIndex
     }
