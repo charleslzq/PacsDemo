@@ -10,9 +10,8 @@ import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 class PacsMain(
         mainView: View,
         pacsViewState: PacsViewState
-) : PacsComponent<View>(mainView, pacsViewState) {
-    private val thumbList = ThumbList(view.findViewById(R.id.thumbList), pacsViewState)
-    private val viewSelector = ViewSelector(view.findViewById(R.id.viewSelector), pacsViewState)
-    private var imageProgressBar = ImageProgressBar(view.findViewById(R.id.imageSeekBar), pacsViewState)
-    private val buttonPanel = ButtonPanel(view.findViewById(R.id.buttonPanel), pacsViewState)
-}
+) : PacsComponentGroup<View>(mainView, pacsViewState, listOf(
+        Sub(ThumbList::class, byId(R.id.thumbList), sameAsParent()),
+        Sub(ViewSelector::class, byId(R.id.viewSelector), sameAsParent()),
+        Sub(ButtonPanel::class, byId(R.id.buttonPanel), sameAsParent())
+))

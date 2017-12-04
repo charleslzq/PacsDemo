@@ -36,28 +36,27 @@ class ButtonPanel(
         measureAngleButton.setOnClickListener {
             if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
                 val imageModel = state.imageCells[0]
-                imageModel.measure = ImageFramesViewState.Measure.ANGEL
+                imageModel.imageFramesViewState.measure = ImageFramesViewState.Measure.ANGEL
             }
         }
 
         measureLineButton.setOnClickListener {
             if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
                 val imageModel = state.imageCells[0]
-                imageModel.measure = ImageFramesViewState.Measure.LINE
+                imageModel.imageFramesViewState.measure = ImageFramesViewState.Measure.LINE
             }
         }
 
         reverseButton.setOnClickListener {
             if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
-                state.imageCells[0].reverseColor()
-
+                state.imageCells[0].imageFramesViewState.reverseColor()
             }
         }
 
         pseudoButton.setOnClickListener {
             if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
                 val imageModel = state.imageCells[0]
-                imageModel.pseudoColor = !imageModel.pseudoColor
+                imageModel.imageFramesViewState.pseudoColor = !imageModel.imageFramesViewState.pseudoColor
             }
         }
 

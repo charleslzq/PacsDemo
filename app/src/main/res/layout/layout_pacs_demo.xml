@@ -97,12 +97,6 @@
         android:gravity="end"
         >
 
-        <SeekBar
-            android:id="@+id/imageSeekBar"
-            style="@style/Widget.AppCompat.SeekBar"
-            android:layout_width="100dp"
-            android:layout_height="match_parent"
-            android:visibility="invisible" />
         <LinearLayout
             android:id="@+id/buttonPanel"
             android:layout_width="wrap_content"

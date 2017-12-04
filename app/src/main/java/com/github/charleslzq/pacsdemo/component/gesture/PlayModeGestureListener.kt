@@ -2,7 +2,7 @@ package com.github.charleslzq.pacsdemo.component.gesture
 
 import android.graphics.ColorMatrix
 import android.view.MotionEvent
-import com.github.charleslzq.pacsdemo.component.event.DragEvent
+import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.event.EventBus
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
 
@@ -29,7 +29,7 @@ class PlayModeGestureListener(
     }
 
     override fun onLongPress(e: MotionEvent) {
-        EventBus.send(DragEvent.StartAtCell(framesViewState.layoutPosition, framesViewState.dataPosition))
+        EventBus.send(DragEventMessage.StartCopyCell(framesViewState.layoutPosition, framesViewState.dataPosition))
     }
 
     override fun onDoubleTap(motionEvent: MotionEvent?): Boolean {

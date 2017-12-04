@@ -9,12 +9,12 @@ class PacsViewState {
     var seriesList by ObservableStatus(mutableListOf<PatientSeriesModel>())
     var selected: Int by ObservableStatus(0)
     var layoutOption: LayoutOption by ObservableStatus(LayoutOption.ONE_ONE)
-    var imageCells: List<ImageFramesViewState> = (0..8).map { ImageFramesViewState(it) }
+    var imageCells: List<PatientSeriesViewState> = (0..8).map { PatientSeriesViewState(ImageFramesViewState(it)) }
 
     fun resetImageStates() {
         imageCells.forEach {
-            it.reset()
-            it.framesModel = ImageFramesModel()
+            it.imageFramesViewState.reset()
+            it.imageFramesViewState.framesModel = ImageFramesModel()
         }
     }
 

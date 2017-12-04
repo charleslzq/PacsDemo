@@ -5,12 +5,12 @@ import android.content.ClipDescription
 import android.graphics.ColorMatrixColorFilter
 import android.view.View
 import android.widget.ImageView
-import com.github.charleslzq.pacsdemo.component.event.DragEvent
+import com.github.charleslzq.pacsdemo.component.base.Component
+import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.event.EventBus
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesModel
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
-import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
 
 /**
@@ -18,10 +18,9 @@ import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
  */
 class DicomImage(
         imageView: ImageView,
-        val position: Int,
-        pacsViewState: PacsViewState
-) : PacsComponentFragment<ImageView, ImageFramesViewState>(imageView, pacsViewState, { it.imageCells[position] }) {
-    val tag = "image$position"
+        imageFramesViewState: ImageFramesViewState
+) : Component<ImageView, ImageFramesViewState>(imageView, imageFramesViewState) {
+    val tag = "image${imageFramesViewState.layoutPosition}"
     var dataPosition = -1
     var operationMode: OperationMode = PlayMode(view.context, NoOpCompositeGestureListener())
         set(value) {
@@ -30,7 +29,7 @@ class DicomImage(
         }
 
     init {
-        EventBus.onEvent<DragEvent.StartAtCell> { onDragStart(it) }
+        EventBus.onEvent<DragEventMessage.StartCopyCell> { onDragStart(it) }
 
         onStateChange(state::framesModel) {
             state.reset()
@@ -45,8 +44,8 @@ class DicomImage(
         }
     }
 
-    private fun onDragStart(dragAtCell: DragEvent.StartAtCell) {
-        if (dragAtCell.layoutPosition == state.layoutPosition) {
+    private fun onDragStart(dragCopyCellMessage: DragEventMessage.StartCopyCell) {
+        if (dragCopyCellMessage.layoutPosition == state.layoutPosition) {
             val dragBuilder = View.DragShadowBuilder(view)
             val clipDataItem = ClipData.Item(tag, dataPosition.toString())
             val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), clipDataItem)
