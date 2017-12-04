@@ -29,6 +29,9 @@ class ViewSelector(
             val dataPosition = it.dataPosition
             if (dataPosition >= 0 && dataPosition < pacsViewState.imageCells.size && layoutPosition in (0..8)) {
                 state.imageCells[layoutPosition].patientSeriesModel = pacsViewState.seriesList[dataPosition]
+                if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
+                    state.imageCells[layoutPosition].imageFramesViewState.allowPlay = true
+                }
             }
         }
 
