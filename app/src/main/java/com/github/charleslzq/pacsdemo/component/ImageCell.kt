@@ -20,12 +20,22 @@ class ImageCell(
 )) {
 
     init {
+        onStateChange(state::patientSeriesModel) {
+            state.imageFramesViewState.framesModel = state.patientSeriesModel.imageFramesModel
+        }
+
         view.setOnDragListener { _, dragEvent ->
             when (dragEvent.action) {
                 DragEvent.ACTION_DROP -> {
-                    val dataPosition = dragEvent.clipData.getItemAt(0).htmlText.toInt()
-                    val layoutPosition = state.imageFramesViewState.layoutPosition
-                    EventBus.send(DragEventMessage.DropAtCellWithData(layoutPosition, dataPosition))
+                    val tag = dragEvent.clipData.getItemAt(0).text.toString()
+                    if (tag == ThumbList.tag) {
+                        val dataPosition = dragEvent.clipData.getItemAt(0).htmlText.toInt()
+                        val layoutPosition = state.imageFramesViewState.layoutPosition
+                        EventBus.send(DragEventMessage.DropAtCellWithData(layoutPosition, dataPosition))
+                    } else if (tag == DicomImage.tag) {
+                        val layoutPosition = dragEvent.clipData.getItemAt(0).htmlText.toInt()
+                        EventBus.send(DragEventMessage.DropToCopyCell(layoutPosition, state.imageFramesViewState.layoutPosition))
+                    }
                 }
             }
             true

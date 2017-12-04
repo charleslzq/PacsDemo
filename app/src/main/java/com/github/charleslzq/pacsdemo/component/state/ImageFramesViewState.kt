@@ -66,6 +66,19 @@ class ImageFramesViewState(val layoutPosition: Int) {
         stringPaint.isLinearText = true
     }
 
+    fun copyFrom(imageFramesViewState: ImageFramesViewState) {
+        scaleFactor = imageFramesViewState.scaleFactor
+        startOffset = imageFramesViewState.startOffset
+        matrix = imageFramesViewState.matrix
+        colorMatrix = imageFramesViewState.colorMatrix
+        pseudoColor = imageFramesViewState.pseudoColor
+        measure = imageFramesViewState.measure
+        linePaint = imageFramesViewState.linePaint
+        stringPaint = imageFramesViewState.stringPaint
+
+        currentIndex = imageFramesViewState.currentIndex
+    }
+
     fun playable() = framesModel.size > 1 && allowPlay
 
     fun autoAdjustScale(view: View) {

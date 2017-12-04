@@ -2,7 +2,10 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.view.View
 import android.widget.*
+import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
+import com.github.charleslzq.pacsdemo.component.event.EventBus
 import com.github.charleslzq.pacsdemo.component.state.PacsViewState
+import com.github.charleslzq.pacsdemo.component.state.PatientSeriesModel
 import com.github.charleslzq.pacsdemo.support.ViewUtils
 
 /**
@@ -16,8 +19,25 @@ class ViewSelector(
 )) {
     init {
         onStateChange(state::layoutOption) {
+            view.displayedChild = state.layoutOption.ordinal
             state.resetImageStates()
             rebind()
+        }
+
+        EventBus.onEvent<DragEventMessage.DropAtCellWithData> {
+            val layoutPosition = it.layoutPosition
+            val dataPosition = it.dataPosition
+            if (dataPosition >= 0 && dataPosition < pacsViewState.imageCells.size && layoutPosition in (0..8)) {
+                state.imageCells[layoutPosition].patientSeriesModel = pacsViewState.seriesList[dataPosition]
+            }
+        }
+
+        EventBus.onEvent<DragEventMessage.DropToCopyCell> {
+            val srcPosition = it.sourcePosition
+            val destPosition = it.targetPosition
+            state.imageCells[destPosition].patientSeriesModel = state.imageCells[srcPosition].patientSeriesModel
+            state.imageCells[destPosition].imageFramesViewState.copyFrom(state.imageCells[srcPosition].imageFramesViewState)
+            state.imageCells[srcPosition].patientSeriesModel = PatientSeriesModel()
         }
     }
 

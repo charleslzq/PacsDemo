@@ -5,11 +5,16 @@ package com.github.charleslzq.pacsdemo.component.event
  */
 class DragEventMessage {
     data class StartCopyCell(
-            val layoutPosition: Int,
-            val dataPosition: Int
+            val layoutPosition: Int
     )
+
     data class DropAtCellWithData(
             val layoutPosition: Int,
             val dataPosition: Int
+    )
+
+    data class DropToCopyCell(
+            val sourcePosition: Int,
+            val targetPosition: Int
     )
 }

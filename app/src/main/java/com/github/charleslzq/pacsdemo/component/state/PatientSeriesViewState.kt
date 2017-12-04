@@ -8,5 +8,5 @@ import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus
 class PatientSeriesViewState(
         val imageFramesViewState: ImageFramesViewState
 ) {
-    val patientSeriesModel by ObservableStatus(PatientSeriesModel())
+    var patientSeriesModel by ObservableStatus(PatientSeriesModel())
 }

@@ -66,6 +66,7 @@ class ButtonPanel(
                 false -> View.INVISIBLE
             }
             measureLineButton.visibility = visible
+            measureAngleButton.visibility = visible
             reverseButton.visibility = visible
             pseudoButton.visibility = visible
         }

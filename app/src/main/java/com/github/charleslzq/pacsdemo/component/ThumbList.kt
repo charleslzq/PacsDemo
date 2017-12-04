@@ -16,7 +16,6 @@ class ThumbList(
         recyclerView: RecyclerView,
         pacsViewState: PacsViewState
 ) : PacsComponent<RecyclerView>(recyclerView, pacsViewState) {
-    private val tag = "thumbList"
 
     init {
         view.layoutManager = LinearLayoutManager(recyclerView.context)
@@ -59,5 +58,9 @@ class ThumbList(
                 view.getChildAt(it.second).isSelected = true
             }
         }
+    }
+
+    companion object {
+        val tag = "thumbList"
     }
 }

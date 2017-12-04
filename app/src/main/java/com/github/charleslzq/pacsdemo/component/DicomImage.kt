@@ -9,7 +9,6 @@ import com.github.charleslzq.pacsdemo.component.base.Component
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.event.EventBus
 import com.github.charleslzq.pacsdemo.component.gesture.*
-import com.github.charleslzq.pacsdemo.component.state.ImageFramesModel
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
 import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
 
@@ -20,7 +19,6 @@ class DicomImage(
         imageView: ImageView,
         imageFramesViewState: ImageFramesViewState
 ) : Component<ImageView, ImageFramesViewState>(imageView, imageFramesViewState) {
-    val tag = "image${imageFramesViewState.layoutPosition}"
     var dataPosition = -1
     var operationMode: OperationMode = PlayMode(view.context, NoOpCompositeGestureListener())
         set(value) {
@@ -47,12 +45,10 @@ class DicomImage(
     private fun onDragStart(dragCopyCellMessage: DragEventMessage.StartCopyCell) {
         if (dragCopyCellMessage.layoutPosition == state.layoutPosition) {
             val dragBuilder = View.DragShadowBuilder(view)
-            val clipDataItem = ClipData.Item(tag, dataPosition.toString())
+            val clipDataItem = ClipData.Item(tag, state.layoutPosition.toString())
             val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), clipDataItem)
             @Suppress("DEPRECATION")
             view.startDrag(clipData, dragBuilder, null, 0)
-            state.framesModel = ImageFramesModel()
-            state.dataPosition = -1
         }
     }
 
@@ -87,7 +83,7 @@ class DicomImage(
         }
 
         onStateChange(state::currentIndex) {
-            if (!state.playing) {
+            if (!state.playing && state.framesModel.size > 0) {
                 view.clearAnimation()
                 view.background = null
                 view.setImageBitmap(state.getScaledFrame(state.currentIndex))
@@ -124,5 +120,9 @@ class DicomImage(
                 view.setImageBitmap(state.getScaledFrame(state.currentIndex))
             }
         }
+    }
+
+    companion object {
+        val tag = "imageCell"
     }
 }

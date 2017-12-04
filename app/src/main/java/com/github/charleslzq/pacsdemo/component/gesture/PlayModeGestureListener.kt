@@ -29,7 +29,7 @@ class PlayModeGestureListener(
     }
 
     override fun onLongPress(e: MotionEvent) {
-        EventBus.send(DragEventMessage.StartCopyCell(framesViewState.layoutPosition, framesViewState.dataPosition))
+        EventBus.send(DragEventMessage.StartCopyCell(framesViewState.layoutPosition))
     }
 
     override fun onDoubleTap(motionEvent: MotionEvent?): Boolean {
