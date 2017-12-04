@@ -19,7 +19,6 @@ class DicomImage(
         imageView: ImageView,
         imageFramesViewState: ImageFramesViewState
 ) : Component<ImageView, ImageFramesViewState>(imageView, imageFramesViewState) {
-    var dataPosition = -1
     var operationMode: OperationMode = PlayMode(view.context, NoOpCompositeGestureListener())
         set(value) {
             field = value
