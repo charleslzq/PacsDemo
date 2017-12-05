@@ -83,9 +83,7 @@ class MeasureModeGestureListener(
     }
 
     override fun onDoubleTap(e: MotionEvent?): Boolean {
-        framesViewState.pathList.clear()
-        framesViewState.textList.clear()
-        EventBus.send(RequireRedrawCanvas())
+        framesViewState.measure = ImageFramesViewState.Measure.NONE
         return true
     }
 

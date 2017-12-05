@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipDescription
 import android.graphics.Canvas
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.Path
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.component.base.Component
@@ -64,12 +65,15 @@ class DicomImage(
         view.setImageBitmap(firstImage)
 
         onStateChange(state::measure) {
+            state.currentPath = Path()
+            state.firstPath = true
             operationMode = when (state.measure != ImageFramesViewState.Measure.NONE && state.framesModel.frames.isNotEmpty()) {
                 true -> {
-                    redrawCanvas()
                     MeasureMode(view.context, MeasureModeGestureListener(state))
                 }
                 false -> {
+                    state.pathList.clear()
+                    state.textList.clear()
                     if (state.scaleFactor > 1.0f) {
                         StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, state))
                     } else {
@@ -77,6 +81,7 @@ class DicomImage(
                     }
                 }
             }
+            redrawCanvas()
         }
 
         onStateChange(state::colorMatrix) {
