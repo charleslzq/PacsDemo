@@ -16,6 +16,7 @@ class ImageCell(
         patientSeriesViewState: PatientSeriesViewState
 ) : ComponentGroup<View, PatientSeriesViewState>(baseView, patientSeriesViewState, listOf(
         Sub(ImageLeftTopPanel::class, byId(R.id.leftTopPanel), sameAsParent()),
+        Sub(ImageRightTopPanel::class, byId(R.id.rightTopPanel), sameAsParent()),
         Sub(DicomImage::class, byId(R.id.imagesContainer), { patientState, _ -> patientState.imageFramesViewState })
 )) {
 
