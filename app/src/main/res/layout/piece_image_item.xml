@@ -55,39 +55,59 @@
         android:orientation="vertical">
         <TextView
             android:id="@+id/patientName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:textAlignment="textEnd"
             android:gravity="end"/>
         <TextView
             android:id="@+id/patientId"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:textAlignment="gravity"
             android:gravity="end"/>
         <TextView
             android:id="@+id/patientInfo"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:textAlignment="gravity"
             android:gravity="end"/>
         <TextView
             android:id="@+id/institutionName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:textAlignment="gravity"
             android:gravity="end"/>
         <TextView
             android:id="@+id/description"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:textAlignment="gravity"
             android:gravity="end"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/leftBottomPanel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/imagesContainer"
+        android:layout_alignStart="@id/imagesContainer"
+        android:layout_alignLeft="@id/imagesContainer"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/xRayInfo"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
     </LinearLayout>
 
 
