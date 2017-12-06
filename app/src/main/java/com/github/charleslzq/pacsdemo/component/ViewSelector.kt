@@ -21,6 +21,9 @@ class ViewSelector(
         onStateChange(state::layoutOption) {
             view.displayedChild = state.layoutOption.ordinal
             rebind()
+            if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE && state.imageCells[0].patientSeriesModel.imageFramesModel.size > 0) {
+                state.imageCells[0].imageFramesViewState.allowPlay = true
+            }
         }
 
         EventBus.onEvent<DragEventMessage.DropAtCellWithData> {
