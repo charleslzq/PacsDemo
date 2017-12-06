@@ -9,6 +9,7 @@ import com.github.charleslzq.pacsdemo.R
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
 import com.github.charleslzq.pacsdemo.component.state.PacsViewState
 import com.github.charleslzq.pacsdemo.component.state.PatientSeriesViewState
+import com.github.charleslzq.pacsdemo.support.TypefaceUtil
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -22,6 +23,8 @@ class ButtonPanel(
     private val pseudoButton: Button = view.findViewById(R.id.pseudoColorButton)
     private val reverseButton: Button = view.findViewById(R.id.reverseButton)
     private val splitButton: Button = view.findViewById(R.id.spliteButton)
+    private val refreshButton: Button = view.findViewById(R.id.refreshButton)
+    private val backButton: Button = view.findViewById(R.id.backButton)
     private val layoutSelector: PopupMenu = PopupMenu(buttonPanel.context, splitButton)
 
     init {
@@ -59,6 +62,15 @@ class ButtonPanel(
                 it.imageFramesViewState.pseudoColor = !it.imageFramesViewState.pseudoColor
             }
         }
+
+        val fontAwesomeTypeface = TypefaceUtil.getTypeFace(view.context, TypefaceUtil.fontAwesome)
+        measureLineButton.typeface = fontAwesomeTypeface
+        measureAngleButton.typeface = fontAwesomeTypeface
+        pseudoButton.typeface = fontAwesomeTypeface
+        reverseButton.typeface = fontAwesomeTypeface
+        splitButton.typeface = fontAwesomeTypeface
+        refreshButton.typeface = fontAwesomeTypeface
+        backButton.typeface = fontAwesomeTypeface
 
         onStateChange(state::layoutOption) {
             val visible = when (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
