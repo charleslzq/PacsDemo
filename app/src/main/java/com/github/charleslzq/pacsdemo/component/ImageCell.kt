@@ -15,7 +15,7 @@ class ImageCell(
         baseView: View,
         patientSeriesViewState: PatientSeriesViewState
 ) : ComponentGroup<View, PatientSeriesViewState>(baseView, patientSeriesViewState, listOf(
-        Sub(ProgressText::class, byId(R.id.imageProgress), { patientState, _ -> patientState.imageFramesViewState }),
+        Sub(ImageLeftTopPanel::class, byId(R.id.leftTopPanel), sameAsParent()),
         Sub(DicomImage::class, byId(R.id.imagesContainer), { patientState, _ -> patientState.imageFramesViewState })
 )) {
 

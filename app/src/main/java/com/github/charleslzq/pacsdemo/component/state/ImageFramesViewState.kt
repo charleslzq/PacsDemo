@@ -35,7 +35,7 @@ class ImageFramesViewState(val layoutPosition: Int) {
     var firstPath = true
 
 
-    private var rawScale = 1.0f
+    var rawScale = 1.0f
 
     init {
         reset()

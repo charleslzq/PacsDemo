@@ -14,11 +14,37 @@
         android:contentDescription="@string/imageContentDescription"
         android:scaleType="matrix" />
 
-    <TextView
-        android:id="@+id/imageProgress"
+    <LinearLayout
+        android:id="@+id/leftTopPanel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/imagesContainer"
-        android:layout_centerHorizontal="true"/>
+        android:layout_alignStart="@id/imagesContainer"
+        android:layout_alignLeft="@id/imagesContainer"
+        android:orientation="vertical"
+        >
+        <TextView
+            android:id="@+id/windowInfo"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+        <TextView
+            android:id="@+id/sliceInfo"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+        <TextView
+            android:id="@+id/scaleInfo"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+        <TextView
+            android:id="@+id/imageProgress"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+
 
 </RelativeLayout>

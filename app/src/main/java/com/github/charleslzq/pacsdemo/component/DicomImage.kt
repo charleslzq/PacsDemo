@@ -129,6 +129,8 @@ class DicomImage(
                 view.setImageBitmap(state.getScaledFrame(state.currentIndex))
             }
         }
+
+        state.currentIndex = 0
     }
 
     private fun redrawCanvas() {
