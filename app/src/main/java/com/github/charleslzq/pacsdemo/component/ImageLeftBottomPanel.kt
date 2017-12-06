@@ -17,7 +17,7 @@ class ImageLeftBottomPanel(
     private val timeInfo: TextView = view.findViewById(R.id.time)
 
     init {
-        onStateChange(state.imageFramesViewState::currentIndex) {
+        onStateChange(state.imageFramesViewState::currentIndex, false) {
             if (state.imageFramesViewState.framesModel.size > 1) {
                 xRayInfo.visibility = View.VISIBLE
                 timeInfo.visibility = View.VISIBLE
