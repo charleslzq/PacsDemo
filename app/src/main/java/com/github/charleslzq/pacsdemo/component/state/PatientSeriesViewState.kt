@@ -9,4 +9,5 @@ class PatientSeriesViewState(
         val imageFramesViewState: ImageFramesViewState
 ) {
     var patientSeriesModel by ObservableStatus(PatientSeriesModel())
+    var selected by ObservableStatus(false)
 }

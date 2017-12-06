@@ -25,7 +25,7 @@ abstract class ComponentGroup<V, S>(
         children.addAll(bind())
     }
 
-    inline fun <reified T, SV, SS> getChildren(index: Int = 0): T where T : Component<SV, SS> {
+    inline fun <reified T, SV, SS> getChild(index: Int = 0): T where T : Component<SV, SS> {
         return children.mapNotNull { getChildAs<T>(it) }[index]
     }
 

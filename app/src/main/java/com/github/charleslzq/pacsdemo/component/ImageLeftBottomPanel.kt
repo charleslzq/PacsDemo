@@ -12,7 +12,7 @@ import com.github.charleslzq.pacsdemo.component.state.PatientSeriesViewState
 class ImageLeftBottomPanel(
         panelView: View,
         patientSeriesViewState: PatientSeriesViewState
-): Component<View, PatientSeriesViewState>(panelView, patientSeriesViewState) {
+) : Component<View, PatientSeriesViewState>(panelView, patientSeriesViewState) {
     private val xRayInfo: TextView = view.findViewById(R.id.xRayInfo)
     private val timeInfo: TextView = view.findViewById(R.id.time)
 

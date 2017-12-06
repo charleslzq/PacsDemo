@@ -8,6 +8,7 @@ import android.widget.PopupMenu
 import com.github.charleslzq.pacsdemo.R
 import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
 import com.github.charleslzq.pacsdemo.component.state.PacsViewState
+import com.github.charleslzq.pacsdemo.component.state.PatientSeriesViewState
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -48,15 +49,14 @@ class ButtonPanel(
         }
 
         reverseButton.setOnClickListener {
-            if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
-                state.imageCells[0].imageFramesViewState.reverseColor()
+            getSelected().forEach {
+                it.imageFramesViewState.reverseColor()
             }
         }
 
         pseudoButton.setOnClickListener {
-            if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
-                val imageModel = state.imageCells[0]
-                imageModel.imageFramesViewState.pseudoColor = !imageModel.imageFramesViewState.pseudoColor
+            getSelected().forEach {
+                it.imageFramesViewState.pseudoColor = !it.imageFramesViewState.pseudoColor
             }
         }
 
@@ -67,10 +67,15 @@ class ButtonPanel(
             }
             measureLineButton.visibility = visible
             measureAngleButton.visibility = visible
-            reverseButton.visibility = visible
-            pseudoButton.visibility = visible
         }
 
+    }
+
+    private fun getSelected(): List<PatientSeriesViewState> {
+        return when (state.layoutOption) {
+            PacsViewState.LayoutOption.ONE_ONE -> listOf(state.imageCells[0])
+            else -> state.imageCells.filter { it.selected }
+        }
     }
 
     private fun onLayoutSelected(item: MenuItem): Boolean {

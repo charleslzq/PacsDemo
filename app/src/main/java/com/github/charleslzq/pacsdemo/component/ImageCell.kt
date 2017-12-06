@@ -26,6 +26,16 @@ class ImageCell(
             state.imageFramesViewState.framesModel = state.patientSeriesModel.imageFramesModel
         }
 
+        onStateChange(state::selected) {
+            view.isSelected = state.selected
+        }
+
+        view.setOnClickListener {
+            if (state.imageFramesViewState.framesModel.size > 0) {
+                state.selected = !state.selected
+            }
+        }
+
         view.setOnDragListener { _, dragEvent ->
             when (dragEvent.action) {
                 DragEvent.ACTION_DROP -> {

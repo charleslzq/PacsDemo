@@ -11,13 +11,6 @@ class PacsViewState {
     var layoutOption: LayoutOption by ObservableStatus(LayoutOption.ONE_ONE)
     var imageCells: List<PatientSeriesViewState> = (0..8).map { PatientSeriesViewState(ImageFramesViewState(it)) }
 
-    fun resetImageStates() {
-        imageCells.forEach {
-            it.imageFramesViewState.reset()
-            it.imageFramesViewState.framesModel = ImageFramesModel()
-        }
-    }
-
     enum class LayoutOption {
         ONE_ONE,
         ONE_TWO,

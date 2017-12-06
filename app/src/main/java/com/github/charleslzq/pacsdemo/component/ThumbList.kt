@@ -51,12 +51,12 @@ class ThumbList(
         }
 
         onStateChange(state::selected) {
-            if (it.first >= 0 && it.first < view.childCount) {
-                view.getChildAt(it.first).isSelected = false
-            }
-            if (it.second >= 0 && it.second < view.childCount) {
-                view.getChildAt(it.second).isSelected = true
-                if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
+            if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
+                if (it.first >= 0 && it.first < view.childCount) {
+                    view.getChildAt(it.first).isSelected = false
+                }
+                if (it.second >= 0 && it.second < view.childCount) {
+                    view.getChildAt(it.second).isSelected = true
                     state.imageCells[0].patientSeriesModel = state.seriesList[it.second]
                     state.imageCells[0].imageFramesViewState.allowPlay = true
                 }

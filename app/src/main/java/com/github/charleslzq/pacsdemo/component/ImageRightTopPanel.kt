@@ -12,7 +12,7 @@ import com.github.charleslzq.pacsdemo.component.state.PatientSeriesViewState
 class ImageRightTopPanel(
         view: View,
         patientSeriesViewState: PatientSeriesViewState
-): Component<View, PatientSeriesViewState>(view, patientSeriesViewState) {
+) : Component<View, PatientSeriesViewState>(view, patientSeriesViewState) {
     private val patientName: TextView = view.findViewById(R.id.patientName)
     private val patientId: TextView = view.findViewById(R.id.patientId)
     private val patientInfo: TextView = view.findViewById(R.id.patientInfo)

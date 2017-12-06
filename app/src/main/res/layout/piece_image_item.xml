@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="3dp"
-    android:background="@drawable/border_thumb">
+    android:background="@drawable/background_thumb">
 
     <ImageView
         android:id="@+id/imagesContainer"
