@@ -8,17 +8,7 @@ import kotlin.reflect.KMutableProperty0
  * Created by charleslzq on 17-12-7.
  */
 interface WithReducer {
-    fun <P> reduce(kProperty: KMutableProperty0<P>, handler: (Pair<P, Event>) -> P) {
-        EventBus.onEvent<Event> {
-            val rawValue = kProperty.get()
-            val newValue = handler(rawValue to it)
-            if (rawValue != newValue) {
-                kProperty.set(newValue)
-            }
-        }
-    }
-
-    fun <P> reduce(kProperty: KMutableProperty0<P>, predicate: () -> Boolean, handler: (Pair<P, Event>) -> P) {
+    fun <P> reduce(kProperty: KMutableProperty0<P>, predicate: () -> Boolean = { true }, handler: (Pair<P, Event>) -> P) {
         EventBus.onEvent<Event> {
             if (predicate()) {
                 val rawValue = kProperty.get()
