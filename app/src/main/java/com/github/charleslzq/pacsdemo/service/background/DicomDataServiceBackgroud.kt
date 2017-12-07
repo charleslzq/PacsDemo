@@ -84,7 +84,7 @@ class DicomDataServiceBackgroud : Service() {
         val CLIENT_ID = "clientId"
         val WS_URL = "wsUrl"
         val PATIENTS = "patients"
-        val STORE_BASE = "/Pacs/Dicom/WithReducer"
+        val STORE_BASE = "/Pacs/Dicom/Store"
         val SHARED_PREFERENCE = "com.github.charleslzq.pacsdemo"
     }
 }
