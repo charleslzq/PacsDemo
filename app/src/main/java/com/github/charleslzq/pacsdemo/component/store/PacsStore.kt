@@ -25,25 +25,18 @@ class PacsStore : Store<PacsStore>() {
             }
         }
 
-        reducerFor(imageCells[0].imageFramesStore::measure) {
-            if (layoutOption == LayoutOption.ONE_ONE) {
-                when (it.second) {
-                    is ClickEvent.TurnToMeasureLine -> ImageFramesStore.Measure.LINE
-                    is ClickEvent.TurnToMeasureAngle -> ImageFramesStore.Measure.ANGEL
-                    else -> it.first
-                }
-            } else {
-                it.first
+        reducerFor(imageCells[0].imageFramesStore::measure, { layoutOption == LayoutOption.ONE_ONE }) {
+            when (it.second) {
+                is ClickEvent.TurnToMeasureLine -> ImageFramesStore.Measure.LINE
+                is ClickEvent.TurnToMeasureAngle -> ImageFramesStore.Measure.ANGEL
+                else -> it.first
             }
         }
 
-        reducerFor(this::selected) {
-            when (layoutOption == LayoutOption.ONE_ONE) {
-                true -> when (it.second) {
-                    is ClickEvent.ThumbListItemClicked -> (it.second as ClickEvent.ThumbListItemClicked).position
-                    else -> it.first
-                }
-                false -> it.first
+        reducerFor(this::selected, { layoutOption == LayoutOption.ONE_ONE }) {
+            when (it.second) {
+                is ClickEvent.ThumbListItemClicked -> (it.second as ClickEvent.ThumbListItemClicked).position
+                else -> it.first
             }
         }
     }
