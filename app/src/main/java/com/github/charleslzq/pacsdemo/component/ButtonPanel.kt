@@ -6,9 +6,9 @@ import android.view.View
 import android.widget.Button
 import android.widget.PopupMenu
 import com.github.charleslzq.pacsdemo.R
-import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
-import com.github.charleslzq.pacsdemo.component.state.PacsViewState
-import com.github.charleslzq.pacsdemo.component.state.PatientSeriesViewState
+import com.github.charleslzq.pacsdemo.component.event.ClickEvent
+import com.github.charleslzq.pacsdemo.component.event.EventBus
+import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.support.TypefaceUtil
 
 /**
@@ -16,8 +16,8 @@ import com.github.charleslzq.pacsdemo.support.TypefaceUtil
  */
 class ButtonPanel(
         buttonPanel: View,
-        pacsViewState: PacsViewState
-) : PacsComponent<View>(buttonPanel, pacsViewState) {
+        pacsStore: PacsStore
+) : PacsComponent<View>(buttonPanel, pacsStore) {
     private val measureAngleButton: Button = view.findViewById(R.id.measureAngleButton)
     private val measureLineButton: Button = view.findViewById(R.id.measureLineButton)
     private val pseudoButton: Button = view.findViewById(R.id.pseudoColorButton)
@@ -38,29 +38,19 @@ class ButtonPanel(
         }
 
         measureAngleButton.setOnClickListener {
-            if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
-                val imageModel = state.imageCells[0]
-                imageModel.imageFramesViewState.measure = ImageFramesViewState.Measure.ANGEL
-            }
+            EventBus.post(ClickEvent.TurnToMeasureAngle())
         }
 
         measureLineButton.setOnClickListener {
-            if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
-                val imageModel = state.imageCells[0]
-                imageModel.imageFramesViewState.measure = ImageFramesViewState.Measure.LINE
-            }
+            EventBus.post(ClickEvent.TurnToMeasureLine())
         }
 
         reverseButton.setOnClickListener {
-            getSelected().forEach {
-                it.imageFramesViewState.reverseColor()
-            }
+            EventBus.post(ClickEvent.ReverseColor(getSelected()))
         }
 
         pseudoButton.setOnClickListener {
-            getSelected().forEach {
-                it.imageFramesViewState.pseudoColor = !it.imageFramesViewState.pseudoColor
-            }
+            EventBus.post(ClickEvent.PseudoColor(getSelected()))
         }
 
         val fontAwesomeTypeface = TypefaceUtil.getTypeFace(view.context, TypefaceUtil.fontAwesome)
@@ -72,37 +62,36 @@ class ButtonPanel(
         refreshButton.typeface = fontAwesomeTypeface
         backButton.typeface = fontAwesomeTypeface
 
-        onStateChange(state::layoutOption) {
-            val visible = when (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
+        bind(PacsStore::layoutOption) {
+            val visible = when (it == PacsStore.LayoutOption.ONE_ONE) {
                 true -> View.VISIBLE
                 false -> View.INVISIBLE
             }
             measureLineButton.visibility = visible
             measureAngleButton.visibility = visible
         }
-
     }
 
-    private fun getSelected(): List<PatientSeriesViewState> {
-        return when (state.layoutOption) {
-            PacsViewState.LayoutOption.ONE_ONE -> listOf(state.imageCells[0])
-            else -> state.imageCells.filter { it.selected }
-        }
+    private fun getSelected(): List<Int> {
+        return when (store.layoutOption) {
+            PacsStore.LayoutOption.ONE_ONE -> listOf(store.imageCells[0])
+            else -> store.imageCells.filter { it.selected }
+        }.map { it.imageFramesStore.layoutPosition }
     }
 
     private fun onLayoutSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.one_one -> {
-                state.layoutOption = PacsViewState.LayoutOption.ONE_ONE
+                EventBus.post(ClickEvent.ChangeLayout(0))
             }
             R.id.one_two -> {
-                state.layoutOption = PacsViewState.LayoutOption.ONE_TWO
+                EventBus.post(ClickEvent.ChangeLayout(1))
             }
             R.id.two_two -> {
-                state.layoutOption = PacsViewState.LayoutOption.TWO_TWO
+                EventBus.post(ClickEvent.ChangeLayout(2))
             }
             R.id.three_three -> {
-                state.layoutOption = PacsViewState.LayoutOption.THREE_THREE
+                EventBus.post(ClickEvent.ChangeLayout(3))
             }
         }
         return true

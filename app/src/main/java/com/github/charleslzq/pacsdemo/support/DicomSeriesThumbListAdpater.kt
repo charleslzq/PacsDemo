@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.R
-import com.github.charleslzq.pacsdemo.component.state.PatientSeriesModel
+import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
 import java.io.File
 
 /**

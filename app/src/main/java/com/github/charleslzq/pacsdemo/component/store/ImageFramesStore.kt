@@ -1,10 +1,11 @@
-package com.github.charleslzq.pacsdemo.component.state
+package com.github.charleslzq.pacsdemo.component.store
 
 import android.content.res.Resources
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import android.widget.ImageView
+import com.github.charleslzq.pacsdemo.component.base.Store
 import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus
 import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus.Companion.getDelegate
 import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
@@ -14,7 +15,7 @@ import java.io.File
 /**
  * Created by charleslzq on 17-11-27.
  */
-class ImageFramesViewState(val layoutPosition: Int) {
+class ImageFramesStore(val layoutPosition: Int) : Store<ImageFramesStore>() {
     var framesModel by ObservableStatus(ImageFramesModel())
     var duration: Int = 40
     var scaleFactor: Float by ObservableStatus(1.0f)
@@ -74,23 +75,23 @@ class ImageFramesViewState(val layoutPosition: Int) {
         currentPath = Path()
     }
 
-    fun copyFrom(imageFramesViewState: ImageFramesViewState) {
-        scaleFactor = imageFramesViewState.scaleFactor
-        startOffset = imageFramesViewState.startOffset
-        matrix = imageFramesViewState.matrix
-        colorMatrix = imageFramesViewState.colorMatrix
-        pseudoColor = imageFramesViewState.pseudoColor
-        measure = imageFramesViewState.measure
-        linePaint = imageFramesViewState.linePaint
-        stringPaint = imageFramesViewState.stringPaint
+    fun copyFrom(imageFramesStore: ImageFramesStore) {
+        scaleFactor = imageFramesStore.scaleFactor
+        startOffset = imageFramesStore.startOffset
+        matrix = imageFramesStore.matrix
+        colorMatrix = imageFramesStore.colorMatrix
+        pseudoColor = imageFramesStore.pseudoColor
+        measure = imageFramesStore.measure
+        linePaint = imageFramesStore.linePaint
+        stringPaint = imageFramesStore.stringPaint
 
         pathList.clear()
-        pathList.addAll(imageFramesViewState.pathList)
+        pathList.addAll(imageFramesStore.pathList)
         textList.clear()
-        textList.addAll(imageFramesViewState.textList)
-        currentPath = imageFramesViewState.currentPath
+        textList.addAll(imageFramesStore.textList)
+        currentPath = imageFramesStore.currentPath
 
-        currentIndex = imageFramesViewState.currentIndex
+        currentIndex = imageFramesStore.currentIndex
     }
 
     fun playable() = framesModel.size > 1 && allowPlay
@@ -212,9 +213,6 @@ class ImageFramesViewState(val layoutPosition: Int) {
     }
 
     companion object {
-        val THUMB = "thumb"
-        val DEFAULT = "default"
-        val RAW = "raw"
         private val reverseMatrix = ColorMatrix(floatArrayOf(
                 -1f, 0f, 0f, 0f, 255f,
                 0f, -1f, 0f, 0f, 255f,

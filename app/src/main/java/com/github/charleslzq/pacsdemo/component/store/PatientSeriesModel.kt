@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo.component.state
+package com.github.charleslzq.pacsdemo.component.store
 
 import com.github.charleslzq.dicom.data.DicomPatientMetaInfo
 import com.github.charleslzq.dicom.data.DicomSeriesMetaInfo

@@ -6,23 +6,23 @@ import kotlin.reflect.KClass
 /**
  * Created by charleslzq on 17-12-4.
  */
-abstract class ComponentGroup<V, S>(
+open class ComponentGroup<out V, S>(
         parentView: V,
         parentState: S,
         private val config: List<Sub<V, S, *, *, *>>
 ) : Component<V, S>(parentView, parentState)
-        where V : View {
-    val children = bind()
+        where V : View, S : Store<S> {
+    val children = init()
 
-    private fun bind() = config.flatMap { sub ->
+    private fun init() = config.flatMap { sub ->
         val subViews = sub.findViews(view)
-        val subStates = (1..subViews.size).map { sub.mapStates(state, it - 1) }
+        val subStates = (1..subViews.size).map { sub.mapStates(store, it - 1) }
         (1..subViews.size).map { sub.target.constructors.first().call(subViews[it - 1], subStates[it - 1]) }
     }.toMutableList()
 
-    fun rebind() {
+    fun reInit() {
         children.clear()
-        children.addAll(bind())
+        children.addAll(init())
     }
 
     inline fun <reified T, SV, SS> getChild(index: Int = 0): T where T : Component<SV, SS> {
@@ -36,11 +36,11 @@ abstract class ComponentGroup<V, S>(
         }
     }
 
-    class Sub<in V, in S, T, out SV, out SS>(
+    class Sub<in V, S, T, out SV, SS>(
             val target: KClass<T>,
             val findViews: (V) -> List<SV>,
             val mapStates: (S, Int) -> SS
-    ) where V : View, SV : View, T : Component<SV, SS>
+    ) where V : View, SV : View, T : Component<SV, SS>, S : Store<S>, SS : Store<SS>
 
     companion object {
         fun <V, SV> byId(id: Int): (V) -> List<SV> where V : View, SV : View {

@@ -4,6 +4,7 @@ import io.reactivex.subjects.PublishSubject
 import kotlin.properties.ObservableProperty
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
+import kotlin.reflect.KProperty1
 import kotlin.reflect.jvm.isAccessible
 
 /**
@@ -35,6 +36,16 @@ class ObservableStatus<T>(
             return if (delegate != null && delegate is ObservableStatus<*>) {
                 @Suppress("UNCHECKED_CAST")
                 delegate as ObservableStatus<T>
+            } else {
+                null
+            }
+        }
+
+        fun <T, P> getDelegate(kProperty1: KProperty1<T, P>, receiver: T): ObservableStatus<P>? {
+            val delegate = kProperty1.getDelegate(receiver)
+            return if (delegate != null && delegate is ObservableStatus<*>) {
+                @Suppress("UNCHECKED_CAST")
+                delegate as ObservableStatus<P>
             } else {
                 null
             }

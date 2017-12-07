@@ -6,9 +6,11 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.charleslzq.pacsdemo.component.PacsMain
-import com.github.charleslzq.pacsdemo.component.state.ImageFramesModel
-import com.github.charleslzq.pacsdemo.component.state.PacsViewState
-import com.github.charleslzq.pacsdemo.component.state.PatientSeriesModel
+import com.github.charleslzq.pacsdemo.component.event.BindingEvent
+import com.github.charleslzq.pacsdemo.component.event.EventBus
+import com.github.charleslzq.pacsdemo.component.store.ImageFramesModel
+import com.github.charleslzq.pacsdemo.component.store.PacsStore
+import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
 import com.github.charleslzq.pacsdemo.support.SimpleServiceConnection
@@ -27,7 +29,7 @@ class PacsDemoActivity : AppCompatActivity() {
         setContentView(R.layout.layout_pacs_demo)
         Log.d("PacsDemoActivity", "onCreate execute")
 
-        pacs = PacsMain(pacsPanel, PacsViewState())
+        pacs = PacsMain(pacsPanel, PacsStore())
         bindService(Intent(this, DicomDataServiceBackgroud::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
         refreshButton.setOnClickListener { refresh() }
     }
@@ -35,16 +37,18 @@ class PacsDemoActivity : AppCompatActivity() {
     private fun refresh() {
         val patient = dicomDataService?.findPatient(patientId)
         if (patient != null) {
-            pacs.state.seriesList = patient.studies.flatMap { study ->
-                study.series.sortedBy { it.metaInfo.instanceUID }.map {
-                    PatientSeriesModel(
-                            patient.metaInfo,
-                            study.metaInfo,
-                            it.metaInfo,
-                            ImageFramesModel(it.images.sortedBy { it.instanceNumber?.toInt() })
-                    )
-                }
-            }.toMutableList()
+            EventBus.post(BindingEvent.SeriesListUpdated(
+                    patient.studies.flatMap { study ->
+                        study.series.sortedBy { it.metaInfo.instanceUID }.map {
+                            PatientSeriesModel(
+                                    patient.metaInfo,
+                                    study.metaInfo,
+                                    it.metaInfo,
+                                    ImageFramesModel(it.images.sortedBy { it.instanceNumber?.toInt() })
+                            )
+                        }
+                    }.toMutableList()
+            ))
         }
     }
 }

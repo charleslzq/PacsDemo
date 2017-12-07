@@ -6,13 +6,13 @@ import android.view.MotionEvent
 import android.view.View
 import com.github.charleslzq.pacsdemo.component.event.EventBus
 import com.github.charleslzq.pacsdemo.component.event.RequireRedrawCanvas
-import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
+import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 
 /**
  * Created by charleslzq on 17-11-30.
  */
 class MeasureModeGestureListener(
-        state: ImageFramesViewState
+        state: ImageFramesStore
 ) : ScaleCompositeGestureListener(state) {
     lateinit var startPoint: PointF
     lateinit var secondPoint: PointF
@@ -21,69 +21,69 @@ class MeasureModeGestureListener(
         when (motionEvent.action) {
             MotionEvent.ACTION_DOWN -> {
                 val currentPoint = getPoint(motionEvent)
-                if (framesViewState.firstPath) {
+                if (framesStore.firstPath) {
                     startPoint = currentPoint
                 } else {
-                    framesViewState.currentPath.reset()
-                    framesViewState.currentPath.moveTo(startPoint.x, startPoint.y)
-                    framesViewState.currentPath.lineTo(secondPoint.x, secondPoint.y)
-                    framesViewState.currentPath.lineTo(currentPoint.x, currentPoint.y)
+                    framesStore.currentPath.reset()
+                    framesStore.currentPath.moveTo(startPoint.x, startPoint.y)
+                    framesStore.currentPath.lineTo(secondPoint.x, secondPoint.y)
+                    framesStore.currentPath.lineTo(currentPoint.x, currentPoint.y)
                 }
-                EventBus.send(RequireRedrawCanvas())
+                EventBus.post(RequireRedrawCanvas())
             }
             MotionEvent.ACTION_MOVE -> {
                 val currentPoint = getPoint(motionEvent)
-                framesViewState.currentPath.reset()
-                framesViewState.currentPath.moveTo(startPoint.x, startPoint.y)
-                if (!framesViewState.firstPath) {
-                    framesViewState.currentPath.lineTo(secondPoint.x, secondPoint.y)
+                framesStore.currentPath.reset()
+                framesStore.currentPath.moveTo(startPoint.x, startPoint.y)
+                if (!framesStore.firstPath) {
+                    framesStore.currentPath.lineTo(secondPoint.x, secondPoint.y)
                 }
-                framesViewState.currentPath.lineTo(currentPoint.x, currentPoint.y)
-                EventBus.send(RequireRedrawCanvas())
+                framesStore.currentPath.lineTo(currentPoint.x, currentPoint.y)
+                EventBus.post(RequireRedrawCanvas())
             }
             MotionEvent.ACTION_UP -> {
                 val currentPoint = getPoint(motionEvent)
-                val length = if (framesViewState.firstPath) length(startPoint, currentPoint) else length(secondPoint, currentPoint)
+                val length = if (framesStore.firstPath) length(startPoint, currentPoint) else length(secondPoint, currentPoint)
                 if (length > 5.0) {
-                    if (framesViewState.measure == ImageFramesViewState.Measure.LINE) {
+                    if (framesStore.measure == ImageFramesStore.Measure.LINE) {
                         val text = length.toString()
-                        framesViewState.currentPath.reset()
-                        framesViewState.currentPath.moveTo(startPoint.x, startPoint.y)
-                        framesViewState.currentPath.lineTo(currentPoint.x, currentPoint.y)
+                        framesStore.currentPath.reset()
+                        framesStore.currentPath.moveTo(startPoint.x, startPoint.y)
+                        framesStore.currentPath.lineTo(currentPoint.x, currentPoint.y)
 
-                        framesViewState.textList.add(currentPoint to text)
-                        framesViewState.pathList.add(framesViewState.currentPath)
-                        framesViewState.currentPath = Path()
-                    } else if (framesViewState.measure == ImageFramesViewState.Measure.ANGEL) {
-                        if (framesViewState.firstPath) {
-                            framesViewState.currentPath.reset()
-                            framesViewState.currentPath.moveTo(startPoint.x, startPoint.y)
-                            framesViewState.currentPath.lineTo(currentPoint.x, currentPoint.y)
+                        framesStore.textList.add(currentPoint to text)
+                        framesStore.pathList.add(framesStore.currentPath)
+                        framesStore.currentPath = Path()
+                    } else if (framesStore.measure == ImageFramesStore.Measure.ANGEL) {
+                        if (framesStore.firstPath) {
+                            framesStore.currentPath.reset()
+                            framesStore.currentPath.moveTo(startPoint.x, startPoint.y)
+                            framesStore.currentPath.lineTo(currentPoint.x, currentPoint.y)
                             secondPoint = currentPoint
-                            framesViewState.firstPath = false
+                            framesStore.firstPath = false
                         } else {
-                            framesViewState.currentPath.reset()
-                            framesViewState.currentPath.moveTo(startPoint.x, startPoint.y)
-                            framesViewState.currentPath.lineTo(secondPoint.x, secondPoint.y)
-                            framesViewState.currentPath.lineTo(currentPoint.x, currentPoint.y)
+                            framesStore.currentPath.reset()
+                            framesStore.currentPath.moveTo(startPoint.x, startPoint.y)
+                            framesStore.currentPath.lineTo(secondPoint.x, secondPoint.y)
+                            framesStore.currentPath.lineTo(currentPoint.x, currentPoint.y)
 
                             val text = calculateAngle(secondPoint, currentPoint)
-                            framesViewState.pathList.add(framesViewState.currentPath)
-                            framesViewState.textList.add(secondPoint to text.toString())
+                            framesStore.pathList.add(framesStore.currentPath)
+                            framesStore.textList.add(secondPoint to text.toString())
 
-                            framesViewState.currentPath = Path()
-                            framesViewState.firstPath = true
+                            framesStore.currentPath = Path()
+                            framesStore.firstPath = true
                         }
                     }
                 }
-                EventBus.send(RequireRedrawCanvas())
+                EventBus.post(RequireRedrawCanvas())
             }
         }
         return true
     }
 
     override fun onDoubleTap(e: MotionEvent?): Boolean {
-        framesViewState.measure = ImageFramesViewState.Measure.NONE
+        framesStore.measure = ImageFramesStore.Measure.NONE
         return true
     }
 

@@ -12,7 +12,7 @@ import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.event.EventBus
 import com.github.charleslzq.pacsdemo.component.event.RequireRedrawCanvas
 import com.github.charleslzq.pacsdemo.component.gesture.*
-import com.github.charleslzq.pacsdemo.component.state.ImageFramesViewState
+import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
 
 /**
@@ -20,8 +20,8 @@ import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
  */
 class DicomImage(
         imageView: ImageView,
-        imageFramesViewState: ImageFramesViewState
-) : Component<ImageView, ImageFramesViewState>(imageView, imageFramesViewState) {
+        imageFramesStore: ImageFramesStore
+) : Component<ImageView, ImageFramesStore>(imageView, imageFramesStore) {
     var operationMode: OperationMode = PlayMode(view.context, NoOpCompositeGestureListener())
         set(value) {
             field = value
@@ -33,10 +33,10 @@ class DicomImage(
         EventBus.onEvent<DragEventMessage.StartCopyCell> { onDragStart(it) }
         EventBus.onEvent<RequireRedrawCanvas> { redrawCanvas() }
 
-        onStateChange(state::framesModel) {
-            state.reset()
-            if (state.framesModel.size != 0) {
-                state.autoAdjustScale(view)
+        onStateChange(store::framesModel) {
+            store.reset()
+            if (store.framesModel.size != 0) {
+                store.autoAdjustScale(view)
                 init()
             } else {
                 view.clearAnimation()
@@ -47,9 +47,9 @@ class DicomImage(
     }
 
     private fun onDragStart(dragCopyCellMessage: DragEventMessage.StartCopyCell) {
-        if (dragCopyCellMessage.layoutPosition == state.layoutPosition) {
+        if (dragCopyCellMessage.layoutPosition == store.layoutPosition) {
             val dragBuilder = View.DragShadowBuilder(view)
-            val clipDataItem = ClipData.Item(tag, state.layoutPosition.toString())
+            val clipDataItem = ClipData.Item(tag, store.layoutPosition.toString())
             val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), clipDataItem)
             @Suppress("DEPRECATION")
             view.startDrag(clipData, dragBuilder, null, 0)
@@ -57,60 +57,60 @@ class DicomImage(
     }
 
     private fun init() {
-        operationMode = PlayMode(view.context, PlayModeGestureListener(state))
+        operationMode = PlayMode(view.context, PlayModeGestureListener(store))
 
-        val firstImage = state.getScaledFrame(0)
+        val firstImage = store.getScaledFrame(0)
         view.clearAnimation()
         view.background = null
         view.setImageBitmap(firstImage)
 
-        onStateChange(state::measure) {
-            state.currentPath = Path()
-            state.firstPath = true
-            operationMode = when (state.measure != ImageFramesViewState.Measure.NONE && state.framesModel.frames.isNotEmpty()) {
+        onStateChange(store::measure) {
+            store.currentPath = Path()
+            store.firstPath = true
+            operationMode = when (store.measure != ImageFramesStore.Measure.NONE && store.framesModel.frames.isNotEmpty()) {
                 true -> {
-                    MeasureMode(view.context, MeasureModeGestureListener(state))
+                    MeasureMode(view.context, MeasureModeGestureListener(store))
                 }
                 false -> {
-                    state.pathList.clear()
-                    state.textList.clear()
-                    if (state.scaleFactor > 1.0f) {
-                        StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, state))
+                    store.pathList.clear()
+                    store.textList.clear()
+                    if (store.scaleFactor > 1.0f) {
+                        StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, store))
                     } else {
-                        PlayMode(view.context, PlayModeGestureListener(state))
+                        PlayMode(view.context, PlayModeGestureListener(store))
                     }
                 }
             }
             redrawCanvas()
         }
 
-        onStateChange(state::colorMatrix) {
-            if (state.playing) {
-                state.playing = false
+        onStateChange(store::colorMatrix) {
+            if (store.playing) {
+                store.playing = false
             }
-            view.colorFilter = ColorMatrixColorFilter(state.colorMatrix)
+            view.colorFilter = ColorMatrixColorFilter(store.colorMatrix)
         }
 
-        onStateChange(state::currentIndex) {
-            if (!state.playing && state.framesModel.size > 0) {
+        onStateChange(store::currentIndex) {
+            if (!store.playing && store.framesModel.size > 0) {
                 view.clearAnimation()
                 view.background = null
-                view.setImageBitmap(state.getScaledFrame(state.currentIndex))
+                view.setImageBitmap(store.getScaledFrame(store.currentIndex))
             }
         }
-        onStateChange(state::matrix) {
-            view.imageMatrix = state.matrix
+        onStateChange(store::matrix) {
+            view.imageMatrix = store.matrix
         }
-        onStateChange(state::scaleFactor) {
-            if (state.scaleFactor > 1 && operationMode is PlayMode) {
-                operationMode = StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, state))
-            } else if (state.scaleFactor == 1.0f && operationMode is StudyMode) {
-                operationMode = PlayMode(view.context, PlayModeGestureListener(state))
+        onStateChange(store::scaleFactor) {
+            if (store.scaleFactor > 1 && operationMode is PlayMode) {
+                operationMode = StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, store))
+            } else if (store.scaleFactor == 1.0f && operationMode is StudyMode) {
+                operationMode = PlayMode(view.context, PlayModeGestureListener(store))
             }
         }
-        onStateChange(state::playing) {
-            when (state.playing) {
-                true -> view.post(state.resetAnimation(view))
+        onStateChange(store::playing) {
+            when (store.playing) {
+                true -> view.post(store.resetAnimation(view))
                 false -> {
                     if (view.background != null) {
                         val animation = view.background as IndexListenableAnimationDrawable
@@ -118,34 +118,34 @@ class DicomImage(
                         view.clearAnimation()
                         view.background = null
                     }
-                    view.setImageBitmap(state.getScaledFrame(state.currentIndex))
+                    view.setImageBitmap(store.getScaledFrame(store.currentIndex))
                 }
             }
         }
-        onStateChange(state::pseudoColor) {
-            if (state.playing) {
-                state.playing = false
+        onStateChange(store::pseudoColor) {
+            if (store.playing) {
+                store.playing = false
             } else {
-                view.setImageBitmap(state.getScaledFrame(state.currentIndex))
+                view.setImageBitmap(store.getScaledFrame(store.currentIndex))
             }
         }
 
-        state.currentIndex = 0
+        store.currentIndex = 0
     }
 
     private fun redrawCanvas() {
-        val bitmap = state.getScaledFrame(state.currentIndex)
+        val bitmap = store.getScaledFrame(store.currentIndex)
         canvas = Canvas(bitmap)
         view.setImageBitmap(bitmap)
 
-        state.pathList.forEach {
-            canvas.drawPath(it, state.linePaint)
+        store.pathList.forEach {
+            canvas.drawPath(it, store.linePaint)
         }
 
-        canvas.drawPath(state.currentPath, state.linePaint)
+        canvas.drawPath(store.currentPath, store.linePaint)
 
-        state.textList.forEach {
-            canvas.drawText(it.second, it.first.x, it.first.y, state.stringPaint)
+        store.textList.forEach {
+            canvas.drawText(it.second, it.first.x, it.first.y, store.stringPaint)
         }
 
         view.invalidate()

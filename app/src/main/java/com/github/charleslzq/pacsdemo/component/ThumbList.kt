@@ -6,7 +6,10 @@ import android.content.ClipDescription
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import com.github.charleslzq.pacsdemo.component.state.PacsViewState
+import com.github.charleslzq.pacsdemo.component.event.BindingEvent
+import com.github.charleslzq.pacsdemo.component.event.ClickEvent
+import com.github.charleslzq.pacsdemo.component.event.EventBus
+import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.support.DicomSeriesThumbListAdpater
 
 /**
@@ -14,24 +17,24 @@ import com.github.charleslzq.pacsdemo.support.DicomSeriesThumbListAdpater
  */
 class ThumbList(
         recyclerView: RecyclerView,
-        pacsViewState: PacsViewState
-) : PacsComponent<RecyclerView>(recyclerView, pacsViewState) {
+        pacsStore: PacsStore
+) : PacsComponent<RecyclerView>(recyclerView, pacsStore) {
 
     init {
         view.layoutManager = LinearLayoutManager(recyclerView.context)
-        onStateChange(state::seriesList) {
+        bind(store::seriesList) {
             val adapter = view.adapter
             if (adapter != null && adapter is DicomSeriesThumbListAdpater) {
                 adapter.seriesModels.clear()
-                adapter.seriesModels.addAll(state.seriesList)
+                adapter.seriesModels.addAll(store.seriesList)
             } else {
-                view.adapter = DicomSeriesThumbListAdpater(state.seriesList)
+                view.adapter = DicomSeriesThumbListAdpater(store.seriesList)
             }
             view.adapter.notifyDataSetChanged()
-            if (state.seriesList.isNotEmpty()) {
+            if (store.seriesList.isNotEmpty()) {
                 ItemClickSupport.addTo(view).setOnItemClickListener(object : ItemClickSupport.OnItemClickListener {
                     override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
-                        state.selected = position
+                        EventBus.post(ClickEvent.ThumbListItemClicked(position))
                     }
                 })
                 ItemClickSupport.addTo(view).setOnItemLongClickListener(object : ItemClickSupport.OnItemLongClickListener {
@@ -50,16 +53,11 @@ class ThumbList(
             }
         }
 
-        onStateChange(state::selected) {
-            if (state.layoutOption == PacsViewState.LayoutOption.ONE_ONE) {
-                if (it.first >= 0 && it.first < view.childCount) {
-                    view.getChildAt(it.first).isSelected = false
-                }
-                if (it.second >= 0 && it.second < view.childCount) {
-                    view.getChildAt(it.second).isSelected = true
-                    state.imageCells[0].patientSeriesModel = state.seriesList[it.second]
-                    state.imageCells[0].imageFramesViewState.allowPlay = true
-                }
+        bind(store::selected) {
+            (1..view.childCount).forEach { view.getChildAt(it - 1).isSelected = false }
+            if (it >= 0 && it < view.childCount) {
+                view.getChildAt(it).isSelected = true
+                EventBus.post(BindingEvent.ModelSelected(store.seriesList[it]))
             }
         }
     }
