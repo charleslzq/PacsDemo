@@ -7,10 +7,11 @@ import io.reactivex.subjects.PublishSubject
  * Created by charleslzq on 17-12-1.
  */
 object EventBus {
+    val DEFAULT = "DEFAULT"
     private val registry = mutableMapOf<String, PublishSubject<Any>>()
     val handlers = mutableMapOf<String, MutableList<(Any) -> Unit>>()
 
-    fun post(event: Any, name: String = "DEFAULT") {
+    fun post(event: Any, name: String = DEFAULT) {
         if (!registry.containsKey(name)) {
             registerNew(name)
         }
@@ -36,7 +37,7 @@ object EventBus {
         }
     }
 
-    inline fun <reified T> onEvent(busName: String = "DEFAULT", crossinline handler: (T) -> Unit) {
+    inline fun <reified T> onEvent(busName: String = DEFAULT, crossinline handler: (T) -> Unit) {
         val existHandlers = handlers.getOrDefault(busName, mutableListOf())
         existHandlers.add({
             castEvent<T>(it)?.apply { handler(this) }
