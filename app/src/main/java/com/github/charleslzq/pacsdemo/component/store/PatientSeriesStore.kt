@@ -1,6 +1,6 @@
 package com.github.charleslzq.pacsdemo.component.store
 
-import com.github.charleslzq.pacsdemo.component.base.Store
+import com.github.charleslzq.pacsdemo.component.base.WithReducer
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus
@@ -10,7 +10,7 @@ import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus
  */
 class PatientSeriesStore(
         val imageFramesStore: ImageFramesStore
-) : Store<PatientSeriesStore>() {
+) : WithReducer {
     var patientSeriesModel by ObservableStatus(PatientSeriesModel())
         private set
     var selected by ObservableStatus(false)

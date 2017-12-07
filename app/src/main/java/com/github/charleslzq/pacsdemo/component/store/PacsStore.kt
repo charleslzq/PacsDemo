@@ -1,6 +1,6 @@
 package com.github.charleslzq.pacsdemo.component.store
 
-import com.github.charleslzq.pacsdemo.component.base.Store
+import com.github.charleslzq.pacsdemo.component.base.WithReducer
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus
@@ -8,7 +8,7 @@ import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus
 /**
  * Created by charleslzq on 17-11-27.
  */
-class PacsStore : Store<PacsStore>() {
+class PacsStore : WithReducer {
     var seriesList by ObservableStatus(mutableListOf<PatientSeriesModel>())
         private set
     var selected: Int by ObservableStatus(-1)

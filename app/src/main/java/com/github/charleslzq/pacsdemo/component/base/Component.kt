@@ -11,7 +11,7 @@ import kotlin.reflect.KProperty1
 open class Component<out V, S>(
         val view: V,
         val store: S
-) where V : View, S : Store<S> {
+) where V : View {
     fun <P> bind(property: KProperty1<S, P>, handler: (P) -> Unit) {
         val delegate = getDelegate(property, store)
         if (delegate != null) {

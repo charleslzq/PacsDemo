@@ -11,7 +11,7 @@ open class ComponentGroup<out V, S>(
         parentState: S,
         private val config: List<Sub<V, S, *, *, *>>
 ) : Component<V, S>(parentView, parentState)
-        where V : View, S : Store<S> {
+        where V : View {
     val children = init()
 
     private fun init() = config.flatMap { sub ->
@@ -40,7 +40,7 @@ open class ComponentGroup<out V, S>(
             val target: KClass<T>,
             val findViews: (V) -> List<SV>,
             val mapStates: (S, Int) -> SS
-    ) where V : View, SV : View, T : Component<SV, SS>, S : Store<S>, SS : Store<SS>
+    ) where V : View, SV : View, T : Component<SV, SS>
 
     companion object {
         fun <V, SV> byId(id: Int): (V) -> List<SV> where V : View, SV : View {

@@ -5,7 +5,7 @@ import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import android.widget.ImageView
-import com.github.charleslzq.pacsdemo.component.base.Store
+import com.github.charleslzq.pacsdemo.component.base.WithReducer
 import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus
 import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus.Companion.getDelegate
 import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
@@ -15,7 +15,7 @@ import java.io.File
 /**
  * Created by charleslzq on 17-11-27.
  */
-class ImageFramesStore(val layoutPosition: Int) : Store<ImageFramesStore>() {
+class ImageFramesStore(val layoutPosition: Int) : WithReducer {
     var framesModel by ObservableStatus(ImageFramesModel())
     var duration: Int = 40
     var scaleFactor: Float by ObservableStatus(1.0f)
