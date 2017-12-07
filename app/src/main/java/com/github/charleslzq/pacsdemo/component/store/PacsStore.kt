@@ -18,14 +18,14 @@ class PacsStore : Store<PacsStore>() {
     val imageCells: List<PatientSeriesStore> = (0..8).map { PatientSeriesStore(ImageFramesStore(it)) }
 
     init {
-        reducerFor(this::seriesList) {
+        reduce(this::seriesList) {
             when (it.second) {
                 is BindingEvent.SeriesListUpdated -> (it.second as BindingEvent.SeriesListUpdated).seriesList
                 else -> it.first
             }
         }
 
-        reducerFor(imageCells[0].imageFramesStore::measure, { layoutOption == LayoutOption.ONE_ONE }) {
+        reduce(imageCells[0].imageFramesStore::measure, { layoutOption == LayoutOption.ONE_ONE }) {
             when (it.second) {
                 is ClickEvent.TurnToMeasureLine -> ImageFramesStore.Measure.LINE
                 is ClickEvent.TurnToMeasureAngle -> ImageFramesStore.Measure.ANGEL
@@ -33,7 +33,7 @@ class PacsStore : Store<PacsStore>() {
             }
         }
 
-        reducerFor(this::selected, { layoutOption == LayoutOption.ONE_ONE }) {
+        reduce(this::selected, { layoutOption == LayoutOption.ONE_ONE }) {
             when (it.second) {
                 is ClickEvent.ThumbListItemClicked -> (it.second as ClickEvent.ThumbListItemClicked).position
                 else -> it.first

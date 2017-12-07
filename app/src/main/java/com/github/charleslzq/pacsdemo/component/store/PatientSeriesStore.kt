@@ -17,7 +17,7 @@ class PatientSeriesStore(
         private set
 
     init {
-        reducerFor(this::patientSeriesModel) {
+        reduce(this::patientSeriesModel) {
             when (it.second) {
                 is BindingEvent.ModelSelected -> if (imageFramesStore.layoutPosition == 0) (it.second as BindingEvent.ModelSelected).patientSeriesModel else it.first
                 is BindingEvent.SeriesListUpdated -> PatientSeriesModel()
@@ -25,7 +25,7 @@ class PatientSeriesStore(
             }
         }
 
-        reducerFor(this::selected) {
+        reduce(this::selected) {
             when (it.second) {
                 is ClickEvent.ImageCellClicked -> if ((it.second as ClickEvent.ImageCellClicked).layoutPosition == imageFramesStore.layoutPosition) !it.first else it.first
                 is BindingEvent.ModelSelected -> false
