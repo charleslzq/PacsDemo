@@ -1,10 +1,8 @@
 package com.github.charleslzq.pacsdemo.broker.message
 
-import android.util.Log
 import com.github.charleslzq.dicom.data.*
 import com.github.charleslzq.dicom.store.DicomDataStore
 import java.io.File
-import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Created by charleslzq on 17-11-15.
@@ -12,7 +10,6 @@ import java.util.concurrent.atomic.AtomicInteger
 class StoreMessageListener(
         private val dicomDataStore: DicomDataStore
 ) : DicomMessageListener {
-    private val counter = AtomicInteger(0)
 
     override fun onPatient(dicomPatientMessage: Message<DicomPatient>) {
         dicomDataStore.savePatient(dicomPatientMessage.payload)
@@ -37,12 +34,10 @@ class StoreMessageListener(
         val patientId = checkAndGet(dicomImageMetaInfoMessage.headers, MessageHeaders.PATIENT_ID)
         val studyId = checkAndGet(dicomImageMetaInfoMessage.headers, MessageHeaders.STUDY_ID)
         val seriesId = checkAndGet(dicomImageMetaInfoMessage.headers, MessageHeaders.SERIES_ID)
-        Log.i("test", "image saved for $patientId, $studyId, $seriesId, $dicomImageMetaInfoMessage")
         dicomDataStore.saveImage(patientId, studyId, seriesId, dicomImageMetaInfoMessage.payload)
     }
 
     override fun onFile(byteArrayMessage: Message<ByteArray>) {
-        Log.i("receiveFile", "${Thread.currentThread().id}, ${counter.incrementAndGet()} files received")
         val fileDir = checkAndGet(byteArrayMessage.headers, MessageHeaders.FILE_DIR)
         val fileName = checkAndGet(byteArrayMessage.headers, MessageHeaders.FILE_NAME)
         val file = File(fileDir + File.separator + fileName)

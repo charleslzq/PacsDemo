@@ -48,9 +48,6 @@ class DicomDataServiceBackgroud : Service() {
 
         val storeRoot = Environment.getExternalStorageDirectory().absolutePath + STORE_BASE
         val file = File(storeRoot)
-        if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || !file.exists() || !file.isDirectory) {
-            file.mkdirs()
-        }
         when (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             true -> file.mkdirs()
             false -> {
