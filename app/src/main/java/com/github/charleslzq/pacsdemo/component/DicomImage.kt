@@ -88,21 +88,12 @@ class DicomImage(
             }
         }
 
-        refreshByProperty(store::imageCanvasModel, { store.hasImage() }) {
-            initCanvas()
-            it.paths.forEach {
-                canvas.drawPath(it, store.linePaint)
-            }
-            it.texts.forEach {
-                canvas.drawText(it.value, it.key.x, it.key.y, store.stringPaint)
-            }
-            view.invalidate()
-        }
-
         refreshByProperty(store::currentPath, { store.hasImage() }) {
-            initCanvas()
-            canvas.drawPath(it, store.linePaint)
-            view.invalidate()
+            if (store.measure != ImageFramesStore.Measure.NONE) {
+                initCanvas()
+                canvas.drawPath(it, store.linePaint)
+                view.invalidate()
+            }
         }
 
     }
@@ -121,6 +112,13 @@ class DicomImage(
         val bitmap = store.getCurrentFrame()
         canvas = Canvas(bitmap)
         view.setImageBitmap(bitmap)
+
+        store.imageCanvasModel.paths.forEach {
+            canvas.drawPath(it, store.linePaint)
+        }
+        store.imageCanvasModel.texts.forEach {
+            canvas.drawText(it.value, it.key.x, it.key.y, store.stringPaint)
+        }
     }
 
     companion object {

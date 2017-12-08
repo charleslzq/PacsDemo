@@ -233,8 +233,9 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
 
         reduce(this::measure, { layoutPosition == 0 && allowMeasure }) { state, event ->
             when (event) {
-                is ClickEvent.TurnToMeasureLine -> ImageFramesStore.Measure.LINE
-                is ClickEvent.TurnToMeasureAngle -> ImageFramesStore.Measure.ANGEL
+                is ClickEvent.TurnToMeasureLine -> Measure.LINE
+                is ClickEvent.TurnToMeasureAngle -> Measure.ANGEL
+                is ImageDisplayEvent.MeasureModeReset -> Measure.NONE
                 else -> state
             }
         }
@@ -254,6 +255,13 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
                                 },
                                 state.texts.toMutableMap().apply { put(event.text.first, event.text.second) }
                         )
+                    } else {
+                        state
+                    }
+                }
+                is ImageDisplayEvent.MeasureModeReset -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        ImageCanvasModel()
                     } else {
                         state
                     }
@@ -279,6 +287,13 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
                                 lineTo(event.points[it].x, event.points[it].y)
                             }
                         }
+                    } else {
+                        state
+                    }
+                }
+                is ImageDisplayEvent.MeasureModeReset -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        Path()
                     } else {
                         state
                     }
