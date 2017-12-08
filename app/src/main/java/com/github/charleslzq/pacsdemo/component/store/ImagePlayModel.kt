@@ -11,6 +11,5 @@ data class ImagePlayModel(
         val frameUrls: List<URI> = frameMetas.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[ImageFramesModel.DEFAULT] },
         val duration: Int = 40,
         val currentIndex: Int = 0,
-        val playing: Boolean = false,
-        val framesChanged: Boolean = false
+        val playing: Boolean = false
 )

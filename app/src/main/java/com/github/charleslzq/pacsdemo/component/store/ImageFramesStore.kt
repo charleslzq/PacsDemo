@@ -55,17 +55,17 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
 
         reduce(this::imagePlayModel) { state, event ->
             when (event) {
-                is ClickEvent.ChangeLayout -> ImagePlayModel(framesChanged = true)
+                is ClickEvent.ChangeLayout -> ImagePlayModel()
                 is BindingEvent.ModelSelected -> {
                     if (layoutPosition == 0 && event.patientSeriesModel.imageFramesModel.size > 0) {
-                        ImagePlayModel(frameMetas = event.patientSeriesModel.imageFramesModel.frames, framesChanged = true)
+                        ImagePlayModel(frameMetas = event.patientSeriesModel.imageFramesModel.frames)
                     } else {
                         state
                     }
                 }
                 is BindingEvent.ModelDropped -> {
                     if (layoutPosition == event.layoutPosition) {
-                        ImagePlayModel(frameMetas = event.patientSeriesModel.imageFramesModel.frames, framesChanged = true)
+                        ImagePlayModel(frameMetas = event.patientSeriesModel.imageFramesModel.frames)
                     } else {
                         state
                     }
@@ -73,7 +73,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
                 is BindingEvent.SeriesListUpdated -> ImagePlayModel()
                 is ImageDisplayEvent.ChangePlayStatus -> {
                     if (event.layoutPosition == layoutPosition && playable()) {
-                        state.copy(playing = !state.playing, framesChanged = false)
+                        state.copy(playing = !state.playing)
                     } else {
                         state
                     }
@@ -87,21 +87,21 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
                 }
                 is ImageDisplayEvent.IndexChange -> {
                     if (event.layoutPosition == layoutPosition && event.index >= 0 && event.index < imagePlayModel.frameUrls.size) {
-                        state.copy(currentIndex = event.index, framesChanged = false)
+                        state.copy(currentIndex = event.index)
                     } else {
                         state
                     }
                 }
                 is ClickEvent.ReverseColor -> {
                     if (event.layoutPosition == layoutPosition) {
-                        state.copy(playing = false, framesChanged = false)
+                        state.copy(playing = false)
                     } else {
                         state
                     }
                 }
                 is ClickEvent.PseudoColor -> {
                     if (event.layoutPosition == layoutPosition) {
-                        state.copy(playing = false, framesChanged = false)
+                        state.copy(playing = false)
                     } else {
                         state
                     }
@@ -109,7 +109,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
                 is ImageDisplayEvent.IndexScroll -> {
                     if (event.layoutPosition == layoutPosition) {
                         val currentIndex = Math.min(Math.max(imagePlayModel.currentIndex - event.scroll, 0), imagePlayModel.frameUrls.size - 1)
-                        state.copy(playing = false, currentIndex = currentIndex, framesChanged = false)
+                        state.copy(playing = false, currentIndex = currentIndex)
                     } else {
                         state
                     }

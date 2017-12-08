@@ -5,7 +5,6 @@ import android.widget.*
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.event.EventBus
-import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
 import com.github.charleslzq.pacsdemo.support.ViewUtils
