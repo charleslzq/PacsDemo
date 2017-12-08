@@ -79,6 +79,7 @@ class DicomImage(
                     MeasureMode(view.context, MeasureModeGestureListener(store))
                 }
                 false -> {
+                    view.setImageBitmap(store.getCurrentFrame())
                     if (store.scaleFactor > 1.0f) {
                         StudyMode(view.context, StudyModeGestureListener(store.layoutPosition))
                     } else {
