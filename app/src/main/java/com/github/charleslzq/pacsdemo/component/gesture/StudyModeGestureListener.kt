@@ -8,8 +8,6 @@ import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
  * Created by charleslzq on 17-11-27.
  */
 class StudyModeGestureListener(
-        val viewWidth: Int,
-        val viewHeight: Int,
         layoutPosition: Int
 ) : ScaleCompositeGestureListener(layoutPosition) {
 

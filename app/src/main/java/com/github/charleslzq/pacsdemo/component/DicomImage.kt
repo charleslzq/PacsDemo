@@ -4,13 +4,11 @@ import android.content.ClipData
 import android.content.ClipDescription
 import android.graphics.Canvas
 import android.graphics.ColorMatrixColorFilter
-import android.graphics.Path
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.component.base.Component
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.event.EventBus
-import com.github.charleslzq.pacsdemo.component.event.RequireRedrawCanvas
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
@@ -31,7 +29,6 @@ class DicomImage(
 
     init {
         EventBus.onEvent<DragEventMessage.StartCopyCell> { onDragStart(it) }
-        EventBus.onEvent<RequireRedrawCanvas> { redrawCanvas() }
         view.setOnTouchListener(operationMode)
 
         refreshByProperty(store::imagePlayModel) {
@@ -57,7 +54,7 @@ class DicomImage(
 
         refreshByProperty(store::scaleFactor) {
             if (store.scaleFactor > 1 && operationMode is PlayMode) {
-                operationMode = StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, store.layoutPosition))
+                operationMode = StudyMode(view.context, StudyModeGestureListener(store.layoutPosition))
             } else if (store.scaleFactor == 1.0f && operationMode is StudyMode) {
                 operationMode = PlayMode(view.context, PlayModeGestureListener(store.layoutPosition))
             }
@@ -76,26 +73,38 @@ class DicomImage(
         }
 
         refreshByProperty(store::measure, { store.hasImage() }) {
-            store.currentPath = Path()
-            store.firstPath = true
             operationMode = when (store.measure != ImageFramesStore.Measure.NONE && store.hasImage()) {
                 true -> {
+                    initCanvas()
                     MeasureMode(view.context, MeasureModeGestureListener(store, store.layoutPosition))
                 }
                 false -> {
-                    store.pathList.clear()
-                    store.textList.clear()
                     if (store.scaleFactor > 1.0f) {
-                        StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, store.layoutPosition))
+                        StudyMode(view.context, StudyModeGestureListener(store.layoutPosition))
                     } else {
                         PlayMode(view.context, PlayModeGestureListener(store.layoutPosition))
                     }
                 }
             }
-            if (store.measure != ImageFramesStore.Measure.NONE) {
-                redrawCanvas()
-            }
         }
+
+        refreshByProperty(store::imageCanvasModel, { store.hasImage() }) {
+            initCanvas()
+            it.paths.forEach {
+                canvas.drawPath(it, store.linePaint)
+            }
+            it.texts.forEach {
+                canvas.drawText(it.value, it.key.x, it.key.y, store.stringPaint)
+            }
+            view.invalidate()
+        }
+
+        refreshByProperty(store::currentPath, { store.hasImage() }) {
+            initCanvas()
+            canvas.drawPath(it, store.linePaint)
+            view.invalidate()
+        }
+
     }
 
     private fun onDragStart(dragCopyCellMessage: DragEventMessage.StartCopyCell) {
@@ -108,22 +117,10 @@ class DicomImage(
         }
     }
 
-    private fun redrawCanvas() {
+    private fun initCanvas() {
         val bitmap = store.getCurrentFrame()
         canvas = Canvas(bitmap)
         view.setImageBitmap(bitmap)
-
-        store.pathList.forEach {
-            canvas.drawPath(it, store.linePaint)
-        }
-
-        canvas.drawPath(store.currentPath, store.linePaint)
-
-        store.textList.forEach {
-            canvas.drawText(it.second, it.first.x, it.first.y, store.stringPaint)
-        }
-
-        view.invalidate()
     }
 
     companion object {

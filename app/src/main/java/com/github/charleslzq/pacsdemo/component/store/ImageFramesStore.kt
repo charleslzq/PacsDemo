@@ -19,20 +19,14 @@ import java.io.File
  * Created by charleslzq on 17-11-27.
  */
 class ImageFramesStore(val layoutPosition: Int) : WithReducer {
-    var measure by ObservableStatus(Measure.NONE)
     var linePaint = Paint()
     var stringPaint = Paint()
-
-    var currentPath = Path()
-    val pathList = mutableListOf<Path>()
-    val textList = mutableListOf<Pair<PointF, String>>()
-    var firstPath = true
-
     private var allowPlay = true
-
-    private var rawScale = 1.0f
+    private var allowMeasure = true
 
     var imagePlayModel by ObservableStatus(ImagePlayModel())
+        private set
+    var rawScale = 1.0f
         private set
     var scaleFactor by ObservableStatus(1.0f)
         private set
@@ -42,8 +36,23 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
         private set
     var pseudoColor by ObservableStatus(false)
         private set
+    var measure by ObservableStatus(Measure.NONE)
+        private set
+    var imageCanvasModel by ObservableStatus(ImageCanvasModel())
+        private set
+    var currentPath by ObservableStatus(Path())
+        private set
 
     init {
+        linePaint.color = Color.RED
+        linePaint.strokeWidth = 3f
+        linePaint.isAntiAlias = true
+        linePaint.strokeJoin = Paint.Join.ROUND
+        linePaint.style = Paint.Style.STROKE
+        stringPaint.strokeWidth = 1f
+        stringPaint.color = Color.RED
+        stringPaint.isLinearText = true
+
         reduce(this::imagePlayModel) { state, event ->
             when (event) {
                 is ClickEvent.ChangeLayout -> ImagePlayModel(framesChanged = true)
@@ -207,6 +216,69 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
                 is ImageDisplayEvent.StudyModeReset -> {
                     if (event.layoutPosition == layoutPosition) {
                         false
+                    } else {
+                        state
+                    }
+                }
+                else -> state
+            }
+        }
+
+        reduce(this::allowMeasure, { hasImage() }) { state, event ->
+            when (event) {
+                is ClickEvent.ChangeLayout -> event.layoutOrdinal == 0
+                else -> state
+            }
+        }
+
+        reduce(this::measure, { layoutPosition == 0 && allowMeasure }) { state, event ->
+            when (event) {
+                is ClickEvent.TurnToMeasureLine -> ImageFramesStore.Measure.LINE
+                is ClickEvent.TurnToMeasureAngle -> ImageFramesStore.Measure.ANGEL
+                else -> state
+            }
+        }
+
+        reduce(this::imageCanvasModel, { hasImage() }) { state, event ->
+            when (event) {
+                is ImageDisplayEvent.AddPath -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        ImageCanvasModel(
+                                state.paths.toMutableList().apply {
+                                    val path = Path()
+                                    path.moveTo(event.points[0].x, event.points[0].y)
+                                    (1..(event.points.size - 1)).forEach {
+                                        path.lineTo(event.points[it].x, event.points[it].y)
+                                    }
+                                    add(path)
+                                },
+                                state.texts.toMutableMap().apply { put(event.text.first, event.text.second) }
+                        )
+                    } else {
+                        state
+                    }
+                }
+                else -> state
+            }
+        }
+
+        reduce(this::currentPath, { hasImage() }) { state, event ->
+            when (event) {
+                is ImageDisplayEvent.AddPath -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        Path()
+                    } else {
+                        state
+                    }
+                }
+                is ImageDisplayEvent.DrawPath -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        Path().apply {
+                            moveTo(event.points[0].x, event.points[0].y)
+                            (1..(event.points.size - 1)).forEach {
+                                lineTo(event.points[it].x, event.points[it].y)
+                            }
+                        }
                     } else {
                         state
                     }

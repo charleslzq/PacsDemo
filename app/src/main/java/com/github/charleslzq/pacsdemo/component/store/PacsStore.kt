@@ -39,14 +39,6 @@ class PacsStore : WithReducer {
                 else -> state
             }
         }
-
-        reduce(imageCells[0].imageFramesStore::measure, { layoutOption == LayoutOption.ONE_ONE }) { state, event ->
-            when (event) {
-                is ClickEvent.TurnToMeasureLine -> ImageFramesStore.Measure.LINE
-                is ClickEvent.TurnToMeasureAngle -> ImageFramesStore.Measure.ANGEL
-                else -> state
-            }
-        }
     }
 
     enum class LayoutOption {
