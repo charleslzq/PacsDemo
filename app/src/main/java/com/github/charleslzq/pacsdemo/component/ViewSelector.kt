@@ -33,7 +33,6 @@ class ViewSelector(
             if (sourcePosition >= 0 && sourcePosition < store.imageCells.size) {
                 val data = store.imageCells[sourcePosition].patientSeriesModel
                 EventBus.post(BindingEvent.ModelDropped(destPosition, data))
-                EventBus.post(ImageDisplayEvent.PlayModeReset(sourcePosition))
                 EventBus.post(BindingEvent.ModelDropped(sourcePosition, PatientSeriesModel()))
             }
         }
