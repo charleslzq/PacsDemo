@@ -55,6 +55,14 @@ class DicomImage(
             }
         }
 
+        refreshByProperty(store::scaleFactor) {
+            if (store.scaleFactor > 1 && operationMode is PlayMode) {
+                operationMode = StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, store.layoutPosition))
+            } else if (store.scaleFactor == 1.0f && operationMode is StudyMode) {
+                operationMode = PlayMode(view.context, PlayModeGestureListener(store.layoutPosition))
+            }
+        }
+
         refreshByProperty(store::matrix) {
             view.imageMatrix = store.matrix
         }
@@ -78,7 +86,7 @@ class DicomImage(
                     store.pathList.clear()
                     store.textList.clear()
                     if (store.scaleFactor > 1.0f) {
-                        StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, store, store.layoutPosition))
+                        StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, store.layoutPosition))
                     } else {
                         PlayMode(view.context, PlayModeGestureListener(store.layoutPosition))
                     }
@@ -98,18 +106,6 @@ class DicomImage(
             @Suppress("DEPRECATION")
             view.startDrag(clipData, dragBuilder, null, 0)
         }
-    }
-
-    private fun init() {
-
-
-//        onStateChange(store::scaleFactor) {
-//            if (store.scaleFactor > 1 && operationMode is PlayMode) {
-//                operationMode = StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, store))
-//            } else if (store.scaleFactor == 1.0f && operationMode is StudyMode) {
-//                operationMode = PlayMode(view.context, PlayModeGestureListener(store))
-//            }
-//        }
     }
 
     private fun redrawCanvas() {

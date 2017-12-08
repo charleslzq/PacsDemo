@@ -13,8 +13,7 @@ open class ScaleCompositeGestureListener(
 
     override fun onScale(scaleGestureDetector: ScaleGestureDetector): Boolean {
         val rawScaleFactor = scaleGestureDetector.scaleFactor
-        val scaleFactor = Math.max(1.0f, Math.min(rawScaleFactor, 5.0f))
-        EventBus.post(ImageDisplayEvent.ScaleChange(layoutPosition, scaleFactor))
+        EventBus.post(ImageDisplayEvent.ScaleChange(layoutPosition, rawScaleFactor))
         return true
     }
 }

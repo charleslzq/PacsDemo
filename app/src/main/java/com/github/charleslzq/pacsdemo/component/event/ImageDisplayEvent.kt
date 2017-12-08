@@ -9,4 +9,6 @@ class ImageDisplayEvent {
     data class PlayModeReset(val layoutPosition: Int) : Event
     data class IndexChange(val layoutPosition: Int, val index: Int) : Event
     data class IndexScroll(val layoutPosition: Int, val scroll: Int) : Event
+    data class LocationTranslate(val layoutPosition: Int, val distanceX: Float, val distanceY: Float) : Event
+    data class StudyModeReset(val layoutPosition: Int) : Event
 }

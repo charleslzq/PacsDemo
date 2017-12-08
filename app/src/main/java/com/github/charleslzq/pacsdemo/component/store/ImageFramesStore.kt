@@ -30,12 +30,11 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
 
     private var allowPlay = true
 
-    var rawScale = 1.0f
-        private set
-    var scaleFactor = 1.0f
-        private set
+    private var rawScale = 1.0f
 
     var imagePlayModel by ObservableStatus(ImagePlayModel())
+        private set
+    var scaleFactor by ObservableStatus(1.0f)
         private set
     var matrix by ObservableStatus(Matrix())
         private set
@@ -117,13 +116,41 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
             }
         }
 
+        reduce(this::scaleFactor) { state, event ->
+            when (event) {
+                is ImageDisplayEvent.ScaleChange -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        getNewScaleFactor(event.scaleFactor)
+                    } else {
+                        state
+                    }
+                }
+                is ImageDisplayEvent.StudyModeReset -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        1.0f
+                    } else {
+                        state
+                    }
+                }
+                else -> state
+            }
+        }
+
         reduce(this::matrix, { hasImage() }) { state, event ->
             when (event) {
                 is ImageDisplayEvent.ScaleChange -> {
                     if (event.layoutPosition == layoutPosition) {
                         val matrix = Matrix(state)
-                        matrix.setScale(event.scaleFactor, event.scaleFactor)
+                        val newScale = getNewScaleFactor(event.scaleFactor)
+                        matrix.setScale(newScale, newScale)
                         matrix
+                    } else {
+                        state
+                    }
+                }
+                is ImageDisplayEvent.StudyModeReset -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        Matrix()
                     } else {
                         state
                     }
@@ -150,6 +177,13 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
                         state
                     }
                 }
+                is ImageDisplayEvent.StudyModeReset -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        ColorMatrix()
+                    } else {
+                        state
+                    }
+                }
                 else -> state
             }
         }
@@ -164,6 +198,13 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
                     }
                 }
                 is ImageDisplayEvent.PlayModeReset -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        false
+                    } else {
+                        state
+                    }
+                }
+                is ImageDisplayEvent.StudyModeReset -> {
                     if (event.layoutPosition == layoutPosition) {
                         false
                     } else {
@@ -214,6 +255,8 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
     }
 
     fun getCurrentFrameMeta(): DicomImageMetaInfo? = if (hasImage()) imagePlayModel.frameMetas[imagePlayModel.currentIndex] else null
+
+    private fun getNewScaleFactor(rawScaleFactor: Float): Float = Math.max(1.0f, Math.min(rawScaleFactor * scaleFactor, 5.0f))
 
     private fun getFrame(index: Int): Bitmap {
         val rawBitmap = BitmapFactory.decodeFile(File(imagePlayModel.frameUrls[index]).absolutePath,
@@ -269,7 +312,6 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
     private fun calculateColor(color: Int): Int {
         return getPseudoColor((Color.red(color) + Color.green(color) + Color.blue(color) + Color.alpha(color)) / 4)
     }
-
 
     private fun getPseudoColor(greyValue: Int): Int {
         return when (greyValue) {
