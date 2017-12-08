@@ -5,6 +5,6 @@ package com.github.charleslzq.pacsdemo.component.store
  */
 data class ImagePlayModel(
         val duration: Int = 40,
-        val currentIndex: Int = -1,
+        val currentIndex: Int = 0,
         val playing: Boolean = false
 )

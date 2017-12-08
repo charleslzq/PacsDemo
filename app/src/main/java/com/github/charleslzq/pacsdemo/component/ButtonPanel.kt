@@ -62,7 +62,7 @@ class ButtonPanel(
         refreshButton.typeface = fontAwesomeTypeface
         backButton.typeface = fontAwesomeTypeface
 
-        bind(PacsStore::layoutOption) {
+        refreshByProperty(PacsStore::layoutOption) {
             val visible = when (it == PacsStore.LayoutOption.ONE_ONE) {
                 true -> View.VISIBLE
                 false -> View.INVISIBLE

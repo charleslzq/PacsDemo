@@ -22,7 +22,7 @@ class ThumbList(
 
     init {
         view.layoutManager = LinearLayoutManager(recyclerView.context)
-        bind(store::seriesList) {
+        refreshByProperty(store::seriesList) {
             val adapter = view.adapter
             if (adapter != null && adapter is DicomSeriesThumbListAdpater) {
                 adapter.seriesModels.clear()
@@ -53,7 +53,7 @@ class ThumbList(
             }
         }
 
-        bind(store::selected) {
+        refreshByProperty(store::selected) {
             (1..view.childCount).forEach { view.getChildAt(it - 1).isSelected = false }
             if (it >= 0 && it < view.childCount) {
                 view.getChildAt(it).isSelected = true

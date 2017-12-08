@@ -17,12 +17,12 @@ class ImageLeftBottomPanel(
     private val timeInfo: TextView = view.findViewById(R.id.time)
 
     init {
-        bind(store.imageFramesStore::imagePlayModel) {
-            if (store.imageFramesStore.framesModel.size > 0) {
+        refreshByProperties(store.imageFramesStore::imagePlayModel, store.imageFramesStore::framesModel) {
+            if (store.imageFramesStore.framesModel.size > 0 && store.imageFramesStore.indexValid()) {
                 xRayInfo.visibility = View.VISIBLE
                 timeInfo.visibility = View.VISIBLE
 
-                val imageMeta = store.imageFramesStore.framesModel.frames[it.currentIndex]
+                val imageMeta = store.imageFramesStore.framesModel.frames[store.imageFramesStore.imagePlayModel.currentIndex]
                 val kvp = imageMeta.kvp ?: "unknown"
                 val xRay = imageMeta.xRayTubCurrent ?: "unknown"
                 xRayInfo.post { xRayInfo.text = "${xRay}mA ${kvp}KV" }

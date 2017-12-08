@@ -23,7 +23,7 @@ class ImageCell(
 )) {
 
     init {
-        bind(PatientSeriesStore::selected) {
+        refreshByProperty(PatientSeriesStore::selected) {
             view.isSelected = store.selected
         }
 

@@ -15,7 +15,7 @@ class ViewSelector(
         Sub(ImageCell::class, this::getImageCellsFromPanel, { parentState, index -> parentState.imageCells[index] })
 )) {
     init {
-        bind(store::layoutOption) {
+        refreshByProperty(store::layoutOption) {
             view.displayedChild = store.layoutOption.ordinal
             reInit()
         }

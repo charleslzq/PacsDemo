@@ -20,7 +20,7 @@ class ImageRightTopPanel(
     private val description: TextView = view.findViewById(R.id.description)
 
     init {
-        bind(store::patientSeriesModel) {
+        refreshByProperty(store::patientSeriesModel) {
             if (store.patientSeriesModel.imageFramesModel.size > 0) {
                 val name = store.patientSeriesModel.patientMetaInfo.name ?: "UNKNOWN"
                 val id = store.patientSeriesModel.patientMetaInfo.id ?: "UNKNOWN"

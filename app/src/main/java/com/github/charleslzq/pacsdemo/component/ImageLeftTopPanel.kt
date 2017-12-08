@@ -20,8 +20,8 @@ class ImageLeftTopPanel(
     private val imageProgress: TextView = view.findViewById(R.id.imageProgress)
 
     init {
-        bind(store.imageFramesStore::imagePlayModel) {
-            val visible = when (store.patientSeriesModel.imageFramesModel.size == 0) {
+        refreshByProperties(store.imageFramesStore::imagePlayModel, store.imageFramesStore::framesModel) {
+            val visible = when (store.imageFramesStore.indexValid()) {
                 true -> View.INVISIBLE
                 false -> View.VISIBLE
             }
@@ -29,8 +29,8 @@ class ImageLeftTopPanel(
             sliceInfo.visibility = visible
             scaleInfo.visibility = visible
             imageProgress.visibility = visible
-            if (store.patientSeriesModel.imageFramesModel.size > 0) {
-                val imageInfo = store.patientSeriesModel.imageFramesModel.frames[it.currentIndex]
+            if (store.imageFramesStore.indexValid()) {
+                val imageInfo = store.patientSeriesModel.imageFramesModel.frames[store.imageFramesStore.imagePlayModel.currentIndex]
 
                 val windowCenter = imageInfo.windowCenter ?: "不明"
                 val windowWidth = imageInfo.windowWidth ?: "不明"
@@ -42,7 +42,7 @@ class ImageLeftTopPanel(
 
                 scaleInfo.post { scaleInfo.text = "缩放: ${store.imageFramesStore.scaleFactor * store.imageFramesStore.rawScale}倍" }
 
-                imageProgress.post { imageProgress.text = "IMAGE: ${it.currentIndex + 1}/${store.imageFramesStore.framesModel.size}" }
+                imageProgress.post { imageProgress.text = "IMAGE: ${store.imageFramesStore.imagePlayModel.currentIndex + 1}/${store.imageFramesStore.framesModel.size}" }
             }
         }
 

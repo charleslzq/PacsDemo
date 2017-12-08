@@ -33,7 +33,15 @@ class DicomImage(
         EventBus.onEvent<DragEventMessage.StartCopyCell> { onDragStart(it) }
         EventBus.onEvent<RequireRedrawCanvas> { redrawCanvas() }
 
-        bind(store::imagePlayModel) {
+        refreshByProperty(store::framesModel) {
+            view.clearAnimation()
+            view.background = null
+            if (store.indexValid()) {
+                view.setImageBitmap(store.getScaledFrame(store.imagePlayModel.currentIndex))
+            }
+        }
+
+        refreshByProperty(store::imagePlayModel) {
             if (it.playing && view.background == null && store.playable()) {
                 view.setImageBitmap(null)
                 view.post(store.resetAnimation(view))
@@ -44,27 +52,27 @@ class DicomImage(
                     view.clearAnimation()
                     view.background = null
                 }
-                if (indexValid()) {
+                if (store.indexValid()) {
                     view.setImageBitmap(store.getScaledFrame(it.currentIndex))
                 }
             }
         }
 
-        bind(store::matrix) {
+        refreshByProperty(store::matrix) {
             view.imageMatrix = store.matrix
         }
 
-        bind(store::colorMatrix) {
+        refreshByProperty(store::colorMatrix) {
             view.colorFilter = ColorMatrixColorFilter(store.colorMatrix)
         }
 
-        bind(store::pseudoColor) {
-            if (indexValid()) {
+        refreshByProperty(store::pseudoColor) {
+            if (store.indexValid()) {
                 view.setImageBitmap(store.getScaledFrame(store.imagePlayModel.currentIndex))
             }
         }
 
-        bind(store::measure) {
+        refreshByProperty(store::measure) {
             store.currentPath = Path()
             store.firstPath = true
             operationMode = when (store.measure != ImageFramesStore.Measure.NONE && store.framesModel.frames.isNotEmpty()) {
@@ -81,13 +89,11 @@ class DicomImage(
                     }
                 }
             }
-            if (store.measure != ImageFramesStore.Measure.NONE && indexValid()) {
+            if (store.measure != ImageFramesStore.Measure.NONE && store.indexValid()) {
                 redrawCanvas()
             }
         }
     }
-
-    private fun indexValid() = store.imagePlayModel.currentIndex >= 0 && store.imagePlayModel.currentIndex < store.framesModel.size
 
     private fun onDragStart(dragCopyCellMessage: DragEventMessage.StartCopyCell) {
         if (dragCopyCellMessage.layoutPosition == store.layoutPosition) {

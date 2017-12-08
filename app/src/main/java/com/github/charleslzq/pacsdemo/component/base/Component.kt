@@ -12,23 +12,29 @@ open class Component<out V, S>(
         val view: V,
         val store: S
 ) where V : View {
-    fun <P> bind(property: KProperty1<S, P>, handler: (P) -> Unit) {
+    fun <P> refreshByProperty(property: KProperty1<S, P>, handler: (P) -> Unit) {
         val delegate = getDelegate(property, store)
         if (delegate != null) {
             handler(property.get(store))
             delegate.onChange { handler(property.get(store)) }
         } else {
-            throw IllegalAccessException("Not Observable Property, Can't bind")
+            throw IllegalAccessException("Not Observable Property, Can't refreshByProperty")
         }
     }
 
-    fun <P> bind(property: KProperty0<P>, handler: (P) -> Unit) {
+    fun <P> refreshByProperty(property: KProperty0<P>, handler: (P) -> Unit) {
         val delegate = getDelegate(property)
         if (delegate != null) {
             handler(property.get())
             delegate.onChange { handler(property.get()) }
         } else {
-            throw IllegalAccessException("Not Observable Property, Can't bind")
+            throw IllegalAccessException("Not Observable Property, Can't refreshByProperty")
+        }
+    }
+
+    fun refreshByProperties(vararg property: KProperty0<*>, handler: () -> Unit) {
+        property.forEach {
+            refreshByProperty(it, { handler() })
         }
     }
 }

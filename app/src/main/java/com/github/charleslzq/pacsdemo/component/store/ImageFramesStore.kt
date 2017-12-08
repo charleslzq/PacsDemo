@@ -64,7 +64,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
             when (event) {
                 is BindingEvent.ModelSelected -> {
                     if (layoutPosition == 0 && event.patientSeriesModel.imageFramesModel.size > 0) {
-                        ImagePlayModel().copy(currentIndex = 0)
+                        ImagePlayModel()
                     } else {
                         state
                     }
@@ -182,6 +182,8 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
     }
 
     fun playable() = framesModel.size > 1 && allowPlay
+
+    fun indexValid() = imagePlayModel.currentIndex >= 0 && imagePlayModel.currentIndex < framesModel.size
 
     fun autoAdjustScale(view: View) {
         if (framesModel.size > 0) {
