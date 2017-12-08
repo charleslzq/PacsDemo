@@ -21,7 +21,7 @@ class ImageRightTopPanel(
 
     init {
         refreshByProperty(store::patientSeriesModel) {
-            if (store.patientSeriesModel.imageFramesModel.size > 0) {
+            if (store.imageFramesStore.hasImage()) {
                 val name = store.patientSeriesModel.patientMetaInfo.name ?: "UNKNOWN"
                 val id = store.patientSeriesModel.patientMetaInfo.id ?: "UNKNOWN"
                 val birthday = store.patientSeriesModel.patientMetaInfo.birthday ?: "UNKNOWN"

@@ -183,7 +183,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
 
     fun playable() = framesModel.size > 1 && allowPlay
 
-    fun indexValid() = imagePlayModel.currentIndex >= 0 && imagePlayModel.currentIndex < framesModel.size
+    fun hasImage() = framesModel.size > 0
 
     fun autoAdjustScale(view: View) {
         if (framesModel.size > 0) {

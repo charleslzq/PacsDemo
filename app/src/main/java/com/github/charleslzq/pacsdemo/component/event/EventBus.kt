@@ -8,7 +8,7 @@ import io.reactivex.subjects.PublishSubject
  */
 object EventBus {
     val DEFAULT = "DEFAULT"
-    val registry = mutableMapOf<String, MutableList<PublishSubject<Any>>>()
+    val registry = mutableMapOf<String, Array<PublishSubject<Any>>>()
 
     fun post(event: Any, name: String = DEFAULT) {
         registry[name]?.forEach { it.onNext(event) }
@@ -31,9 +31,9 @@ object EventBus {
             logger.subscribe {
                 Log.d("EventBus $busName", "${it.javaClass.simpleName} received")
             }
-            registry[busName] = mutableListOf(logger)
+            registry[busName] = arrayOf(logger)
         }
-        registry[busName]?.add(publisher)
+        registry[busName] = registry[busName]!!.plus(publisher)
     }
 }
 

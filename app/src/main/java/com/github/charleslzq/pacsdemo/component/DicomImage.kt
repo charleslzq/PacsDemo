@@ -36,12 +36,13 @@ class DicomImage(
         refreshByProperty(store::framesModel) {
             view.clearAnimation()
             view.background = null
-            if (store.indexValid()) {
+            if (store.hasImage()) {
+                store.autoAdjustScale(view)
                 view.setImageBitmap(store.getScaledFrame(store.imagePlayModel.currentIndex))
             }
         }
 
-        refreshByProperty(store::imagePlayModel) {
+        refreshByProperty(store::imagePlayModel, { store.hasImage() }) {
             if (it.playing && view.background == null && store.playable()) {
                 view.setImageBitmap(null)
                 view.post(store.resetAnimation(view))
@@ -52,9 +53,7 @@ class DicomImage(
                     view.clearAnimation()
                     view.background = null
                 }
-                if (store.indexValid()) {
-                    view.setImageBitmap(store.getScaledFrame(it.currentIndex))
-                }
+                view.setImageBitmap(store.getScaledFrame(it.currentIndex))
             }
         }
 
@@ -66,13 +65,11 @@ class DicomImage(
             view.colorFilter = ColorMatrixColorFilter(store.colorMatrix)
         }
 
-        refreshByProperty(store::pseudoColor) {
-            if (store.indexValid()) {
-                view.setImageBitmap(store.getScaledFrame(store.imagePlayModel.currentIndex))
-            }
+        refreshByProperty(store::pseudoColor, { store.hasImage() }) {
+            view.setImageBitmap(store.getScaledFrame(store.imagePlayModel.currentIndex))
         }
 
-        refreshByProperty(store::measure) {
+        refreshByProperty(store::measure, { store.hasImage() }) {
             store.currentPath = Path()
             store.firstPath = true
             operationMode = when (store.measure != ImageFramesStore.Measure.NONE && store.framesModel.frames.isNotEmpty()) {
@@ -89,7 +86,7 @@ class DicomImage(
                     }
                 }
             }
-            if (store.measure != ImageFramesStore.Measure.NONE && store.indexValid()) {
+            if (store.measure != ImageFramesStore.Measure.NONE) {
                 redrawCanvas()
             }
         }

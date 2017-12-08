@@ -18,7 +18,7 @@ class ImageLeftBottomPanel(
 
     init {
         refreshByProperties(store.imageFramesStore::imagePlayModel, store.imageFramesStore::framesModel) {
-            if (store.imageFramesStore.framesModel.size > 0 && store.imageFramesStore.indexValid()) {
+            if (store.imageFramesStore.hasImage()) {
                 xRayInfo.visibility = View.VISIBLE
                 timeInfo.visibility = View.VISIBLE
 

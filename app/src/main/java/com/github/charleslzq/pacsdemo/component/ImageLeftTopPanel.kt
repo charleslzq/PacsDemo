@@ -21,7 +21,7 @@ class ImageLeftTopPanel(
 
     init {
         refreshByProperties(store.imageFramesStore::imagePlayModel, store.imageFramesStore::framesModel) {
-            val visible = when (store.imageFramesStore.indexValid()) {
+            val visible = when (store.imageFramesStore.hasImage()) {
                 true -> View.INVISIBLE
                 false -> View.VISIBLE
             }
@@ -29,8 +29,8 @@ class ImageLeftTopPanel(
             sliceInfo.visibility = visible
             scaleInfo.visibility = visible
             imageProgress.visibility = visible
-            if (store.imageFramesStore.indexValid()) {
-                val imageInfo = store.patientSeriesModel.imageFramesModel.frames[store.imageFramesStore.imagePlayModel.currentIndex]
+            if (store.imageFramesStore.hasImage()) {
+                val imageInfo = store.imageFramesStore.framesModel.frames[store.imageFramesStore.imagePlayModel.currentIndex]
 
                 val windowCenter = imageInfo.windowCenter ?: "不明"
                 val windowWidth = imageInfo.windowWidth ?: "不明"
