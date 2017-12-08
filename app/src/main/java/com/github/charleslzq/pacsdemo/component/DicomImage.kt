@@ -76,7 +76,7 @@ class DicomImage(
             operationMode = when (store.measure != ImageFramesStore.Measure.NONE && store.hasImage()) {
                 true -> {
                     initCanvas()
-                    MeasureMode(view.context, MeasureModeGestureListener(store, store.layoutPosition))
+                    MeasureMode(view.context, MeasureModeGestureListener(store))
                 }
                 false -> {
                     if (store.scaleFactor > 1.0f) {

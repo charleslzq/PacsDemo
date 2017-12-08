@@ -5,7 +5,9 @@ import android.widget.*
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.event.EventBus
+import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
+import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
 import com.github.charleslzq.pacsdemo.support.ViewUtils
 
 /**
@@ -23,6 +25,16 @@ class ViewSelector(
             val dataPosition = it.dataPosition
             if (dataPosition >= 0 && dataPosition < store.seriesList.size) {
                 EventBus.post(BindingEvent.ModelDropped(layoutPosition, store.seriesList[dataPosition]))
+            }
+        }
+        EventBus.onEvent<DragEventMessage.DropToCopyCell> {
+            val sourcePosition = it.sourcePosition
+            val destPosition = it.targetPosition
+            if (sourcePosition >= 0 && sourcePosition < store.imageCells.size) {
+                val data = store.imageCells[sourcePosition].patientSeriesModel
+                EventBus.post(BindingEvent.ModelDropped(destPosition, data))
+                EventBus.post(ImageDisplayEvent.PlayModeReset(sourcePosition))
+                EventBus.post(BindingEvent.ModelDropped(sourcePosition, PatientSeriesModel()))
             }
         }
 

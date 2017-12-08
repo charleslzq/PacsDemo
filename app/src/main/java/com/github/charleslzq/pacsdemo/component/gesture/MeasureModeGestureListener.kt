@@ -11,9 +11,8 @@ import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
  * Created by charleslzq on 17-11-30.
  */
 class MeasureModeGestureListener(
-        val framesStore: ImageFramesStore,
-        layoutPosition: Int
-) : ScaleCompositeGestureListener(layoutPosition) {
+        val framesStore: ImageFramesStore
+) : ScaleCompositeGestureListener(framesStore.layoutPosition) {
     lateinit var startPoint: PointF
     lateinit var secondPoint: PointF
     private var firstPath = true
