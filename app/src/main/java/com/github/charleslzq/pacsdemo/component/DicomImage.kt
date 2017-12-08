@@ -34,27 +34,24 @@ class DicomImage(
         EventBus.onEvent<RequireRedrawCanvas> { redrawCanvas() }
         view.setOnTouchListener(operationMode)
 
-        refreshByProperty(store::framesModel) {
-            view.clearAnimation()
-            view.background = null
-            if (store.hasImage()) {
-                store.autoAdjustScale(view)
-                view.setImageBitmap(store.getScaledFrame(store.imagePlayModel.currentIndex))
-            }
-        }
-
-        refreshByProperty(store::imagePlayModel, { store.hasImage() }) {
+        refreshByProperty(store::imagePlayModel) {
             if (it.playing && view.background == null && store.playable()) {
                 view.setImageBitmap(null)
-                view.post(store.resetAnimation(view))
+                if (store.hasImage()) {
+                    view.post(store.resetAnimation(view))
+                }
             } else if (!it.playing) {
                 val background = view.background
+                view.setImageBitmap(null)
                 if (background != null && background is IndexAwareAnimationDrawable) {
                     background.stop()
                     view.clearAnimation()
                     view.background = null
                 }
-                view.setImageBitmap(store.getScaledFrame(it.currentIndex))
+                if (store.hasImage()) {
+                    store.autoAdjustScale(view)
+                    view.setImageBitmap(store.getCurrentFrame())
+                }
             }
         }
 
@@ -67,13 +64,13 @@ class DicomImage(
         }
 
         refreshByProperty(store::pseudoColor, { store.hasImage() }) {
-            view.setImageBitmap(store.getScaledFrame(store.imagePlayModel.currentIndex))
+            view.setImageBitmap(store.getCurrentFrame())
         }
 
         refreshByProperty(store::measure, { store.hasImage() }) {
             store.currentPath = Path()
             store.firstPath = true
-            operationMode = when (store.measure != ImageFramesStore.Measure.NONE && store.framesModel.frames.isNotEmpty()) {
+            operationMode = when (store.measure != ImageFramesStore.Measure.NONE && store.hasImage()) {
                 true -> {
                     MeasureMode(view.context, MeasureModeGestureListener(store, store.layoutPosition))
                 }
@@ -116,7 +113,7 @@ class DicomImage(
     }
 
     private fun redrawCanvas() {
-        val bitmap = store.getScaledFrame(store.imagePlayModel.currentIndex)
+        val bitmap = store.getCurrentFrame()
         canvas = Canvas(bitmap)
         view.setImageBitmap(bitmap)
 

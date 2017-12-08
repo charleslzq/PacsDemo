@@ -25,9 +25,10 @@ class PacsStore : WithReducer {
             }
         }
 
-        reduce(this::selected, { layoutOption == LayoutOption.ONE_ONE }) { state, event ->
+        reduce(this::selected) { state, event ->
             when (event) {
-                is ClickEvent.ThumbListItemClicked -> event.position
+                is ClickEvent.ChangeLayout -> -1
+                is ClickEvent.ThumbListItemClicked -> if (layoutOption == LayoutOption.ONE_ONE) event.position else state
                 else -> state
             }
         }

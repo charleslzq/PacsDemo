@@ -5,6 +5,7 @@ import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import android.widget.ImageView
+import com.github.charleslzq.dicom.data.DicomImageMetaInfo
 import com.github.charleslzq.pacsdemo.component.base.WithReducer
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
@@ -27,17 +28,14 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
     val textList = mutableListOf<Pair<PointF, String>>()
     var firstPath = true
 
+    private var allowPlay = true
 
     var rawScale = 1.0f
         private set
     var scaleFactor = 1.0f
         private set
 
-    var framesModel by ObservableStatus(ImageFramesModel())
-        private set
     var imagePlayModel by ObservableStatus(ImagePlayModel())
-        private set
-    var allowPlay = false
         private set
     var matrix by ObservableStatus(Matrix())
         private set
@@ -47,39 +45,27 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
         private set
 
     init {
-        reduce(this::framesModel) { state, event ->
+        reduce(this::imagePlayModel) { state, event ->
             when (event) {
+                is ClickEvent.ChangeLayout -> ImagePlayModel(framesChanged = true)
                 is BindingEvent.ModelSelected -> {
-                    if (layoutPosition == 0) {
-                        event.patientSeriesModel.imageFramesModel
+                    if (layoutPosition == 0 && event.patientSeriesModel.imageFramesModel.size > 0) {
+                        ImagePlayModel(frameMetas = event.patientSeriesModel.imageFramesModel.frames, framesChanged = true)
                     } else {
                         state
                     }
                 }
                 is BindingEvent.ModelDropped -> {
                     if (layoutPosition == event.layoutPosition) {
-                        event.patientSeriesModel.imageFramesModel
+                        ImagePlayModel(frameMetas = event.patientSeriesModel.imageFramesModel.frames, framesChanged = true)
                     } else {
                         state
                     }
                 }
-                is BindingEvent.SeriesListUpdated -> ImageFramesModel()
-                else -> state
-            }
-        }
-
-        reduce(this::imagePlayModel, { framesModel.size > 0 }) { state, event ->
-            when (event) {
-                is BindingEvent.ModelSelected -> {
-                    if (layoutPosition == 0 && event.patientSeriesModel.imageFramesModel.size > 0) {
-                        ImagePlayModel()
-                    } else {
-                        state
-                    }
-                }
+                is BindingEvent.SeriesListUpdated -> ImagePlayModel()
                 is ImageDisplayEvent.ChangePlayStatus -> {
                     if (event.layoutPosition == layoutPosition && playable()) {
-                        state.copy(playing = !state.playing)
+                        state.copy(playing = !state.playing, framesChanged = false)
                     } else {
                         state
                     }
@@ -92,30 +78,30 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
                     }
                 }
                 is ImageDisplayEvent.IndexChange -> {
-                    if (event.layoutPosition == layoutPosition && event.index >= 0 && event.index < framesModel.size) {
-                        state.copy(currentIndex = event.index)
+                    if (event.layoutPosition == layoutPosition && event.index >= 0 && event.index < imagePlayModel.frameUrls.size) {
+                        state.copy(currentIndex = event.index, framesChanged = false)
                     } else {
                         state
                     }
                 }
                 is ClickEvent.ReverseColor -> {
                     if (event.layoutPosition == layoutPosition) {
-                        state.copy(playing = false)
+                        state.copy(playing = false, framesChanged = false)
                     } else {
                         state
                     }
                 }
                 is ClickEvent.PseudoColor -> {
                     if (event.layoutPosition == layoutPosition) {
-                        state.copy(playing = false)
+                        state.copy(playing = false, framesChanged = false)
                     } else {
                         state
                     }
                 }
                 is ImageDisplayEvent.IndexScroll -> {
                     if (event.layoutPosition == layoutPosition) {
-                        val currentIndex = Math.min(Math.max(imagePlayModel.currentIndex - event.scroll, 0), framesModel.size - 1)
-                        state.copy(playing = false, currentIndex = currentIndex)
+                        val currentIndex = Math.min(Math.max(imagePlayModel.currentIndex - event.scroll, 0), imagePlayModel.frameUrls.size - 1)
+                        state.copy(playing = false, currentIndex = currentIndex, framesChanged = false)
                     } else {
                         state
                     }
@@ -124,14 +110,14 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
             }
         }
 
-        reduce(this::allowPlay, { layoutPosition == 0 && framesModel.size > 0 }) { state, event ->
+        reduce(this::allowPlay, { layoutPosition == 0 && hasImage() }) { state, event ->
             when (event) {
                 is ClickEvent.ChangeLayout -> event.layoutOrdinal == 0
                 else -> state
             }
         }
 
-        reduce(this::matrix, { framesModel.size > 0 }) { state, event ->
+        reduce(this::matrix, { hasImage() }) { state, event ->
             when (event) {
                 is ImageDisplayEvent.ScaleChange -> {
                     if (event.layoutPosition == layoutPosition) {
@@ -146,7 +132,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
             }
         }
 
-        reduce(this::colorMatrix, { framesModel.size > 0 }) { state, event ->
+        reduce(this::colorMatrix, { hasImage() }) { state, event ->
             when (event) {
                 is ClickEvent.ReverseColor -> {
                     if (event.layoutPosition == layoutPosition) {
@@ -168,7 +154,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
             }
         }
 
-        reduce(this::pseudoColor, { framesModel.size > 0 }) { state, event ->
+        reduce(this::pseudoColor, { hasImage() }) { state, event ->
             when (event) {
                 is ClickEvent.PseudoColor -> {
                     if (event.layoutPosition == layoutPosition) {
@@ -189,12 +175,16 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
         }
     }
 
-    fun playable() = framesModel.size > 1 && allowPlay
+    fun playable() = imagePlayModel.frameUrls.size > 1 && allowPlay
 
-    fun hasImage() = framesModel.size > 0
+    fun hasImage() = imagePlayModel.frameUrls.isNotEmpty()
+
+    fun currentIndex() = imagePlayModel.currentIndex
+
+    fun framesSize() = imagePlayModel.frameUrls.size
 
     fun autoAdjustScale(view: View) {
-        if (framesModel.size > 0) {
+        if (hasImage()) {
             val viewHeight = view.measuredHeight
             val viewWidth = view.measuredWidth
             val firstImage = getFrame(0)
@@ -213,8 +203,20 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
         }
     }
 
-    fun getFrame(index: Int): Bitmap {
-        val rawBitmap = BitmapFactory.decodeFile(File(framesModel.frameUrls[index]).absolutePath,
+    fun getCurrentFrame(scaled: Boolean = true): Bitmap? {
+        return when (hasImage()) {
+            true -> when (scaled) {
+                true -> getScaledFrame(imagePlayModel.currentIndex)
+                false -> getFrame(imagePlayModel.currentIndex)
+            }
+            false -> null
+        }
+    }
+
+    fun getCurrentFrameMeta(): DicomImageMetaInfo? = if (hasImage()) imagePlayModel.frameMetas[imagePlayModel.currentIndex] else null
+
+    private fun getFrame(index: Int): Bitmap {
+        val rawBitmap = BitmapFactory.decodeFile(File(imagePlayModel.frameUrls[index]).absolutePath,
                 BitmapFactory.Options().apply { inMutable = pseudoColor || measure != Measure.NONE })
         if (pseudoColor) {
             val pixels = IntArray(rawBitmap.height * rawBitmap.width)
@@ -227,7 +229,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
         return rawBitmap
     }
 
-    fun getScaledFrame(index: Int): Bitmap {
+    private fun getScaledFrame(index: Int): Bitmap {
         val rawBitmap = getFrame(index)
         return if (rawScale != 1.0f) {
             val newWidth = (rawBitmap.width * rawScale).toInt()
@@ -240,11 +242,11 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
         }
     }
 
-    fun getAnimation(resources: Resources, duration: Int): IndexAwareAnimationDrawable {
+    private fun getAnimation(resources: Resources, duration: Int): IndexAwareAnimationDrawable {
         val startOffset = imagePlayModel.currentIndex
         val animation = IndexAwareAnimationDrawable(layoutPosition, startOffset)
         animation.isOneShot = true
-        framesModel.frames.subList(startOffset, framesModel.size).forEachIndexed { index, _ ->
+        imagePlayModel.frameUrls.subList(startOffset, imagePlayModel.frameUrls.size).forEachIndexed { index, _ ->
             val bitmap = BitmapDrawable(resources, getFrame(startOffset + index))
             bitmap.colorFilter = ColorMatrixColorFilter(colorMatrix)
             animation.addFrame(bitmap, duration)
@@ -264,7 +266,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
         return animation
     }
 
-    fun calculateColor(color: Int): Int {
+    private fun calculateColor(color: Int): Int {
         return getPseudoColor((Color.red(color) + Color.green(color) + Color.blue(color) + Color.alpha(color)) / 4)
     }
 

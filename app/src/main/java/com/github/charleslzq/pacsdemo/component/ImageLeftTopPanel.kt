@@ -20,29 +20,29 @@ class ImageLeftTopPanel(
     private val imageProgress: TextView = view.findViewById(R.id.imageProgress)
 
     init {
-        refreshByProperties(store.imageFramesStore::imagePlayModel, store.imageFramesStore::framesModel) {
-            val visible = when (store.imageFramesStore.hasImage()) {
-                true -> View.VISIBLE
-                false -> View.INVISIBLE
-            }
-            windowInfo.visibility = visible
-            sliceInfo.visibility = visible
-            scaleInfo.visibility = visible
-            imageProgress.visibility = visible
-            if (store.imageFramesStore.hasImage()) {
-                val imageInfo = store.imageFramesStore.framesModel.frames[store.imageFramesStore.imagePlayModel.currentIndex]
+        refreshByProperties(store.imageFramesStore::imagePlayModel) {
+            windowInfo.visibility = View.INVISIBLE
+            sliceInfo.visibility = View.INVISIBLE
+            scaleInfo.visibility = View.INVISIBLE
+            imageProgress.visibility = View.INVISIBLE
 
-                val windowCenter = imageInfo.windowCenter ?: "不明"
-                val windowWidth = imageInfo.windowWidth ?: "不明"
+            store.imageFramesStore.getCurrentFrameMeta()?.let {
+                windowInfo.visibility = View.VISIBLE
+                sliceInfo.visibility = View.VISIBLE
+                scaleInfo.visibility = View.VISIBLE
+                imageProgress.visibility = View.VISIBLE
+
+                val windowCenter = it.windowCenter ?: "不明"
+                val windowWidth = it.windowWidth ?: "不明"
                 windowInfo.post { windowInfo.text = "窗宽: $windowWidth 窗位: $windowCenter" }
 
-                val sliceThickness = imageInfo.sliceThickness ?: "不明"
-                val sliceLocation = imageInfo.sliceLocation ?: "不明"
+                val sliceThickness = it.sliceThickness ?: "不明"
+                val sliceLocation = it.sliceLocation ?: "不明"
                 sliceInfo.post { sliceInfo.text = "T:${sliceThickness}mm L:${sliceLocation}mm" }
 
                 scaleInfo.post { scaleInfo.text = "缩放: ${store.imageFramesStore.scaleFactor * store.imageFramesStore.rawScale}倍" }
 
-                imageProgress.post { imageProgress.text = "IMAGE: ${store.imageFramesStore.imagePlayModel.currentIndex + 1}/${store.imageFramesStore.framesModel.size}" }
+                imageProgress.post { imageProgress.text = "IMAGE: ${store.imageFramesStore.currentIndex() + 1}/${store.imageFramesStore.framesSize()}" }
             }
         }
 
