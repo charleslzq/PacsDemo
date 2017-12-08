@@ -15,6 +15,8 @@ class PatientSeriesStore(
         private set
     var selected by ObservableStatus(false)
         private set
+    var selectable = false
+        private set
 
     init {
         reduce(this::patientSeriesModel) { state, event ->
@@ -26,12 +28,26 @@ class PatientSeriesStore(
                         state
                     }
                 }
+                is BindingEvent.ModelDropped -> {
+                    if (event.layoutPosition == imageFramesStore.layoutPosition) {
+                        event.patientSeriesModel
+                    } else {
+                        state
+                    }
+                }
                 is BindingEvent.SeriesListUpdated -> PatientSeriesModel()
                 else -> state
             }
         }
 
-        reduce(this::selected) { state, event ->
+        reduce(this::selectable) { state, event ->
+            when (event) {
+                is ClickEvent.ChangeLayout -> event.layoutOrdinal != 0
+                else -> state
+            }
+        }
+
+        reduce(this::selected, { selectable }) { state, event ->
             when (event) {
                 is ClickEvent.ImageCellClicked -> {
                     if (event.layoutPosition == imageFramesStore.layoutPosition) {

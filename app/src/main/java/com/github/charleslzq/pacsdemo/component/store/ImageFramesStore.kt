@@ -56,6 +56,14 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
                         state
                     }
                 }
+                is BindingEvent.ModelDropped -> {
+                    if (layoutPosition == event.layoutPosition) {
+                        event.patientSeriesModel.imageFramesModel
+                    } else {
+                        state
+                    }
+                }
+                is BindingEvent.SeriesListUpdated -> ImageFramesModel()
                 else -> state
             }
         }

@@ -22,8 +22,8 @@ class ImageLeftTopPanel(
     init {
         refreshByProperties(store.imageFramesStore::imagePlayModel, store.imageFramesStore::framesModel) {
             val visible = when (store.imageFramesStore.hasImage()) {
-                true -> View.INVISIBLE
-                false -> View.VISIBLE
+                true -> View.VISIBLE
+                false -> View.INVISIBLE
             }
             windowInfo.visibility = visible
             sliceInfo.visibility = visible

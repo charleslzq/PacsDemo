@@ -22,7 +22,7 @@ class DicomImage(
         imageView: ImageView,
         imageFramesStore: ImageFramesStore
 ) : Component<ImageView, ImageFramesStore>(imageView, imageFramesStore) {
-    var operationMode: OperationMode = PlayMode(view.context, PlayModeGestureListener(store.layoutPosition))
+    private var operationMode: OperationMode = PlayMode(view.context, PlayModeGestureListener(store.layoutPosition))
         set(value) {
             field = value
             view.setOnTouchListener(operationMode)
@@ -32,6 +32,7 @@ class DicomImage(
     init {
         EventBus.onEvent<DragEventMessage.StartCopyCell> { onDragStart(it) }
         EventBus.onEvent<RequireRedrawCanvas> { redrawCanvas() }
+        view.setOnTouchListener(operationMode)
 
         refreshByProperty(store::framesModel) {
             view.clearAnimation()

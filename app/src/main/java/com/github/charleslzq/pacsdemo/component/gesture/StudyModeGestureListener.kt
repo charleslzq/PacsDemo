@@ -1,6 +1,5 @@
 package com.github.charleslzq.pacsdemo.component.gesture
 
-import android.graphics.ColorMatrix
 import android.graphics.Matrix
 import android.view.MotionEvent
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore

@@ -2,6 +2,9 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.view.View
 import android.widget.*
+import com.github.charleslzq.pacsdemo.component.event.BindingEvent
+import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
+import com.github.charleslzq.pacsdemo.component.event.EventBus
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.support.ViewUtils
 
@@ -15,6 +18,14 @@ class ViewSelector(
         Sub(ImageCell::class, this::getImageCellsFromPanel, { parentState, index -> parentState.imageCells[index] })
 )) {
     init {
+        EventBus.onEvent<DragEventMessage.DropAtCellWithData> {
+            val layoutPosition = it.layoutPosition
+            val dataPosition = it.dataPosition
+            if (dataPosition >= 0 && dataPosition < store.seriesList.size) {
+                EventBus.post(BindingEvent.ModelDropped(layoutPosition, store.seriesList[dataPosition]))
+            }
+        }
+
         refreshByProperty(store::layoutOption) {
             view.displayedChild = store.layoutOption.ordinal
             reInit()
