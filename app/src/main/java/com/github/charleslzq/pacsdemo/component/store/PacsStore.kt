@@ -18,25 +18,32 @@ class PacsStore : WithReducer {
     val imageCells: List<PatientSeriesStore> = (0..8).map { PatientSeriesStore(ImageFramesStore(it)) }
 
     init {
-        reduce(this::seriesList) {
-            when (it.second) {
-                is BindingEvent.SeriesListUpdated -> (it.second as BindingEvent.SeriesListUpdated).seriesList
-                else -> it.first
+        reduce(this::seriesList) { state, event ->
+            when (event) {
+                is BindingEvent.SeriesListUpdated -> event.seriesList
+                else -> state
             }
         }
 
-        reduce(imageCells[0].imageFramesStore::measure, { layoutOption == LayoutOption.ONE_ONE }) {
-            when (it.second) {
+        reduce(this::selected, { layoutOption == LayoutOption.ONE_ONE }) { state, event ->
+            when (event) {
+                is ClickEvent.ThumbListItemClicked -> event.position
+                else -> state
+            }
+        }
+
+        reduce(this::layoutOption) { state, event ->
+            when (event) {
+                is ClickEvent.ChangeLayout -> LayoutOption.values()[event.layoutOrdinal]
+                else -> state
+            }
+        }
+
+        reduce(imageCells[0].imageFramesStore::measure, { layoutOption == LayoutOption.ONE_ONE }) { state, event ->
+            when (event) {
                 is ClickEvent.TurnToMeasureLine -> ImageFramesStore.Measure.LINE
                 is ClickEvent.TurnToMeasureAngle -> ImageFramesStore.Measure.ANGEL
-                else -> it.first
-            }
-        }
-
-        reduce(this::selected, { layoutOption == LayoutOption.ONE_ONE }) {
-            when (it.second) {
-                is ClickEvent.ThumbListItemClicked -> (it.second as ClickEvent.ThumbListItemClicked).position
-                else -> it.first
+                else -> state
             }
         }
     }

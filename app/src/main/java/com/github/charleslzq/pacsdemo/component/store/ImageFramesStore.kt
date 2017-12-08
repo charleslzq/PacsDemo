@@ -6,9 +6,11 @@ import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.component.base.WithReducer
+import com.github.charleslzq.pacsdemo.component.event.BindingEvent
+import com.github.charleslzq.pacsdemo.component.event.ClickEvent
+import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus
-import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus.Companion.getDelegate
-import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
+import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
 import java.io.File
 
 
@@ -16,16 +18,6 @@ import java.io.File
  * Created by charleslzq on 17-11-27.
  */
 class ImageFramesStore(val layoutPosition: Int) : WithReducer {
-    var framesModel by ObservableStatus(ImageFramesModel())
-    var duration: Int = 40
-    var scaleFactor: Float by ObservableStatus(1.0f)
-    var currentIndex: Int by ObservableStatus(0)
-    var startOffset: Int = 0
-    var matrix by ObservableStatus(Matrix())
-    var colorMatrix by ObservableStatus(ColorMatrix())
-    var playing by ObservableStatus(false)
-    var pseudoColor by ObservableStatus(false)
-    var allowPlay = false
     var measure by ObservableStatus(Measure.NONE)
     var linePaint = Paint()
     var stringPaint = Paint()
@@ -37,61 +29,156 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
 
 
     var rawScale = 1.0f
+        private set
+    var scaleFactor = 1.0f
+        private set
+
+    var framesModel by ObservableStatus(ImageFramesModel())
+        private set
+    var imagePlayModel by ObservableStatus(ImagePlayModel())
+        private set
+    var allowPlay = false
+        private set
+    var matrix by ObservableStatus(Matrix())
+        private set
+    var colorMatrix by ObservableStatus(ColorMatrix())
+        private set
+    var pseudoColor by ObservableStatus(false)
+        private set
 
     init {
-        reset()
-        getDelegate(this::scaleFactor)?.onChange {
-            val newMatrix = Matrix(matrix)
-            val scale = it.second / it.first
-            newMatrix.postScale(scale, scale)
-            matrix = newMatrix
+        reduce(this::framesModel) { state, event ->
+            when (event) {
+                is BindingEvent.ModelSelected -> {
+                    if (layoutPosition == 0) {
+                        event.patientSeriesModel.imageFramesModel
+                    } else {
+                        state
+                    }
+                }
+                else -> state
+            }
         }
-    }
 
-    fun reset() {
-        scaleFactor = 1.0f
-        currentIndex = 0
-        startOffset = 0
-        matrix = Matrix()
-        colorMatrix = ColorMatrix()
-        playing = false
-        pseudoColor = false
-        allowPlay = false
-        measure = Measure.NONE
-        linePaint = Paint()
-        stringPaint = Paint()
+        reduce(this::imagePlayModel, { framesModel.size > 0 }) { state, event ->
+            when (event) {
+                is BindingEvent.ModelSelected -> {
+                    if (layoutPosition == 0 && event.patientSeriesModel.imageFramesModel.size > 0) {
+                        ImagePlayModel().copy(currentIndex = 0)
+                    } else {
+                        state
+                    }
+                }
+                is ImageDisplayEvent.ChangePlayStatus -> {
+                    if (event.layoutPosition == layoutPosition && playable()) {
+                        state.copy(playing = !state.playing)
+                    } else {
+                        state
+                    }
+                }
+                is ImageDisplayEvent.PlayModeReset -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        ImagePlayModel()
+                    } else {
+                        state
+                    }
+                }
+                is ImageDisplayEvent.IndexChange -> {
+                    if (event.layoutPosition == layoutPosition && event.index >= 0 && event.index < framesModel.size) {
+                        state.copy(currentIndex = event.index)
+                    } else {
+                        state
+                    }
+                }
+                is ClickEvent.ReverseColor -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        state.copy(playing = false)
+                    } else {
+                        state
+                    }
+                }
+                is ClickEvent.PseudoColor -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        state.copy(playing = false)
+                    } else {
+                        state
+                    }
+                }
+                is ImageDisplayEvent.IndexScroll -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        val currentIndex = Math.min(Math.max(imagePlayModel.currentIndex - event.scroll, 0), framesModel.size - 1)
+                        state.copy(playing = false, currentIndex = currentIndex)
+                    } else {
+                        state
+                    }
+                }
+                else -> state
+            }
+        }
 
-        linePaint.color = Color.RED
-        linePaint.strokeWidth = 3f
-        linePaint.isAntiAlias = true
-        linePaint.strokeJoin = Paint.Join.ROUND
-        linePaint.style = Paint.Style.STROKE
-        stringPaint.strokeWidth = 1f
-        stringPaint.color = Color.RED
-        stringPaint.isLinearText = true
+        reduce(this::allowPlay, { layoutPosition == 0 && framesModel.size > 0 }) { state, event ->
+            when (event) {
+                is ClickEvent.ChangeLayout -> event.layoutOrdinal == 0
+                else -> state
+            }
+        }
 
-        pathList.clear()
-        textList.clear()
-        currentPath = Path()
-    }
+        reduce(this::matrix, { framesModel.size > 0 }) { state, event ->
+            when (event) {
+                is ImageDisplayEvent.ScaleChange -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        val matrix = Matrix(state)
+                        matrix.setScale(event.scaleFactor, event.scaleFactor)
+                        matrix
+                    } else {
+                        state
+                    }
+                }
+                else -> state
+            }
+        }
 
-    fun copyFrom(imageFramesStore: ImageFramesStore) {
-        scaleFactor = imageFramesStore.scaleFactor
-        startOffset = imageFramesStore.startOffset
-        matrix = imageFramesStore.matrix
-        colorMatrix = imageFramesStore.colorMatrix
-        pseudoColor = imageFramesStore.pseudoColor
-        measure = imageFramesStore.measure
-        linePaint = imageFramesStore.linePaint
-        stringPaint = imageFramesStore.stringPaint
+        reduce(this::colorMatrix, { framesModel.size > 0 }) { state, event ->
+            when (event) {
+                is ClickEvent.ReverseColor -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        val colorMatrix = ColorMatrix(state)
+                        colorMatrix.postConcat(reverseMatrix)
+                        colorMatrix
+                    } else {
+                        state
+                    }
+                }
+                is ImageDisplayEvent.PlayModeReset -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        ColorMatrix()
+                    } else {
+                        state
+                    }
+                }
+                else -> state
+            }
+        }
 
-        pathList.clear()
-        pathList.addAll(imageFramesStore.pathList)
-        textList.clear()
-        textList.addAll(imageFramesStore.textList)
-        currentPath = imageFramesStore.currentPath
-
-        currentIndex = imageFramesStore.currentIndex
+        reduce(this::pseudoColor, { framesModel.size > 0 }) { state, event ->
+            when (event) {
+                is ClickEvent.PseudoColor -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        !state
+                    } else {
+                        state
+                    }
+                }
+                is ImageDisplayEvent.PlayModeReset -> {
+                    if (event.layoutPosition == layoutPosition) {
+                        false
+                    } else {
+                        state
+                    }
+                }
+                else -> state
+            }
+        }
     }
 
     fun playable() = framesModel.size > 1 && allowPlay
@@ -115,13 +202,6 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
             }
         }
     }
-
-    fun reverseColor() {
-        val newColorMatrix = ColorMatrix(colorMatrix)
-        newColorMatrix.postConcat(reverseMatrix)
-        colorMatrix = newColorMatrix
-    }
-
 
     fun getFrame(index: Int): Bitmap {
         val rawBitmap = BitmapFactory.decodeFile(File(framesModel.frameUrls[index]).absolutePath,
@@ -150,25 +230,22 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
         }
     }
 
-    fun getAnimation(resources: Resources, duration: Int): IndexListenableAnimationDrawable {
-        startOffset = currentIndex
-        val animation = IndexListenableAnimationDrawable()
+    fun getAnimation(resources: Resources, duration: Int): IndexAwareAnimationDrawable {
+        val startOffset = imagePlayModel.currentIndex
+        val animation = IndexAwareAnimationDrawable(layoutPosition, startOffset)
         animation.isOneShot = true
         framesModel.frames.subList(startOffset, framesModel.size).forEachIndexed { index, _ ->
-            val bitmap = BitmapDrawable(resources, getFrame(currentIndex + index))
+            val bitmap = BitmapDrawable(resources, getFrame(startOffset + index))
             bitmap.colorFilter = ColorMatrixColorFilter(colorMatrix)
             animation.addFrame(bitmap, duration)
         }
         animation.selectDrawable(0)
         animation.callback = null
-        getDelegate(animation::currentIndex)?.onChange {
-            currentIndex = (startOffset + it.second) % framesModel.size
-        }
         return animation
     }
 
-    fun resetAnimation(imageView: ImageView): IndexListenableAnimationDrawable {
-        val animation = getAnimation(imageView.resources, duration)
+    fun resetAnimation(imageView: ImageView): IndexAwareAnimationDrawable {
+        val animation = getAnimation(imageView.resources, imagePlayModel.duration)
 
         imageView.clearAnimation()
         imageView.setImageBitmap(null)

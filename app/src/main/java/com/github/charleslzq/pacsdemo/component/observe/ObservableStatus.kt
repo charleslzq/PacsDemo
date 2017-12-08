@@ -42,7 +42,7 @@ class ObservableStatus<T>(
         }
 
         fun <T, P> getDelegate(kProperty1: KProperty1<T, P>, receiver: T): ObservableStatus<P>? {
-            val delegate = kProperty1.getDelegate(receiver)
+            val delegate = kProperty1.apply { isAccessible = true } .getDelegate(receiver)
             return if (delegate != null && delegate is ObservableStatus<*>) {
                 @Suppress("UNCHECKED_CAST")
                 delegate as ObservableStatus<P>

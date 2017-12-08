@@ -13,7 +13,7 @@ import com.github.charleslzq.pacsdemo.component.event.EventBus
 import com.github.charleslzq.pacsdemo.component.event.RequireRedrawCanvas
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
-import com.github.charleslzq.pacsdemo.support.IndexListenableAnimationDrawable
+import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -22,7 +22,7 @@ class DicomImage(
         imageView: ImageView,
         imageFramesStore: ImageFramesStore
 ) : Component<ImageView, ImageFramesStore>(imageView, imageFramesStore) {
-    var operationMode: OperationMode = PlayMode(view.context, NoOpCompositeGestureListener())
+    var operationMode: OperationMode = PlayMode(view.context, PlayModeGestureListener(store.layoutPosition))
         set(value) {
             field = value
             view.setOnTouchListener(operationMode)
@@ -33,18 +33,61 @@ class DicomImage(
         EventBus.onEvent<DragEventMessage.StartCopyCell> { onDragStart(it) }
         EventBus.onEvent<RequireRedrawCanvas> { redrawCanvas() }
 
-        onStateChange(store::framesModel) {
-            store.reset()
-            if (store.framesModel.size != 0) {
-                store.autoAdjustScale(view)
-                init()
-            } else {
-                view.clearAnimation()
-                view.background = null
+        bind(store::imagePlayModel) {
+            if (it.playing && view.background == null && store.playable()) {
                 view.setImageBitmap(null)
+                view.post(store.resetAnimation(view))
+            } else if (!it.playing) {
+                val background = view.background
+                if (background != null && background is IndexAwareAnimationDrawable) {
+                    background.stop()
+                    view.clearAnimation()
+                    view.background = null
+                }
+                if (indexValid()) {
+                    view.setImageBitmap(store.getScaledFrame(it.currentIndex))
+                }
+            }
+        }
+
+        bind(store::matrix) {
+            view.imageMatrix = store.matrix
+        }
+
+        bind(store::colorMatrix) {
+            view.colorFilter = ColorMatrixColorFilter(store.colorMatrix)
+        }
+
+        bind(store::pseudoColor) {
+            if (indexValid()) {
+                view.setImageBitmap(store.getScaledFrame(store.imagePlayModel.currentIndex))
+            }
+        }
+
+        bind(store::measure) {
+            store.currentPath = Path()
+            store.firstPath = true
+            operationMode = when (store.measure != ImageFramesStore.Measure.NONE && store.framesModel.frames.isNotEmpty()) {
+                true -> {
+                    MeasureMode(view.context, MeasureModeGestureListener(store, store.layoutPosition))
+                }
+                false -> {
+                    store.pathList.clear()
+                    store.textList.clear()
+                    if (store.scaleFactor > 1.0f) {
+                        StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, store, store.layoutPosition))
+                    } else {
+                        PlayMode(view.context, PlayModeGestureListener(store.layoutPosition))
+                    }
+                }
+            }
+            if (store.measure != ImageFramesStore.Measure.NONE && indexValid()) {
+                redrawCanvas()
             }
         }
     }
+
+    private fun indexValid() = store.imagePlayModel.currentIndex >= 0 && store.imagePlayModel.currentIndex < store.framesModel.size
 
     private fun onDragStart(dragCopyCellMessage: DragEventMessage.StartCopyCell) {
         if (dragCopyCellMessage.layoutPosition == store.layoutPosition) {
@@ -57,84 +100,19 @@ class DicomImage(
     }
 
     private fun init() {
-        operationMode = PlayMode(view.context, PlayModeGestureListener(store))
 
-        val firstImage = store.getScaledFrame(0)
-        view.clearAnimation()
-        view.background = null
-        view.setImageBitmap(firstImage)
 
-        onStateChange(store::measure) {
-            store.currentPath = Path()
-            store.firstPath = true
-            operationMode = when (store.measure != ImageFramesStore.Measure.NONE && store.framesModel.frames.isNotEmpty()) {
-                true -> {
-                    MeasureMode(view.context, MeasureModeGestureListener(store))
-                }
-                false -> {
-                    store.pathList.clear()
-                    store.textList.clear()
-                    if (store.scaleFactor > 1.0f) {
-                        StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, store))
-                    } else {
-                        PlayMode(view.context, PlayModeGestureListener(store))
-                    }
-                }
-            }
-            redrawCanvas()
-        }
-
-        onStateChange(store::colorMatrix) {
-            if (store.playing) {
-                store.playing = false
-            }
-            view.colorFilter = ColorMatrixColorFilter(store.colorMatrix)
-        }
-
-        onStateChange(store::currentIndex) {
-            if (!store.playing && store.framesModel.size > 0) {
-                view.clearAnimation()
-                view.background = null
-                view.setImageBitmap(store.getScaledFrame(store.currentIndex))
-            }
-        }
-        onStateChange(store::matrix) {
-            view.imageMatrix = store.matrix
-        }
-        onStateChange(store::scaleFactor) {
-            if (store.scaleFactor > 1 && operationMode is PlayMode) {
-                operationMode = StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, store))
-            } else if (store.scaleFactor == 1.0f && operationMode is StudyMode) {
-                operationMode = PlayMode(view.context, PlayModeGestureListener(store))
-            }
-        }
-        onStateChange(store::playing) {
-            when (store.playing) {
-                true -> view.post(store.resetAnimation(view))
-                false -> {
-                    if (view.background != null) {
-                        val animation = view.background as IndexListenableAnimationDrawable
-                        animation.stop()
-                        view.clearAnimation()
-                        view.background = null
-                    }
-                    view.setImageBitmap(store.getScaledFrame(store.currentIndex))
-                }
-            }
-        }
-        onStateChange(store::pseudoColor) {
-            if (store.playing) {
-                store.playing = false
-            } else {
-                view.setImageBitmap(store.getScaledFrame(store.currentIndex))
-            }
-        }
-
-        store.currentIndex = 0
+//        onStateChange(store::scaleFactor) {
+//            if (store.scaleFactor > 1 && operationMode is PlayMode) {
+//                operationMode = StudyMode(view.context, StudyModeGestureListener(view.layoutParams.width, view.layoutParams.height, store))
+//            } else if (store.scaleFactor == 1.0f && operationMode is StudyMode) {
+//                operationMode = PlayMode(view.context, PlayModeGestureListener(store))
+//            }
+//        }
     }
 
     private fun redrawCanvas() {
-        val bitmap = store.getScaledFrame(store.currentIndex)
+        val bitmap = store.getScaledFrame(store.imagePlayModel.currentIndex)
         canvas = Canvas(bitmap)
         view.setImageBitmap(bitmap)
 

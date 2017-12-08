@@ -22,7 +22,7 @@ object EventBus {
         val bus = PublishSubject.create<Any>()
         registry.put(name, bus)
         bus.subscribe { event ->
-            Log.d("EventBus", "$event.javaClass.name received")
+            Log.d("EventBus", "${event.javaClass.name} received")
             handlers.getOrDefault(name, mutableListOf()).forEach {
                 it(event)
             }

@@ -17,21 +17,33 @@ class PatientSeriesStore(
         private set
 
     init {
-        reduce(this::patientSeriesModel) {
-            when (it.second) {
-                is BindingEvent.ModelSelected -> if (imageFramesStore.layoutPosition == 0) (it.second as BindingEvent.ModelSelected).patientSeriesModel else it.first
+        reduce(this::patientSeriesModel) { state, event ->
+            when (event) {
+                is BindingEvent.ModelSelected -> {
+                    if (imageFramesStore.layoutPosition == 0) {
+                        event.patientSeriesModel
+                    } else {
+                        state
+                    }
+                }
                 is BindingEvent.SeriesListUpdated -> PatientSeriesModel()
-                else -> it.first
+                else -> state
             }
         }
 
-        reduce(this::selected) {
-            when (it.second) {
-                is ClickEvent.ImageCellClicked -> if ((it.second as ClickEvent.ImageCellClicked).layoutPosition == imageFramesStore.layoutPosition) !it.first else it.first
+        reduce(this::selected) { state, event ->
+            when (event) {
+                is ClickEvent.ImageCellClicked -> {
+                    if (event.layoutPosition == imageFramesStore.layoutPosition) {
+                        !state
+                    } else {
+                        state
+                    }
+                }
                 is BindingEvent.ModelSelected -> false
                 is BindingEvent.ModelDropped -> false
                 is BindingEvent.SeriesListUpdated -> false
-                else -> it.first
+                else -> state
             }
         }
     }

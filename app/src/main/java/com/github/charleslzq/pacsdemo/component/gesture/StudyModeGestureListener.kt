@@ -11,21 +11,22 @@ import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 class StudyModeGestureListener(
         val viewWidth: Int,
         val viewHeight: Int,
-        framesStore: ImageFramesStore
-) : ScaleCompositeGestureListener(framesStore) {
+        val framesStore: ImageFramesStore,
+        layoutPosition: Int
+) : ScaleCompositeGestureListener(layoutPosition) {
 
     override fun onDoubleTap(motionEvent: MotionEvent?): Boolean {
-        framesStore.scaleFactor = 1.0f
-        framesStore.matrix = Matrix()
-        framesStore.colorMatrix = ColorMatrix()
-        framesStore.pseudoColor = false
+//        framesStore.scaleFactor = 1.0f
+//        framesStore.matrix = Matrix()
+//        framesStore.colorMatrix = ColorMatrix()
+//        framesStore.pseudoColor = false
         return true
     }
 
     override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
         val newMatrix = Matrix(framesStore.matrix)
         newMatrix.postTranslate(distanceX, distanceY)
-        framesStore.matrix = newMatrix
+//        framesStore.matrix = newMatrix
         return true
     }
 }

@@ -4,41 +4,36 @@ import android.graphics.ColorMatrix
 import android.view.MotionEvent
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.event.EventBus
+import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 
 /**
  * Created by charleslzq on 17-11-27.
  */
 class PlayModeGestureListener(
-        framesStore: ImageFramesStore
-) : ScaleCompositeGestureListener(framesStore) {
+        layoutPosition: Int
+) : ScaleCompositeGestureListener(layoutPosition) {
 
     override fun onSingleTapConfirmed(motionEvent: MotionEvent): Boolean {
-        if (framesStore.playable()) {
-            framesStore.playing = !framesStore.playing
-        }
+        EventBus.post(ImageDisplayEvent.ChangePlayStatus(layoutPosition))
         return true
     }
 
     override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
         if (Math.abs(distanceX) > 3 * Math.abs(distanceY)) {
             val rawDistance = (distanceX / 10).toInt()
-            framesStore.currentIndex = Math.min(Math.max(framesStore.currentIndex - rawDistance, 0), framesStore.framesModel.size - 1)
+            EventBus.post(ImageDisplayEvent.IndexScroll(layoutPosition, rawDistance))
+//            framesStore.currentIndex = Math.min(Math.max(framesStore.currentIndex - rawDistance, 0), framesStore.framesModel.size - 1)
         }
         return true
     }
 
     override fun onLongPress(e: MotionEvent) {
-        EventBus.post(DragEventMessage.StartCopyCell(framesStore.layoutPosition))
+        EventBus.post(DragEventMessage.StartCopyCell(layoutPosition))
     }
 
     override fun onDoubleTap(motionEvent: MotionEvent?): Boolean {
-        if (framesStore.playable()) {
-            framesStore.playing = false
-        }
-        framesStore.colorMatrix = ColorMatrix()
-        framesStore.currentIndex = 0
-        framesStore.pseudoColor = false
+        EventBus.post(ImageDisplayEvent.PlayModeReset(layoutPosition))
         return true
     }
 }

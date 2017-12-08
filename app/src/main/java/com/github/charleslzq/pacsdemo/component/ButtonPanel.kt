@@ -46,11 +46,11 @@ class ButtonPanel(
         }
 
         reverseButton.setOnClickListener {
-            EventBus.post(ClickEvent.ReverseColor(getSelected()))
+            getSelected().forEach { EventBus.post(ClickEvent.ReverseColor(it)) }
         }
 
         pseudoButton.setOnClickListener {
-            EventBus.post(ClickEvent.PseudoColor(getSelected()))
+            getSelected().forEach { EventBus.post(ClickEvent.PseudoColor(it)) }
         }
 
         val fontAwesomeTypeface = TypefaceUtil.getTypeFace(view.context, TypefaceUtil.fontAwesome)
