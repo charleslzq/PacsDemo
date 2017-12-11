@@ -5,9 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.PacsMain
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
-import com.github.charleslzq.pacsdemo.component.event.EventBus
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesModel
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel

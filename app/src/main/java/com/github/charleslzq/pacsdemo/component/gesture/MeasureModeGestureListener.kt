@@ -3,7 +3,7 @@ package com.github.charleslzq.pacsdemo.component.gesture
 import android.graphics.PointF
 import android.view.MotionEvent
 import android.view.View
-import com.github.charleslzq.pacsdemo.component.event.EventBus
+import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 

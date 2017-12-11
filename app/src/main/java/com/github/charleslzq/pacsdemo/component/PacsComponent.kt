@@ -1,7 +1,7 @@
 package com.github.charleslzq.pacsdemo.component
 
 import android.view.View
-import com.github.charleslzq.pacsdemo.component.base.Component
+import com.github.charleslzq.kotlin.react.Component
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 
 /**

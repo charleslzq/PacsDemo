@@ -5,9 +5,9 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.PopupMenu
+import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.R
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
-import com.github.charleslzq.pacsdemo.component.event.EventBus
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.support.TypefaceUtil
 
@@ -62,7 +62,7 @@ class ButtonPanel(
         refreshButton.typeface = fontAwesomeTypeface
         backButton.typeface = fontAwesomeTypeface
 
-        refreshByProperty(PacsStore::layoutOption) {
+        render(PacsStore::layoutOption) {
             val visible = when (it == PacsStore.LayoutOption.ONE_ONE) {
                 true -> View.VISIBLE
                 false -> View.INVISIBLE

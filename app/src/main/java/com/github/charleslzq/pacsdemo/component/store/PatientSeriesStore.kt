@@ -1,16 +1,16 @@
 package com.github.charleslzq.pacsdemo.component.store
 
-import com.github.charleslzq.pacsdemo.component.base.WithReducer
+import com.github.charleslzq.kotlin.react.ObservableStatus
+import com.github.charleslzq.kotlin.react.WithReducer
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
-import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus
 
 /**
  * Created by charleslzq on 17-12-4.
  */
 class PatientSeriesStore(
         val imageFramesStore: ImageFramesStore
-) : WithReducer {
+) : WithReducer<PatientSeriesStore> {
     var patientSeriesModel by ObservableStatus(PatientSeriesModel())
         private set
     var selected by ObservableStatus(false)
@@ -19,7 +19,7 @@ class PatientSeriesStore(
         private set
 
     init {
-        reduce(this::patientSeriesModel) { state, event ->
+        reduce(PatientSeriesStore::patientSeriesModel) { state, event ->
             when (event) {
                 is BindingEvent.ModelSelected -> {
                     if (imageFramesStore.layoutPosition == 0) {
@@ -40,14 +40,17 @@ class PatientSeriesStore(
             }
         }
 
-        reduce(this::selectable) { state, event ->
+        reduce(PatientSeriesStore::selectable) { state, event ->
             when (event) {
                 is ClickEvent.ChangeLayout -> event.layoutOrdinal != 0
                 else -> state
             }
         }
 
-        reduce(this::selected, { selectable }) { state, event ->
+        reduce(
+                property = PatientSeriesStore::selected,
+                guard = { selectable }
+        ) { state, event ->
             when (event) {
                 is ClickEvent.ImageCellClicked -> {
                     if (event.layoutPosition == imageFramesStore.layoutPosition) {

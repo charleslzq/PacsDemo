@@ -6,9 +6,9 @@ import android.graphics.Canvas
 import android.graphics.ColorMatrixColorFilter
 import android.view.View
 import android.widget.ImageView
-import com.github.charleslzq.pacsdemo.component.base.Component
+import com.github.charleslzq.kotlin.react.Component
+import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
-import com.github.charleslzq.pacsdemo.component.event.EventBus
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
@@ -31,7 +31,7 @@ class DicomImage(
         EventBus.onEvent<DragEventMessage.StartCopyCell> { onDragStart(it) }
         view.setOnTouchListener(operationMode)
 
-        refreshByProperty(store::imagePlayModel) {
+        render(ImageFramesStore::imagePlayModel) {
             if (it.playing && view.background == null && store.playable()) {
                 view.setImageBitmap(null)
                 if (store.hasImage()) {
@@ -52,7 +52,7 @@ class DicomImage(
             }
         }
 
-        refreshByProperty(store::scaleFactor) {
+        render(ImageFramesStore::scaleFactor) {
             if (store.scaleFactor > 1 && operationMode is PlayMode) {
                 operationMode = StudyMode(view.context, StudyModeGestureListener(store.layoutPosition))
             } else if (store.scaleFactor == 1.0f && operationMode is StudyMode) {
@@ -60,19 +60,19 @@ class DicomImage(
             }
         }
 
-        refreshByProperty(store::matrix) {
+        render(ImageFramesStore::matrix) {
             view.imageMatrix = store.matrix
         }
 
-        refreshByProperty(store::colorMatrix) {
+        render(ImageFramesStore::colorMatrix) {
             view.colorFilter = ColorMatrixColorFilter(store.colorMatrix)
         }
 
-        refreshByProperty(store::pseudoColor, { store.hasImage() }) {
+        render(ImageFramesStore::pseudoColor, { store.hasImage() }) {
             view.setImageBitmap(store.getCurrentFrame())
         }
 
-        refreshByProperty(store::measure, { store.hasImage() }) {
+        render(ImageFramesStore::measure, { store.hasImage() }) {
             operationMode = when (store.measure != ImageFramesStore.Measure.NONE && store.hasImage()) {
                 true -> {
                     initCanvas()
@@ -89,7 +89,7 @@ class DicomImage(
             }
         }
 
-        refreshByProperty(store::currentPath, { store.hasImage() }) {
+        render(ImageFramesStore::currentPath, { store.hasImage() }) {
             if (store.measure != ImageFramesStore.Measure.NONE) {
                 initCanvas()
                 canvas.drawPath(it, store.linePaint)

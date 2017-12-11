@@ -1,14 +1,14 @@
 package com.github.charleslzq.pacsdemo.component.store
 
-import com.github.charleslzq.pacsdemo.component.base.WithReducer
+import com.github.charleslzq.kotlin.react.ObservableStatus
+import com.github.charleslzq.kotlin.react.WithReducer
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
-import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus
 
 /**
  * Created by charleslzq on 17-11-27.
  */
-class PacsStore : WithReducer {
+class PacsStore : WithReducer<PacsStore> {
     var seriesList by ObservableStatus(mutableListOf<PatientSeriesModel>())
         private set
     var selected: Int by ObservableStatus(-1)
@@ -18,14 +18,14 @@ class PacsStore : WithReducer {
     val imageCells: List<PatientSeriesStore> = (0..8).map { PatientSeriesStore(ImageFramesStore(it)) }
 
     init {
-        reduce(this::seriesList) { state, event ->
+        reduce(PacsStore::seriesList) { state, event ->
             when (event) {
                 is BindingEvent.SeriesListUpdated -> event.seriesList
                 else -> state
             }
         }
 
-        reduce(this::selected) { state, event ->
+        reduce(PacsStore::selected) { state, event ->
             when (event) {
                 is ClickEvent.ChangeLayout -> -1
                 is ClickEvent.ThumbListItemClicked -> if (layoutOption == LayoutOption.ONE_ONE) event.position else state
@@ -33,7 +33,7 @@ class PacsStore : WithReducer {
             }
         }
 
-        reduce(this::layoutOption) { state, event ->
+        reduce(PacsStore::layoutOption) { state, event ->
             when (event) {
                 is ClickEvent.ChangeLayout -> LayoutOption.values()[event.layoutOrdinal]
                 else -> state

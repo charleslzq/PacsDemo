@@ -6,9 +6,9 @@ import android.content.ClipDescription
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
-import com.github.charleslzq.pacsdemo.component.event.EventBus
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.support.DicomSeriesThumbListAdpater
 
@@ -22,7 +22,7 @@ class ThumbList(
 
     init {
         view.layoutManager = LinearLayoutManager(recyclerView.context)
-        refreshByProperty(store::seriesList) {
+        render(store::seriesList) {
             val adapter = view.adapter
             if (adapter != null && adapter is DicomSeriesThumbListAdpater) {
                 adapter.seriesModels.clear()
@@ -53,7 +53,7 @@ class ThumbList(
             }
         }
 
-        refreshByProperty(store::selected) {
+        render(store::selected) {
             (1..view.childCount).forEach { view.getChildAt(it - 1).isSelected = false }
             if (it >= 0 && it < view.childCount) {
                 view.getChildAt(it).isSelected = true

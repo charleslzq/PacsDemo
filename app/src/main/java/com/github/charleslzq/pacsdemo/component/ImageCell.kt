@@ -2,11 +2,11 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.view.DragEvent
 import android.view.View
+import com.github.charleslzq.kotlin.react.ComponentGroup
+import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.R
-import com.github.charleslzq.pacsdemo.component.base.ComponentGroup
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
-import com.github.charleslzq.pacsdemo.component.event.EventBus
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesStore
 
 /**
@@ -23,7 +23,7 @@ class ImageCell(
 )) {
 
     init {
-        refreshByProperty(PatientSeriesStore::selected) {
+        render(PatientSeriesStore::selected) {
             view.isSelected = store.selected
         }
 

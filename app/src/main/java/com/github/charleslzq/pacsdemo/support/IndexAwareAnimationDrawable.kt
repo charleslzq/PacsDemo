@@ -1,7 +1,7 @@
 package com.github.charleslzq.pacsdemo.support
 
 import android.graphics.drawable.AnimationDrawable
-import com.github.charleslzq.pacsdemo.component.event.EventBus
+import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 
 /**

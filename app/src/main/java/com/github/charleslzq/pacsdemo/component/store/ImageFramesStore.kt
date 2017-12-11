@@ -6,12 +6,12 @@ import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.dicom.data.DicomImageMetaInfo
-import com.github.charleslzq.pacsdemo.component.base.WithReducer
+import com.github.charleslzq.kotlin.react.ObservableStatus
+import com.github.charleslzq.kotlin.react.WithReducer
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageCellEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
-import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
 import java.io.File
 
@@ -19,7 +19,7 @@ import java.io.File
 /**
  * Created by charleslzq on 17-11-27.
  */
-class ImageFramesStore(val layoutPosition: Int) : WithReducer {
+class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> {
     var linePaint = Paint()
     var stringPaint = Paint()
     private var allowPlay = true
@@ -54,7 +54,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
         stringPaint.color = Color.RED
         stringPaint.isLinearText = true
 
-        reduce(this::imagePlayModel) { state, event ->
+        reduce(ImageFramesStore::imagePlayModel) { state, event ->
             when (event) {
                 is ClickEvent.ChangeLayout -> ImagePlayModel()
                 is BindingEvent.ModelSelected -> {
@@ -112,14 +112,20 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
             }
         }
 
-        reduce(this::allowPlay, { layoutPosition == 0 && hasImage() }) { state, event ->
+        reduce(
+                property = ImageFramesStore::allowPlay,
+                guard = { layoutPosition == 0 && hasImage() }
+        ) { state, event ->
             when (event) {
                 is ClickEvent.ChangeLayout -> event.layoutOrdinal == 0
                 else -> state
             }
         }
 
-        reduce(this::scaleFactor) { state, event ->
+        reduce(
+                property = ImageFramesStore::scaleFactor,
+                type = ImageCellEvent::class.java
+        ) { state, event ->
             when (event) {
                 is ImageDisplayEvent.ScaleChange -> {
                     if (event.layoutPosition == layoutPosition) {
@@ -139,7 +145,11 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
             }
         }
 
-        reduce(this::matrix, { hasImage() }) { state, event ->
+        reduce(
+                property = ImageFramesStore::matrix,
+                type = ImageCellEvent::class.java,
+                guard = { hasImage() }
+        ) { state, event ->
             when (event) {
                 is ImageDisplayEvent.ScaleChange -> {
                     if (event.layoutPosition == layoutPosition) {
@@ -162,7 +172,11 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
             }
         }
 
-        reduce(this::colorMatrix, { hasImage() }) { state, event ->
+        reduce(
+                property = ImageFramesStore::colorMatrix,
+                type = ImageCellEvent::class.java,
+                guard = { hasImage() }
+        ) { state, event ->
             when (event) {
                 is ClickEvent.ReverseColor -> {
                     if (event.layoutPosition == layoutPosition) {
@@ -184,7 +198,11 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
             }
         }
 
-        reduce(this::pseudoColor, { hasImage() }) { state, event ->
+        reduce(
+                property = ImageFramesStore::pseudoColor,
+                type = ImageCellEvent::class.java,
+                guard = { hasImage() }
+        ) { state, event ->
             when (event) {
                 is ClickEvent.PseudoColor -> {
                     if (event.layoutPosition == layoutPosition) {
@@ -204,14 +222,21 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
             }
         }
 
-        reduce(this::allowMeasure, { hasImage() }) { state, event ->
+        reduce(
+                property = ImageFramesStore::allowMeasure,
+                type = ClickEvent.ChangeLayout::class.java,
+                guard = { hasImage() }
+        ) { state, event ->
             when (event) {
                 is ClickEvent.ChangeLayout -> event.layoutOrdinal == 0
                 else -> state
             }
         }
 
-        reduce(this::measure, { layoutPosition == 0 && allowMeasure }) { state, event ->
+        reduce(
+                property = ImageFramesStore::measure,
+                guard = { layoutPosition == 0 && allowMeasure }
+        ) { state, event ->
             when (event) {
                 is ClickEvent.TurnToMeasureLine -> Measure.LINE
                 is ClickEvent.TurnToMeasureAngle -> Measure.ANGEL
@@ -220,7 +245,11 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
             }
         }
 
-        reduce(this::imageCanvasModel, { hasImage() }) { state, event ->
+        reduce(
+                property = ImageFramesStore::imageCanvasModel,
+                type = ImageCellEvent::class.java,
+                guard = { hasImage() }
+        ) { state, event ->
             when (event) {
                 is ImageDisplayEvent.AddPath -> {
                     if (event.layoutPosition == layoutPosition) {
@@ -250,7 +279,11 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
             }
         }
 
-        reduce(this::currentPath, { hasImage() }) { state, event ->
+        reduce(
+                property = ImageFramesStore::currentPath,
+                type = ImageCellEvent::class.java,
+                guard = { hasImage() })
+        { state, event ->
             when (event) {
                 is ImageDisplayEvent.AddPath -> {
                     if (event.layoutPosition == layoutPosition) {

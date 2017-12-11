@@ -2,8 +2,8 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.view.View
 import android.widget.TextView
+import com.github.charleslzq.kotlin.react.Component
 import com.github.charleslzq.pacsdemo.R
-import com.github.charleslzq.pacsdemo.component.base.Component
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesStore
 
 /**
@@ -17,7 +17,7 @@ class ImageLeftBottomPanel(
     private val timeInfo: TextView = view.findViewById(R.id.time)
 
     init {
-        refreshByProperties(store.imageFramesStore::imagePlayModel) {
+        render(store.imageFramesStore::imagePlayModel) {
             xRayInfo.visibility = View.INVISIBLE
             timeInfo.visibility = View.INVISIBLE
 
@@ -31,7 +31,7 @@ class ImageLeftBottomPanel(
             }
         }
 
-        refreshByProperty(store::patientSeriesModel) {
+        render(store::patientSeriesModel) {
             val seriesDate = it.dicomSeriesMetaInfo.date ?: "unknown"
             val seriesTime = it.dicomSeriesMetaInfo.time ?: "unknown"
             timeInfo.post { timeInfo.text = "$seriesDate $seriesTime" }

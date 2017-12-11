@@ -3,8 +3,8 @@ package com.github.charleslzq.pacsdemo.component
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.github.charleslzq.kotlin.react.Component
 import com.github.charleslzq.pacsdemo.R
-import com.github.charleslzq.pacsdemo.component.base.Component
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesStore
 
 /**
@@ -20,7 +20,7 @@ class ImageLeftTopPanel(
     private val imageProgress: TextView = view.findViewById(R.id.imageProgress)
 
     init {
-        refreshByProperties(store.imageFramesStore::imagePlayModel) {
+        render(store.imageFramesStore::imagePlayModel) {
             windowInfo.visibility = View.INVISIBLE
             sliceInfo.visibility = View.INVISIBLE
             scaleInfo.visibility = View.INVISIBLE

@@ -2,8 +2,8 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.view.View
 import android.widget.TextView
+import com.github.charleslzq.kotlin.react.Component
 import com.github.charleslzq.pacsdemo.R
-import com.github.charleslzq.pacsdemo.component.base.Component
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesStore
 
 /**
@@ -20,7 +20,7 @@ class ImageRightTopPanel(
     private val description: TextView = view.findViewById(R.id.description)
 
     init {
-        refreshByProperty(store::patientSeriesModel) {
+        render(store::patientSeriesModel) {
             if (store.imageFramesStore.hasImage()) {
                 val name = store.patientSeriesModel.patientMetaInfo.name ?: "UNKNOWN"
                 val id = store.patientSeriesModel.patientMetaInfo.id ?: "UNKNOWN"

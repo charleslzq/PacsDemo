@@ -2,9 +2,9 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.view.View
 import android.widget.*
+import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
-import com.github.charleslzq.pacsdemo.component.event.EventBus
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
 import com.github.charleslzq.pacsdemo.support.ViewUtils
@@ -36,9 +36,9 @@ class ViewSelector(
             }
         }
 
-        refreshByProperty(store::layoutOption) {
+        render(store::layoutOption) {
             view.displayedChild = store.layoutOption.ordinal
-            reInit()
+            reRenderChildren()
         }
     }
 
