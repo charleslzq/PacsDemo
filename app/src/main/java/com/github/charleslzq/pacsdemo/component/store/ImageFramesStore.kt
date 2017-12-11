@@ -9,6 +9,7 @@ import com.github.charleslzq.dicom.data.DicomImageMetaInfo
 import com.github.charleslzq.pacsdemo.component.base.WithReducer
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
+import com.github.charleslzq.pacsdemo.component.event.ImageCellEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.component.observe.ObservableStatus
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
@@ -57,7 +58,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
             when (event) {
                 is ClickEvent.ChangeLayout -> ImagePlayModel()
                 is BindingEvent.ModelSelected -> {
-                    if (layoutPosition == 0 && event.patientSeriesModel.imageFramesModel.size > 0) {
+                    if (layoutPosition == 0) {
                         ImagePlayModel(frameMetas = event.patientSeriesModel.imageFramesModel.frames)
                     } else {
                         state
@@ -92,15 +93,8 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
                         state
                     }
                 }
-                is ClickEvent.ReverseColor -> {
-                    if (event.layoutPosition == layoutPosition) {
-                        state.copy(playing = false)
-                    } else {
-                        state
-                    }
-                }
-                is ClickEvent.PseudoColor -> {
-                    if (event.layoutPosition == layoutPosition) {
+                is ClickEvent.ReverseColor, is ClickEvent.PseudoColor -> {
+                    if ((event as ImageCellEvent).layoutPosition == layoutPosition) {
                         state.copy(playing = false)
                     } else {
                         state
@@ -179,15 +173,8 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
                         state
                     }
                 }
-                is ImageDisplayEvent.PlayModeReset -> {
-                    if (event.layoutPosition == layoutPosition) {
-                        ColorMatrix()
-                    } else {
-                        state
-                    }
-                }
-                is ImageDisplayEvent.StudyModeReset -> {
-                    if (event.layoutPosition == layoutPosition) {
+                is ImageDisplayEvent.PlayModeReset, is ImageDisplayEvent.StudyModeReset -> {
+                    if ((event as ImageCellEvent).layoutPosition == layoutPosition) {
                         ColorMatrix()
                     } else {
                         state
@@ -206,15 +193,8 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer {
                         state
                     }
                 }
-                is ImageDisplayEvent.PlayModeReset -> {
-                    if (event.layoutPosition == layoutPosition) {
-                        false
-                    } else {
-                        state
-                    }
-                }
-                is ImageDisplayEvent.StudyModeReset -> {
-                    if (event.layoutPosition == layoutPosition) {
+                is ImageDisplayEvent.PlayModeReset, is ImageDisplayEvent.StudyModeReset -> {
+                    if ((event as ImageCellEvent).layoutPosition == layoutPosition) {
                         false
                     } else {
                         state

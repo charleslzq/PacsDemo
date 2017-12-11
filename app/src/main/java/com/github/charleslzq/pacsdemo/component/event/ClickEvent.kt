@@ -7,8 +7,8 @@ class ClickEvent {
     data class ChangeLayout(val layoutOrdinal: Int) : Event
     class TurnToMeasureLine : Event
     class TurnToMeasureAngle : Event
-    data class ReverseColor(val layoutPosition: Int) : Event
-    data class PseudoColor(val layoutPosition: Int) : Event
-    data class ImageCellClicked(val layoutPosition: Int) : Event
-    data class ThumbListItemClicked(val position: Int) : Event
+    class ReverseColor(layoutPosition: Int) : ImageCellEvent(layoutPosition)
+    class PseudoColor(layoutPosition: Int) : ImageCellEvent(layoutPosition)
+    class ImageCellClicked(layoutPosition: Int) : ImageCellEvent(layoutPosition)
+    class ThumbListItemClicked(val position: Int) : Event
 }

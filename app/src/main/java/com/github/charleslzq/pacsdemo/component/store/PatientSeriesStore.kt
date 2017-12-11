@@ -56,9 +56,7 @@ class PatientSeriesStore(
                         state
                     }
                 }
-                is BindingEvent.ModelSelected -> false
-                is BindingEvent.ModelDropped -> false
-                is BindingEvent.SeriesListUpdated -> false
+                is BindingEvent.ModelSelected, is BindingEvent.ModelDropped, is BindingEvent.SeriesListUpdated -> false
                 else -> state
             }
         }

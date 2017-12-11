@@ -6,14 +6,14 @@ import android.graphics.PointF
  * Created by charleslzq on 17-12-8.
  */
 class ImageDisplayEvent {
-    data class ScaleChange(val layoutPosition: Int, val scaleFactor: Float) : Event
-    data class ChangePlayStatus(val layoutPosition: Int) : Event
-    data class PlayModeReset(val layoutPosition: Int) : Event
-    data class IndexChange(val layoutPosition: Int, val index: Int) : Event
-    data class IndexScroll(val layoutPosition: Int, val scroll: Int) : Event
-    data class LocationTranslate(val layoutPosition: Int, val distanceX: Float, val distanceY: Float) : Event
-    data class StudyModeReset(val layoutPosition: Int) : Event
-    data class DrawPath(val layoutPosition: Int, val points: List<PointF>) : Event
-    data class AddPath(val layoutPosition: Int, val points: List<PointF>, val text: Pair<PointF, String>) : Event
-    data class MeasureModeReset(val layoutPosition: Int) : Event
+    class ScaleChange(layoutPosition: Int, val scaleFactor: Float) : ImageCellEvent(layoutPosition)
+    class ChangePlayStatus(layoutPosition: Int) : ImageCellEvent(layoutPosition)
+    class PlayModeReset(layoutPosition: Int) : ImageCellEvent(layoutPosition)
+    class IndexChange(layoutPosition: Int, val index: Int) : ImageCellEvent(layoutPosition)
+    class IndexScroll(layoutPosition: Int, val scroll: Int) : ImageCellEvent(layoutPosition)
+    class LocationTranslate(layoutPosition: Int, val distanceX: Float, val distanceY: Float) : ImageCellEvent(layoutPosition)
+    class StudyModeReset(layoutPosition: Int) : ImageCellEvent(layoutPosition)
+    class DrawPath(layoutPosition: Int, val points: List<PointF>) : ImageCellEvent(layoutPosition)
+    class AddPath(layoutPosition: Int, val points: List<PointF>, val text: Pair<PointF, String>) : ImageCellEvent(layoutPosition)
+    class MeasureModeReset(layoutPosition: Int) : ImageCellEvent(layoutPosition)
 }
