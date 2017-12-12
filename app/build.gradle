@@ -32,19 +32,19 @@ dependencies {
     implementation 'com.android.support:percent:26.1.0'
     implementation 'com.android.support:recyclerview-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:multidex:1.0.2'
+    implementation 'com.android.support:multidex:1.0.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    compile 'com.google.code.gson:gson:2.8.2'
-    compile 'com.koushikdutta.async:androidasync:2.2.1'
-    compile('com.github.charleslzq:dicom-tools:1.0.6-RC4:jar-with-dependencies@jar') {
+    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'com.koushikdutta.async:androidasync:2.2.1'
+    implementation('com.github.charleslzq:dicom-tools:1.0.6-RC4:jar-with-dependencies@jar') {
         exclude group: 'org.dcm4che.tool', module: 'dcm4che-tool-dcm2jpg'
     }
-    compile 'com.fatboyindustrial.gson-jodatime-serialisers:gson-jodatime-serialisers:1.6.0'
-    compile 'jp.wasabeef:recyclerview-animators:2.2.3'
-    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'io.reactivex.rxjava2:rxjava:2.1.7'
-    compile 'com.github.charleslzq:kotlin-react:1.0.1'
+    implementation 'com.fatboyindustrial.gson-jodatime-serialisers:gson-jodatime-serialisers:1.6.0'
+    implementation 'jp.wasabeef:recyclerview-animators:2.2.3'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
+    implementation 'com.github.charleslzq:kotlin-react:1.0.1'
 
 }
