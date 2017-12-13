@@ -8,6 +8,7 @@ import android.util.Log
 import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.PacsMain
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
+import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesModel
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
@@ -18,21 +19,29 @@ import kotlinx.android.synthetic.main.layout_pacs_demo.*
 
 class PacsDemoActivity : AppCompatActivity() {
 
-    private val serviceConnection = SimpleServiceConnection<DicomDataService>(this::dicomDataService::set)
+    private val serviceConnection = SimpleServiceConnection<DicomDataService>(this::dicomDataService::set, this::refresh)
     private var dicomDataService: DicomDataService? = null
-    private val patientList = listOf("03117795").toMutableList()
     private var patientId = "03117795"
+    private var studyId = "1.2.840.113619.186.388521824370.20111208084338939.716"
+    private var seriesId = "1.3.12.2.1107.5.1.4.54473.30000011120623540295300033580"
+    private var imageNum = "62"
     private lateinit var pacs: PacsMain
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_pacs_demo)
-        Log.d("PacsDemoActivity", "onCreate execute")
+        Log.d("PacsActivity", "onCreate execute")
+
+        patientId =  intent.getStringExtra(PATIENT_ID) ?: this.patientId
+        studyId = intent.getStringExtra(STUDY_ID) ?: this.studyId
+        seriesId = intent.getStringExtra(SERIES_ID) ?: this.seriesId
+        imageNum = intent.getStringExtra(IMAGE_NUM) ?: this.imageNum
 
         pacs = PacsMain(pacsPanel, PacsStore())
-        bindService(Intent(this, DicomDataServiceBackgroud::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
         refreshButton.setOnClickListener { refresh() }
         backButton.setOnClickListener { this.finish() }
+
+        bindService(Intent(this, DicomDataServiceBackgroud::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
     override fun onDestroy() {
@@ -41,7 +50,7 @@ class PacsDemoActivity : AppCompatActivity() {
     }
 
     private fun refresh() {
-        val patient = dicomDataService?.findPatient(patientId)
+        val patient = dicomDataService!!.findPatient(patientId)
         if (patient != null) {
             EventBus.post(BindingEvent.SeriesListUpdated(
                     patient.studies.flatMap { study ->
@@ -55,6 +64,21 @@ class PacsDemoActivity : AppCompatActivity() {
                         }
                     }.toMutableList()
             ))
+            pacs.store.seriesList.forEachIndexed { index, it ->
+                if (it.dicomSeriesMetaInfo.instanceUID == seriesId && it.studyMetaInfo.instanceUID == studyId) {
+                    if (imageNum.toInt() in (1..it.imageFramesModel.size)) {
+                        EventBus.post(BindingEvent.ModelSelected(it))
+                        EventBus.post(ImageDisplayEvent.IndexChange(0, imageNum.toInt()-1))
+                    }
+                }
+            }
         }
+    }
+
+    companion object {
+        val PATIENT_ID = "patientId"
+        val STUDY_ID = "studyId"
+        val SERIES_ID = "seriesId"
+        val IMAGE_NUM = "imageNum"
     }
 }
