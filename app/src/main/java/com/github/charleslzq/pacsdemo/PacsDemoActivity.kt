@@ -32,6 +32,12 @@ class PacsDemoActivity : AppCompatActivity() {
         pacs = PacsMain(pacsPanel, PacsStore())
         bindService(Intent(this, DicomDataServiceBackgroud::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
         refreshButton.setOnClickListener { refresh() }
+        backButton.setOnClickListener { this.finish() }
+    }
+
+    override fun onDestroy() {
+        unbindService(serviceConnection)
+        super.onDestroy()
     }
 
     private fun refresh() {
