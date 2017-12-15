@@ -26,8 +26,7 @@ class DicomWebsocketClient(
     private val heartBeat = "@heart"
 
     fun init() {
-        val webSocketFuture = AsyncHttpClient.getDefaultInstance().websocket(url, "dicom", this::onComplete)
-        webSocket = webSocketFuture.get()
+        AsyncHttpClient.getDefaultInstance().websocket(url, "dicom", this::onComplete)
     }
 
     fun isOpen(): Boolean {
@@ -43,6 +42,7 @@ class DicomWebsocketClient(
         when (ex) {
             null -> {
                 webSocket.setStringCallback { onMessage(it) }
+                this.webSocket = webSocket
             }
             else -> {
                 Log.e(logTag, "Error when connecting $url", ex)
