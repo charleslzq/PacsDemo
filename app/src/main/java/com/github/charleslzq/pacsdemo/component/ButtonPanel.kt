@@ -23,7 +23,6 @@ class ButtonPanel(
     private val pseudoButton: Button = view.findViewById(R.id.pseudoColorButton)
     private val reverseButton: Button = view.findViewById(R.id.reverseButton)
     private val splitButton: Button = view.findViewById(R.id.spliteButton)
-    private val refreshButton: Button = view.findViewById(R.id.refreshButton)
     private val backButton: Button = view.findViewById(R.id.backButton)
     private val layoutSelector: PopupMenu = PopupMenu(buttonPanel.context, splitButton)
 
@@ -59,7 +58,6 @@ class ButtonPanel(
         pseudoButton.typeface = fontAwesomeTypeface
         reverseButton.typeface = fontAwesomeTypeface
         splitButton.typeface = fontAwesomeTypeface
-        refreshButton.typeface = fontAwesomeTypeface
         backButton.typeface = fontAwesomeTypeface
 
         render(PacsStore::layoutOption) {

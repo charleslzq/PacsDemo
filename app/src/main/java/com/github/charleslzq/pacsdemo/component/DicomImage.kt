@@ -68,11 +68,11 @@ class DicomImage(
             view.colorFilter = ColorMatrixColorFilter(store.colorMatrix)
         }
 
-        render(property =  ImageFramesStore::pseudoColor, guard =  { store.hasImage() }) {
+        render(property = ImageFramesStore::pseudoColor, guard = { store.hasImage() }) {
             view.setImageBitmap(store.getCurrentFrame())
         }
 
-        render(property =  ImageFramesStore::measure, guard =  { store.hasImage() }) {
+        render(property = ImageFramesStore::measure, guard = { store.hasImage() }) {
             operationMode = when (store.measure != ImageFramesStore.Measure.NONE && store.hasImage()) {
                 true -> {
                     initCanvas()

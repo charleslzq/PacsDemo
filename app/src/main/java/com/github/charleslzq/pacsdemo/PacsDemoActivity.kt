@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import com.github.charleslzq.dicom.data.DicomStudy
 import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.PacsMain
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
@@ -15,11 +16,15 @@ import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
 import com.github.charleslzq.pacsdemo.support.SimpleServiceConnection
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_pacs_demo.*
 
 class PacsDemoActivity : AppCompatActivity() {
 
-    private val serviceConnection = SimpleServiceConnection<DicomDataService>(this::dicomDataService::set, this::refresh)
+    private val serviceConnection = SimpleServiceConnection<DicomDataService>(this::dicomDataService::set, {
+        load(patientId, studyId, seriesId, imageNum)
+    })
     private var dicomDataService: DicomDataService? = null
     private var patientId = "03117795"
     private var studyId = "1.2.840.113619.186.388521824370.20111208084338939.716"
@@ -32,13 +37,12 @@ class PacsDemoActivity : AppCompatActivity() {
         setContentView(R.layout.layout_pacs_demo)
         Log.d("PacsActivity", "onCreate execute")
 
-        patientId =  intent.getStringExtra(PATIENT_ID) ?: this.patientId
+        patientId = intent.getStringExtra(PATIENT_ID) ?: this.patientId
         studyId = intent.getStringExtra(STUDY_ID) ?: this.studyId
         seriesId = intent.getStringExtra(SERIES_ID) ?: this.seriesId
         imageNum = intent.getStringExtra(IMAGE_NUM) ?: this.imageNum
 
         pacs = PacsMain(pacsPanel, PacsStore())
-        refreshButton.setOnClickListener { refresh() }
         backButton.setOnClickListener { this.finish() }
 
         bindService(Intent(this, DicomDataServiceBackgroud::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
@@ -49,11 +53,18 @@ class PacsDemoActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun refresh() {
-        val patient = dicomDataService!!.findPatient(patientId)
-        if (patient != null) {
-            EventBus.post(BindingEvent.SeriesListUpdated(
-                    patient.studies.flatMap { study ->
+    private fun load(patientId: String, studyId: String?, seriesId: String?, imageNum: String?) {
+        Observable.create<MutableList<PatientSeriesModel>> {
+            val patient = dicomDataService?.findPatient(patientId)
+            it.onNext(when (patient == null) {
+                true -> mutableListOf()
+                false -> {
+                    val filter: (DicomStudy) -> Boolean = if (studyId == null) {
+                        { true }
+                    } else {
+                        { it.metaInfo.instanceUID == studyId }
+                    }
+                    patient!!.studies.filter(filter).flatMap { study ->
                         study.series.sortedBy { it.metaInfo.instanceUID }.map {
                             PatientSeriesModel(
                                     patient.metaInfo,
@@ -63,16 +74,21 @@ class PacsDemoActivity : AppCompatActivity() {
                             )
                         }
                     }.toMutableList()
-            ))
-            pacs.store.seriesList.forEachIndexed { index, it ->
-                if (it.dicomSeriesMetaInfo.instanceUID == seriesId && it.studyMetaInfo.instanceUID == studyId) {
-                    if (imageNum.toInt() in (1..it.imageFramesModel.size)) {
-                        EventBus.post(BindingEvent.ModelSelected(it))
-                        EventBus.post(ImageDisplayEvent.IndexChange(0, imageNum.toInt()-1))
+                }
+            })
+        }.subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe {
+                    EventBus.post(BindingEvent.SeriesListUpdated(it))
+                    if (seriesId != null) {
+                        it.find { it.dicomSeriesMetaInfo.instanceUID == seriesId }?.let {
+                            EventBus.post(BindingEvent.ModelSelected(it))
+                            if (imageNum != null && imageNum.toInt() in (1..it.imageFramesModel.size)) {
+                                EventBus.post(ImageDisplayEvent.IndexChange(0, imageNum.toInt() - 1))
+                            }
+                        }
                     }
                 }
-            }
-        }
     }
 
     companion object {

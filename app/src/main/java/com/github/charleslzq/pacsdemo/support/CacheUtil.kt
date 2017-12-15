@@ -23,7 +23,7 @@ object CacheUtil {
             storageType: Class<T>,
             vararg args: String,
             keyGenerator: (Array<String>) -> String = { it.joinToString("#") },
-            onMiss: (Array<String>) -> T?) : T? {
+            onMiss: (Array<String>) -> T?): T? {
         val key = CacheKey(cacheName, storageType)
         if (!registry.containsKey(key)) {
             throw IllegalStateException("Cache for $cacheName, $storageType is not configured")
