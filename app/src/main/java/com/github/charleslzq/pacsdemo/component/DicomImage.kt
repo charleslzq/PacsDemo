@@ -104,7 +104,7 @@ class DicomImage(
         render(property = ImageFramesStore::measure, guard = { store.hasImage() }) {
             operationMode = when (store.measure != ImageFramesStore.Measure.NONE && store.hasImage()) {
                 true -> {
-                    createDraingCache()
+                    createDrawingCache()
                     initCanvas()
                     MeasureMode(view.context, MeasureModeGestureListener(store))
                 }
@@ -121,7 +121,7 @@ class DicomImage(
         }
 
         render(property = ImageFramesStore::imageCanvasModel, guard = { store.hasImage() }) {
-            createDraingCache()
+            createDrawingCache()
             store.imageCanvasModel.paths.forEach {
                 drawingCanvas?.drawPath(it, store.linePaint)
             }
@@ -157,7 +157,7 @@ class DicomImage(
         view.setImageBitmap(bitmap)
     }
 
-    private fun createDraingCache() {
+    private fun createDrawingCache() {
         store.getCurrentFrame()?.let {
             drawingCache = Bitmap.createBitmap(it.width, it.height, Bitmap.Config.ARGB_8888)
             drawingCanvas = Canvas(drawingCache)

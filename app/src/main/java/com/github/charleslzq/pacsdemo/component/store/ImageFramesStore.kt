@@ -181,7 +181,6 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
                 Path()
             }
             on<ImageDisplayEvent.DrawPath>(precondition = { targetAtThis(it) }) {
-                currentPath.reset()
                 Path().apply {
                     moveTo(event.points[0].x, event.points[0].y)
                     (1..(event.points.size - 1)).forEach {
