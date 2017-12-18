@@ -110,9 +110,15 @@ class DicomImage(
             }
         }
 
+        render(property =  ImageFramesStore::imageCanvasModel, guard = { store.hasImage() }) {
+            initCanvas()
+        }
+
         render(property = ImageFramesStore::currentPath, guard = { store.hasImage() }) {
             if (store.measure != ImageFramesStore.Measure.NONE) {
-                initCanvas()
+//                initCanvas()
+                canvas.restore()
+                canvas.save()
                 canvas.drawPath(it, store.linePaint)
                 view.invalidate()
             }
@@ -141,6 +147,8 @@ class DicomImage(
         store.imageCanvasModel.texts.forEach {
             canvas.drawText(it.value, it.key.x, it.key.y, store.stringPaint)
         }
+
+        canvas.save()
     }
 
     companion object {

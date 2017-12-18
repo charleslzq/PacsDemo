@@ -19,8 +19,7 @@ class PlayModeGestureListener(
 
     override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
         if (Math.abs(distanceX) > 3 * Math.abs(distanceY)) {
-            val rawDistance = (distanceX / 10).toInt()
-            EventBus.post(ImageDisplayEvent.IndexScroll(layoutPosition, rawDistance))
+            EventBus.post(ImageDisplayEvent.IndexScroll(layoutPosition, distanceX))
         }
         return true
     }
