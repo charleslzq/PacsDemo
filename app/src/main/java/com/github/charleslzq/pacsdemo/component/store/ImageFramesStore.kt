@@ -24,6 +24,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
     var stringPaint = Paint()
     private var allowPlay = true
     private var allowMeasure = true
+    private var imageWidth = 500
 
     var imageFramesModel by ObservableStatus(ImageFramesModel())
         private set
@@ -86,7 +87,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
                 state.copy(playing = false)
             }
             on<ImageDisplayEvent.IndexScroll>(precondition = { targetAtThis(it) }) {
-                val offset = (event.scroll * imageFramesModel.size.toFloat() / 500).toInt()
+                val offset = (event.scroll * imageFramesModel.size.toFloat() * 2 / imageWidth).toInt()
                 val currentIndex = Math.min(Math.max(imagePlayModel.currentIndex - offset, 0), imageFramesModel.size - 1)
                 state.copy(playing = false, currentIndex = currentIndex)
             }
@@ -211,9 +212,11 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
             val desiredWidth = Math.ceil((viewHeight * ratio).toDouble()).toInt()
             rawScale = if (desiredWidth <= viewWidth) {
                 view.layoutParams.width = desiredWidth
+                this.imageWidth = desiredWidth
                 desiredWidth.toFloat() / imageWidth
             } else {
                 val desiredHeight = Math.ceil((viewWidth / ratio).toDouble()).toInt()
+                this.imageWidth = viewWidth
                 view.layoutParams.height = desiredHeight
                 desiredHeight.toFloat() / imageHeight
             }
