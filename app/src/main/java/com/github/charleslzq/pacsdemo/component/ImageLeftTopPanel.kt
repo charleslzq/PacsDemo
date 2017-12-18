@@ -20,7 +20,7 @@ class ImageLeftTopPanel(
     private val imageProgress: TextView = view.findViewById(R.id.imageProgress)
 
     init {
-        render(store.imageFramesStore::imagePlayModel) {
+        renderByAll(store.imageFramesStore::imagePlayModel, store.imageFramesStore::imageFramesModel) {
             windowInfo.visibility = View.INVISIBLE
             sliceInfo.visibility = View.INVISIBLE
             scaleInfo.visibility = View.INVISIBLE

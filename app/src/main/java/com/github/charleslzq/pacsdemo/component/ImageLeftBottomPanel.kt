@@ -17,7 +17,7 @@ class ImageLeftBottomPanel(
     private val timeInfo: TextView = view.findViewById(R.id.time)
 
     init {
-        render(store.imageFramesStore::imagePlayModel) {
+        renderByAll(store.imageFramesStore::imagePlayModel, store.imageFramesStore::imageFramesModel) {
             xRayInfo.visibility = View.INVISIBLE
             timeInfo.visibility = View.INVISIBLE
 
