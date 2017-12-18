@@ -63,6 +63,8 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
             on<BindingEvent.ModelDropped>(precondition = { it.layoutPosition == layoutPosition }) {
                 event.patientSeriesModel.imageFramesModel
             }
+            on<BindingEvent.SeriesListUpdated> { ImageFramesModel() }
+            on<ClickEvent.ChangeLayout> { ImageFramesModel() }
         }
 
 
