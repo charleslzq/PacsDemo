@@ -30,10 +30,10 @@ class PacsDemoActivity : AppCompatActivity() {
         load(patientId, studyId, seriesId, imageNum)
     })
     private var dicomDataService: DicomDataService? = null
-    private var patientId = "03117795"
-    private var studyId = "1.2.840.113619.186.388521824370.20111208084338939.716"
-    private var seriesId = "1.3.12.2.1107.5.1.4.54473.30000011120623540295300033580"
-    private var imageNum = "62"
+    private val patientId = "03117795"
+    private val studyId = "1.2.840.113619.186.388521824370.20111208084338939.716"
+    private val seriesId = "1.3.12.2.1107.5.1.4.54473.30000011120623540295300033580"
+    private val imageNum = "62"
     private lateinit var pacs: PacsMain
 
     override fun onCreate(savedInstanceState: Bundle?) {
