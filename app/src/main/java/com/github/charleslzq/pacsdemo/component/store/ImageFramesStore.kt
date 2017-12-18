@@ -24,7 +24,6 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
     var stringPaint = Paint()
     private var allowPlay = true
     private var allowMeasure = true
-    private var flingSensitive = 1f
 
     var imageFramesModel by ObservableStatus(ImageFramesModel())
         private set
@@ -68,15 +67,6 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
             on<ClickEvent.ChangeLayout> { ImageFramesModel() }
         }
 
-        reduce(ImageFramesStore::flingSensitive) {
-            on<BindingEvent.ModelSelected>(precondition = { layoutPosition == 0 && it.patientSeriesModel.imageFramesModel.size > 0 }) {
-                event.patientSeriesModel.imageFramesModel.size.toFloat() / 500
-            }
-            on<BindingEvent.ModelDropped>(precondition = { it.layoutPosition == layoutPosition && it.patientSeriesModel.imageFramesModel.size > 0 }) {
-                event.patientSeriesModel.imageFramesModel.size.toFloat() / 500
-            }
-        }
-
         reduce(ImageFramesStore::imagePlayModel) {
             on<ClickEvent.ChangeLayout> { ImagePlayModel() }
             on<BindingEvent.SeriesListUpdated> { ImagePlayModel() }
@@ -96,7 +86,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
                 state.copy(playing = false)
             }
             on<ImageDisplayEvent.IndexScroll>(precondition = { targetAtThis(it) }) {
-                val offset = (event.scroll * flingSensitive).toInt()
+                val offset = (event.scroll * imageFramesModel.size.toFloat() / 500).toInt()
                 val currentIndex = Math.min(Math.max(imagePlayModel.currentIndex - offset, 0), imageFramesModel.size - 1)
                 state.copy(playing = false, currentIndex = currentIndex)
             }
