@@ -86,7 +86,7 @@ class PacsDemoActivity : AppCompatActivity() {
                                 EventBus.post(ImageDisplayEvent.IndexChange(0, imageNum.toInt() - 1))
                             }
                         }
-                    } else if (it.isNotEmpty()){
+                    } else if (it.isNotEmpty()) {
                         EventBus.post(BindingEvent.ModelSelected(it[0]))
                     }
                 }
