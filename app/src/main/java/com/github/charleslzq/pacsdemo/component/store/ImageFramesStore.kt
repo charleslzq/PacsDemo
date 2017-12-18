@@ -260,8 +260,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         return if (rawScale != 1.0f) {
             val newWidth = (rawBitmap.width * rawScale).toInt()
             val newHeight = (rawBitmap.height * rawScale).toInt()
-            val resizedBitmap = Bitmap.createScaledBitmap(rawBitmap, newWidth, newHeight, false)
-            resizedBitmap
+            Bitmap.createScaledBitmap(rawBitmap, newWidth, newHeight, false)
         } else {
             rawBitmap
         }
