@@ -1,5 +1,6 @@
 package com.github.charleslzq.pacsdemo.support
 
+import android.graphics.Bitmap
 import android.util.Log
 import android.util.LruCache
 import com.github.charleslzq.dicom.data.DicomPatient
@@ -9,13 +10,22 @@ import com.github.charleslzq.dicom.data.DicomPatient
  */
 object CacheUtil {
     val PATIENT = "patient"
+    val BITMAP = "bitmap"
     private val registry = mutableMapOf<CacheKey<*>, LruCache<String, *>>()
 
     init {
         with(registry) {
-            val patientCache = LruCache<String, DicomPatient>(3)
-            put(CacheKey(PATIENT, DicomPatient::class.java), patientCache)
+            put(CacheKey(PATIENT, DicomPatient::class.java), LruCache<String, DicomPatient>(3))
+
+            put(CacheKey(BITMAP, Bitmap::class.java), LruCache<String, Bitmap>(20))
         }
+    }
+
+    fun <T> resizeCache(
+            cacheName: String,
+            storageType: Class<T>,
+            newSize: Int) {
+        registry[CacheKey(cacheName, storageType)] = LruCache<String, T>(newSize)
     }
 
     fun <T> cache(

@@ -2,6 +2,7 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.content.ClipData
 import android.content.ClipDescription
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.drawable.AnimationDrawable
@@ -12,6 +13,7 @@ import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
+import com.github.charleslzq.pacsdemo.support.CacheUtil
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -37,6 +39,10 @@ class DicomImage(
 
         render(ImageFramesStore::imageFramesModel) {
             if (store.hasImage()) {
+                CacheUtil.resizeCache(CacheUtil.BITMAP, Bitmap::class.java, Math.max(20, it.size))
+                Observable.range(0, it.size-1).subscribeOn(Schedulers.io()).subscribe {
+                    store.getFrame(it)
+                }
                 store.autoAdjustScale(view)
                 view.setImageBitmap(store.getCurrentFrame())
             } else {
