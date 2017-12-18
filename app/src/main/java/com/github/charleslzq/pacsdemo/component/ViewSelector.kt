@@ -5,6 +5,7 @@ import android.widget.*
 import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
+import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
 import com.github.charleslzq.pacsdemo.support.ViewUtils
@@ -23,6 +24,7 @@ class ViewSelector(
             val layoutPosition = it.layoutPosition
             val dataPosition = it.dataPosition
             if (dataPosition >= 0 && dataPosition < store.seriesList.size) {
+                EventBus.post(ImageDisplayEvent.PlayModeReset(layoutPosition))
                 EventBus.post(BindingEvent.ModelDropped(layoutPosition, store.seriesList[dataPosition]))
             }
         }
@@ -31,7 +33,9 @@ class ViewSelector(
             val destPosition = it.targetPosition
             if (sourcePosition >= 0 && sourcePosition < store.imageCells.size) {
                 val data = store.imageCells[sourcePosition].patientSeriesModel
+                EventBus.post(ImageDisplayEvent.PlayModeReset(destPosition))
                 EventBus.post(BindingEvent.ModelDropped(destPosition, data))
+                EventBus.post(ImageDisplayEvent.PlayModeReset(sourcePosition))
                 EventBus.post(BindingEvent.ModelDropped(sourcePosition, PatientSeriesModel()))
             }
         }

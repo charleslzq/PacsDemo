@@ -9,6 +9,7 @@ import android.view.View
 import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
+import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.support.DicomSeriesThumbListAdpater
 
@@ -57,6 +58,7 @@ class ThumbList(
             (1..view.childCount).forEach { view.getChildAt(it - 1).isSelected = false }
             if (it >= 0 && it < view.childCount) {
                 view.getChildAt(it).isSelected = true
+                EventBus.post(ImageDisplayEvent.PlayModeReset(0))
                 EventBus.post(BindingEvent.ModelSelected(store.seriesList[it]))
             }
         }

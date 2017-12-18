@@ -19,49 +19,27 @@ class PatientSeriesStore(
         private set
 
     init {
-        reduce(PatientSeriesStore::patientSeriesModel) { state, event ->
-            when (event) {
-                is BindingEvent.ModelSelected -> {
-                    if (imageFramesStore.layoutPosition == 0) {
-                        event.patientSeriesModel
-                    } else {
-                        state
-                    }
-                }
-                is BindingEvent.ModelDropped -> {
-                    if (event.layoutPosition == imageFramesStore.layoutPosition) {
-                        event.patientSeriesModel
-                    } else {
-                        state
-                    }
-                }
-                is BindingEvent.SeriesListUpdated -> PatientSeriesModel()
-                else -> state
+        reduce(PatientSeriesStore::patientSeriesModel) {
+            on<BindingEvent.ModelSelected>(precondition = { imageFramesStore.layoutPosition == 0 }) {
+                event.patientSeriesModel
             }
+            on<BindingEvent.ModelDropped>(precondition = { it.layoutPosition == imageFramesStore.layoutPosition }) {
+                event.patientSeriesModel
+            }
+            on<BindingEvent.SeriesListUpdated> { PatientSeriesModel() }
         }
 
-        reduce(PatientSeriesStore::selectable) { state, event ->
-            when (event) {
-                is ClickEvent.ChangeLayout -> event.layoutOrdinal != 0
-                else -> state
-            }
+        reduce(PatientSeriesStore::selectable) {
+            on<ClickEvent.ChangeLayout> { event.layoutOrdinal != 0 }
         }
 
-        reduce(
-                property = PatientSeriesStore::selected,
-                guard = { selectable }
-        ) { state, event ->
-            when (event) {
-                is ClickEvent.ImageCellClicked -> {
-                    if (event.layoutPosition == imageFramesStore.layoutPosition) {
-                        !state
-                    } else {
-                        state
-                    }
-                }
-                is BindingEvent.ModelSelected, is BindingEvent.ModelDropped, is BindingEvent.SeriesListUpdated -> false
-                else -> state
+        reduce(PatientSeriesStore::selected) {
+            on<ClickEvent.ImageCellClicked>(precondition = { selectable && it.layoutPosition == imageFramesStore.layoutPosition }) {
+                !state
             }
+            on<BindingEvent.ModelSelected> { false }
+            on<BindingEvent.ModelDropped> { false }
+            on<BindingEvent.SeriesListUpdated> { false }
         }
     }
 }

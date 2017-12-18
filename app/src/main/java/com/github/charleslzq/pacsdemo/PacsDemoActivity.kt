@@ -77,7 +77,7 @@ class PacsDemoActivity : AppCompatActivity() {
                 }
             })
         }.subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
+                .observeOn(Schedulers.computation())
                 .subscribe {
                     EventBus.post(BindingEvent.SeriesListUpdated(it))
                     if (seriesId != null) {

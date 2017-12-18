@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipDescription
 import android.graphics.Canvas
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.drawable.AnimationDrawable
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.kotlin.react.Component
@@ -12,6 +13,9 @@ import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -31,23 +35,40 @@ class DicomImage(
         EventBus.onEvent<DragEventMessage.StartCopyCell> { onDragStart(it) }
         view.setOnTouchListener(operationMode)
 
+        render(ImageFramesStore::imageFramesModel) {
+            if (store.hasImage()) {
+                store.autoAdjustScale(view)
+                view.setImageBitmap(store.getCurrentFrame())
+            } else {
+                view.setImageBitmap(null)
+            }
+        }
+
         render(ImageFramesStore::imagePlayModel) {
             if (it.playing && view.background == null && store.playable()) {
-                view.setImageBitmap(null)
                 if (store.hasImage()) {
-                    view.post(store.resetAnimation(view))
+                    Observable.create<AnimationDrawable> {
+                        it.onNext(store.getCurrentAnimation(view))
+                    }.subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe {
+                                view.setImageBitmap(null)
+                                view.clearAnimation()
+                                view.background = it
+                                view.post(it)
+                            }
                 }
             } else if (!it.playing) {
                 val background = view.background
-                view.setImageBitmap(null)
                 if (background != null && background is IndexAwareAnimationDrawable) {
                     background.stop()
                     view.clearAnimation()
                     view.background = null
                 }
                 if (store.hasImage()) {
-                    store.autoAdjustScale(view)
                     view.setImageBitmap(store.getCurrentFrame())
+                } else {
+                    view.setImageBitmap(null)
                 }
             }
         }

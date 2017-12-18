@@ -18,26 +18,19 @@ class PacsStore : WithReducer<PacsStore> {
     val imageCells: List<PatientSeriesStore> = (0..8).map { PatientSeriesStore(ImageFramesStore(it)) }
 
     init {
-        reduce(PacsStore::seriesList) { state, event ->
-            when (event) {
-                is BindingEvent.SeriesListUpdated -> event.seriesList
-                else -> state
+        reduce(PacsStore::seriesList) {
+            on<BindingEvent.SeriesListUpdated> { event.seriesList }
+        }
+
+        reduce(PacsStore::selected) {
+            on<ClickEvent.ChangeLayout> { -1 }
+            on<ClickEvent.ThumbListItemClicked>(precondition = { layoutOption == LayoutOption.ONE_ONE }) {
+                event.position
             }
         }
 
-        reduce(PacsStore::selected) { state, event ->
-            when (event) {
-                is ClickEvent.ChangeLayout -> -1
-                is ClickEvent.ThumbListItemClicked -> if (layoutOption == LayoutOption.ONE_ONE) event.position else state
-                else -> state
-            }
-        }
-
-        reduce(PacsStore::layoutOption) { state, event ->
-            when (event) {
-                is ClickEvent.ChangeLayout -> LayoutOption.values()[event.layoutOrdinal]
-                else -> state
-            }
+        reduce(PacsStore::layoutOption) {
+            on<ClickEvent.ChangeLayout> { LayoutOption.values()[event.layoutOrdinal] }
         }
     }
 
