@@ -244,9 +244,6 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         val rawBitmap = CacheUtil.cache(CacheUtil.BITMAP, Bitmap::class.java, "imageRawCache", index.toString()) {
             BitmapFactory.decodeFile(File(imageFramesModel.frameUrls[index]).absolutePath, BitmapFactory.Options().apply { inMutable = true })
         }!!
-//        val rawBitmap = BitmapFactory.decodeFile(File(imageFramesModel.frameUrls[index]).absolutePath, BitmapFactory.Options().apply {
-//            inMutable = pseudoColor || measure != Measure.NONE
-//        })
         if (pseudoColor) {
             val pixels = IntArray(rawBitmap.height * rawBitmap.width)
             rawBitmap.getPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)

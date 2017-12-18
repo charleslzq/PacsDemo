@@ -25,7 +25,9 @@ object CacheUtil {
             cacheName: String,
             storageType: Class<T>,
             newSize: Int) {
-        registry[CacheKey(cacheName, storageType)] = LruCache<String, T>(newSize)
+        val key = CacheKey(cacheName, storageType)
+        registry.remove(key)
+        registry[key] = LruCache<String, T>(newSize)
     }
 
     fun <T> cache(
