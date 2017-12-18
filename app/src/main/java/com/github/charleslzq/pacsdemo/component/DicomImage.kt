@@ -122,12 +122,15 @@ class DicomImage(
 
         render(property = ImageFramesStore::imageCanvasModel, guard = { store.hasImage() }) {
             createDrawingCache()
+            initCanvas()
             store.imageCanvasModel.paths.forEach {
                 drawingCanvas?.drawPath(it, store.linePaint)
             }
             store.imageCanvasModel.texts.forEach {
                 drawingCanvas?.drawText(it.value, it.key.x, it.key.y, store.stringPaint)
             }
+            canvas.drawBitmap(drawingCache, 0f, 0f, store.linePaint)
+            view.invalidate()
         }
 
         render(property = ImageFramesStore::currentPath, guard = { store.hasImage() }) {
