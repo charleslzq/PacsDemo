@@ -58,10 +58,10 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
 
         reduce(ImageFramesStore::imageFramesModel) {
             on<BindingEvent.ModelSelected>(precondition = { layoutPosition == 0 }) {
-                ImageFramesModel(event.patientSeriesModel.imageFramesModel.frames)
+                event.patientSeriesModel.imageFramesModel
             }
             on<BindingEvent.ModelDropped>(precondition = { it.layoutPosition == layoutPosition }) {
-                ImageFramesModel(event.patientSeriesModel.imageFramesModel.frames)
+                event.patientSeriesModel.imageFramesModel
             }
         }
 
