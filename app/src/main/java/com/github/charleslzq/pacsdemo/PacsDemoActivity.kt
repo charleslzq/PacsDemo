@@ -23,6 +23,10 @@ import kotlinx.android.synthetic.main.layout_pacs_demo.*
 class PacsDemoActivity : AppCompatActivity() {
 
     private val serviceConnection = SimpleServiceConnection<DicomDataService>(this::dicomDataService::set, {
+        val patientId = intent.getStringExtra(PATIENT_ID) ?: this.patientId
+        val studyId = intent.getStringExtra(STUDY_ID) ?: this.studyId
+        val seriesId = intent.getStringExtra(SERIES_ID) ?: this.seriesId
+        val imageNum = intent.getStringExtra(IMAGE_NUM) ?: this.imageNum
         load(patientId, studyId, seriesId, imageNum)
     })
     private var dicomDataService: DicomDataService? = null
@@ -37,11 +41,6 @@ class PacsDemoActivity : AppCompatActivity() {
         setContentView(R.layout.layout_pacs_demo)
         Log.d("PacsActivity", "onCreate execute")
 
-        patientId = intent.getStringExtra(PATIENT_ID) ?: this.patientId
-        studyId = intent.getStringExtra(STUDY_ID) ?: this.studyId
-        seriesId = intent.getStringExtra(SERIES_ID) ?: this.seriesId
-        imageNum = intent.getStringExtra(IMAGE_NUM) ?: this.imageNum
-
         pacs = PacsMain(pacsPanel, PacsStore())
         backButton.setOnClickListener { this.finish() }
 
@@ -53,9 +52,9 @@ class PacsDemoActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun load(patientId: String, studyId: String?, seriesId: String?, imageNum: String?) {
+    fun load(patientId: String?, studyId: String?, seriesId: String?, imageNum: String?) {
         Observable.create<MutableList<PatientSeriesModel>> {
-            val patient = dicomDataService?.findPatient(patientId)
+            val patient = patientId?.let { dicomDataService?.findPatient(it) }
             it.onNext(when (patient == null) {
                 true -> mutableListOf()
                 false -> {
