@@ -25,24 +25,28 @@
         <TextView
             android:id="@+id/windowInfo"
             android:textSize="@dimen/metaInfoTextSize"
+            android:textColor="@color/common_text_color"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"/>
         <TextView
             android:id="@+id/sliceInfo"
             android:textSize="@dimen/metaInfoTextSize"
+            android:textColor="@color/common_text_color"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"/>
         <TextView
             android:id="@+id/scaleInfo"
             android:textSize="@dimen/metaInfoTextSize"
+            android:textColor="@color/common_text_color"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"/>
         <TextView
             android:id="@+id/imageProgress"
             android:textSize="@dimen/metaInfoTextSize"
+            android:textColor="@color/common_text_color"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"/>
@@ -61,6 +65,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:textSize="@dimen/metaInfoTextSize"
+            android:textColor="@color/common_text_color"
             android:textAlignment="gravity"
             android:gravity="end"/>
         <TextView
@@ -69,6 +74,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:textSize="@dimen/metaInfoTextSize"
+            android:textColor="@color/common_text_color"
             android:textAlignment="gravity"
             android:gravity="end"/>
         <TextView
@@ -77,6 +83,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:textSize="@dimen/metaInfoTextSize"
+            android:textColor="@color/common_text_color"
             android:textAlignment="gravity"
             android:gravity="end"/>
         <TextView
@@ -85,6 +92,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:textSize="@dimen/metaInfoTextSize"
+            android:textColor="@color/common_text_color"
             android:textAlignment="gravity"
             android:gravity="end"/>
         <TextView
@@ -93,6 +101,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:textSize="@dimen/metaInfoTextSize"
+            android:textColor="@color/common_text_color"
             android:textAlignment="gravity"
             android:gravity="end"/>
     </LinearLayout>
@@ -107,12 +116,14 @@
         <TextView
             android:id="@+id/xRayInfo"
             android:textSize="@dimen/metaInfoTextSize"
+            android:textColor="@color/common_text_color"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"/>
         <TextView
             android:id="@+id/time"
             android:textSize="@dimen/metaInfoTextSize"
+            android:textColor="@color/common_text_color"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"/>
@@ -138,6 +149,7 @@
                 android:layout_height="@dimen/imageButtonSize"
                 android:layout_margin="@dimen/imageButtonMargin"
                 android:background="@drawable/circle_button"
+                android:textColor="@color/common_text_color"
                 android:text="角"/>
             <Button
                 android:id="@+id/measureLineButton"
@@ -145,6 +157,7 @@
                 android:layout_height="@dimen/imageButtonSize"
                 android:layout_margin="@dimen/imageButtonMargin"
                 android:background="@drawable/circle_button"
+                android:textColor="@color/common_text_color"
                 android:text="线"/>
             <Button
                 android:id="@+id/pseudoColorButton"
@@ -152,6 +165,7 @@
                 android:layout_height="@dimen/imageButtonSize"
                 android:layout_margin="@dimen/imageButtonMargin"
                 android:background="@drawable/circle_button"
+                android:textColor="@color/common_text_color"
                 android:text="@string/pseudo_icon"/>
             <Button
                 android:id="@+id/reverseButton"
@@ -159,6 +173,7 @@
                 android:layout_height="@dimen/imageButtonSize"
                 android:layout_margin="@dimen/imageButtonMargin"
                 android:background="@drawable/circle_button"
+                android:textColor="@color/common_text_color"
                 android:text="@string/reverse_icon"/>
         </LinearLayout>
         <LinearLayout android:id="@+id/indexController"
@@ -172,6 +187,7 @@
                 android:layout_height="@dimen/imageButtonSize"
                 android:layout_margin="@dimen/imageButtonMargin"
                 android:background="@drawable/circle_button"
+                android:textColor="@color/common_text_color"
                 android:text="@string/image_to_first"
                 />
             <Button android:id="@+id/previousImage"
@@ -179,6 +195,7 @@
                 android:layout_height="@dimen/imageButtonSize"
                 android:layout_margin="@dimen/imageButtonMargin"
                 android:background="@drawable/circle_button"
+                android:textColor="@color/common_text_color"
                 android:text="@string/image_previous"
                 />
             <Button android:id="@+id/imagePlay"
@@ -186,6 +203,7 @@
                 android:layout_height="@dimen/imageButtonSize"
                 android:layout_margin="@dimen/imageButtonMargin"
                 android:background="@drawable/circle_button"
+                android:textColor="@color/common_text_color"
                 android:text="@string/image_play"
                 />
             <Button android:id="@+id/nextImage"
@@ -193,6 +211,7 @@
                 android:layout_height="@dimen/imageButtonSize"
                 android:layout_margin="@dimen/imageButtonMargin"
                 android:background="@drawable/circle_button"
+                android:textColor="@color/common_text_color"
                 android:text="@string/image_next"
                 />
             <Button android:id="@+id/lastImage"
@@ -200,6 +219,7 @@
                 android:layout_height="@dimen/imageButtonSize"
                 android:layout_margin="@dimen/imageButtonMargin"
                 android:background="@drawable/circle_button"
+                android:textColor="@color/common_text_color"
                 android:text="@string/image_to_last"
                 />
         </LinearLayout>
