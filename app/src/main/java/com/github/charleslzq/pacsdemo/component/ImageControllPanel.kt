@@ -2,7 +2,6 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.view.View
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.SeekBar
 import com.github.charleslzq.kotlin.react.Component
 import com.github.charleslzq.kotlin.react.EventBus
@@ -31,10 +30,6 @@ class ImageControllPanel(
     private val reverse: Button = view.findViewById(R.id.reverseButton)
 
     private val imageSeekBar: SeekBar = view.findViewById(R.id.imageSeekBar)
-
-    private val progress: LinearLayout = view.findViewById(R.id.progressController)
-    private val display: LinearLayout = view.findViewById(R.id.displayController)
-    private val index: LinearLayout = view.findViewById(R.id.imageController)
 
     init {
         val fontAwesomeTypeface = TypefaceUtil.getTypeFace(view.context, TypefaceUtil.fontAwesome)

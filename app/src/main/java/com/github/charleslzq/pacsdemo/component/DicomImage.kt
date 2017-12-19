@@ -13,7 +13,6 @@ import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
-import com.github.charleslzq.pacsdemo.support.CacheUtil
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers

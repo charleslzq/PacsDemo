@@ -12,7 +12,6 @@ import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageCellEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
-import com.github.charleslzq.pacsdemo.support.CacheUtil
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
 import java.io.File
 
@@ -150,7 +149,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
             on<ClickEvent.TurnToMeasureLine>(precondition = { targetAtThis(it) }) { Measure.LINE }
             on<ClickEvent.TurnToMeasureAngle>(precondition = { targetAtThis(it) }) { Measure.ANGEL }
             on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) { Measure.NONE }
-            on<ImageDisplayEvent.IndexChange>(precondition = {targetAtThis(it)}) { Measure.NONE }
+            on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) { Measure.NONE }
         }
 
         reduce(ImageFramesStore::imageCanvasModel) {
@@ -168,7 +167,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
                 )
             }
             on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) { ImageCanvasModel() }
-            on<ImageDisplayEvent.IndexChange>(precondition = {targetAtThis(it)}) { ImageCanvasModel() }
+            on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) { ImageCanvasModel() }
         }
 
         reduce(property = ImageFramesStore::currentPath) {

@@ -2,7 +2,6 @@ package com.github.charleslzq.pacsdemo.component.gesture
 
 import android.view.MotionEvent
 import com.github.charleslzq.kotlin.react.EventBus
-import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 

@@ -1,6 +1,5 @@
 package com.github.charleslzq.pacsdemo.support
 
-import android.graphics.Bitmap
 import android.util.Log
 import android.util.LruCache
 import com.github.charleslzq.dicom.data.DicomPatient
