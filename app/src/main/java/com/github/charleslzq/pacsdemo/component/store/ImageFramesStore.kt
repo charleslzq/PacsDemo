@@ -234,7 +234,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
 
     private fun targetAtThis(event: ImageCellEvent) = event.layoutPosition == layoutPosition
 
-    fun getFrame(index: Int): Bitmap {
+    private fun getFrame(index: Int): Bitmap {
         val rawBitmap = BitmapFactory.decodeFile(File(imageFramesModel.frameUrls[index]).absolutePath, BitmapFactory.Options().apply {
             inMutable = pseudoColor || measure != Measure.NONE
         })

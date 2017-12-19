@@ -36,6 +36,10 @@ class ThumbList(
                 ItemClickSupport.addTo(view).setOnItemClickListener(object : ItemClickSupport.OnItemClickListener {
                     override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
                         EventBus.post(ClickEvent.ThumbListItemClicked(position))
+                        if (position in (0..(store.seriesList.size-1))) {
+                            EventBus.post(ImageDisplayEvent.PlayModeReset(0))
+                            EventBus.post(BindingEvent.ModelSelected(store.seriesList[position]))
+                        }
                     }
                 })
                 ItemClickSupport.addTo(view).setOnItemLongClickListener(object : ItemClickSupport.OnItemLongClickListener {
@@ -51,6 +55,11 @@ class ThumbList(
                         return true
                     }
                 })
+
+                (1..view.childCount).forEach { view.getChildAt(it - 1).isSelected = false }
+                if (store.selected >= 0 && store.selected < view.childCount) {
+                    view.getChildAt(store.selected).isSelected = true
+                }
             }
         }
 
@@ -58,8 +67,6 @@ class ThumbList(
             (1..view.childCount).forEach { view.getChildAt(it - 1).isSelected = false }
             if (it >= 0 && it < view.childCount) {
                 view.getChildAt(it).isSelected = true
-                EventBus.post(ImageDisplayEvent.PlayModeReset(0))
-                EventBus.post(BindingEvent.ModelSelected(store.seriesList[it]))
             }
         }
     }

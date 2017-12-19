@@ -9,6 +9,7 @@ import com.github.charleslzq.dicom.data.DicomStudy
 import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.PacsMain
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
+import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesModel
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
@@ -80,13 +81,15 @@ class PacsDemoActivity : AppCompatActivity() {
                 .subscribe {
                     EventBus.post(BindingEvent.SeriesListUpdated(it))
                     if (seriesId != null) {
-                        it.find { it.dicomSeriesMetaInfo.instanceUID == seriesId }?.let {
-                            EventBus.post(BindingEvent.ModelSelected(it))
-                            if (imageNum != null && imageNum.toInt() in (1..it.imageFramesModel.size)) {
+                        it.indices.find { index -> it[index].dicomSeriesMetaInfo.instanceUID == seriesId }?.let { index ->
+                            EventBus.post(ClickEvent.ThumbListItemClicked(index))
+                            EventBus.post(BindingEvent.ModelSelected(it[index]))
+                            if (imageNum != null && imageNum.toInt() in (1..it[index].imageFramesModel.size)) {
                                 EventBus.post(ImageDisplayEvent.IndexChange(0, imageNum.toInt() - 1, false))
                             }
                         }
                     } else if (it.isNotEmpty()) {
+                        EventBus.post(ClickEvent.ThumbListItemClicked(0))
                         EventBus.post(BindingEvent.ModelSelected(it[0]))
                     }
                 }
