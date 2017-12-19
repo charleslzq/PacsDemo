@@ -24,6 +24,7 @@ class PacsStore : WithReducer<PacsStore> {
 
         reduce(PacsStore::selected) {
             on<ClickEvent.ChangeLayout> { -1 }
+            on<BindingEvent.SeriesListUpdated> { -1 }
             on<ClickEvent.ThumbListItemClicked>(precondition = { layoutOption == LayoutOption.ONE_ONE }) {
                 event.position
             }
