@@ -83,7 +83,7 @@ class PacsDemoActivity : AppCompatActivity() {
                         it.find { it.dicomSeriesMetaInfo.instanceUID == seriesId }?.let {
                             EventBus.post(BindingEvent.ModelSelected(it))
                             if (imageNum != null && imageNum.toInt() in (1..it.imageFramesModel.size)) {
-                                EventBus.post(ImageDisplayEvent.IndexChange(0, imageNum.toInt() - 1))
+                                EventBus.post(ImageDisplayEvent.IndexChange(0, imageNum.toInt() - 1, false))
                             }
                         }
                     } else if (it.isNotEmpty()) {

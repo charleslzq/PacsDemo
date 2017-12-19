@@ -10,7 +10,7 @@ import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 class IndexAwareAnimationDrawable(val layoutPosition: Int, val startOffset: Int) : AnimationDrawable() {
 
     override fun selectDrawable(index: Int): Boolean {
-        EventBus.post(ImageDisplayEvent.IndexChange(layoutPosition, startOffset + index))
+        EventBus.post(ImageDisplayEvent.IndexChange(layoutPosition, startOffset + index, false))
         return super.selectDrawable(index)
     }
 }

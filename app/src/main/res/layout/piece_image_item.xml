@@ -20,7 +20,6 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/imagesContainer"
         android:layout_alignStart="@id/imagesContainer"
-        android:layout_alignLeft="@id/imagesContainer"
         android:orientation="vertical"
         >
         <TextView
@@ -55,7 +54,6 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/imagesContainer"
         android:layout_alignEnd="@id/imagesContainer"
-        android:layout_alignRight="@id/imagesContainer"
         android:orientation="vertical">
         <TextView
             android:id="@+id/patientName"
@@ -105,7 +103,6 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/imagesContainer"
         android:layout_alignStart="@id/imagesContainer"
-        android:layout_alignLeft="@id/imagesContainer"
         android:orientation="vertical">
         <TextView
             android:id="@+id/xRayInfo"
@@ -119,6 +116,103 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/imageController"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignEnd="@id/imagesContainer"
+        android:layout_alignBottom="@id/imagesContainer">
+        <LinearLayout
+            android:id="@+id/displayController"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            >
+            <Button
+                android:id="@+id/measureAngleButton"
+                android:layout_width="@dimen/imageButtonSize"
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="@dimen/imageButtonMargin"
+                android:background="@drawable/circle_button"
+                android:text="角"/>
+            <Button
+                android:id="@+id/measureLineButton"
+                android:layout_width="@dimen/imageButtonSize"
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="@dimen/imageButtonMargin"
+                android:background="@drawable/circle_button"
+                android:text="线"/>
+            <Button
+                android:id="@+id/pseudoColorButton"
+                android:layout_width="@dimen/imageButtonSize"
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="@dimen/imageButtonMargin"
+                android:background="@drawable/circle_button"
+                android:text="@string/pseudo_icon"/>
+            <Button
+                android:id="@+id/reverseButton"
+                android:layout_width="@dimen/imageButtonSize"
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="@dimen/imageButtonMargin"
+                android:background="@drawable/circle_button"
+                android:text="@string/reverse_icon"/>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/indexController"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            >
+            <Button android:id="@+id/firstImage"
+                android:layout_width="@dimen/imageButtonSize"
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="@dimen/imageButtonMargin"
+                android:background="@drawable/circle_button"
+                android:text="@string/image_to_first"
+                />
+            <Button android:id="@+id/previousImage"
+                android:layout_width="@dimen/imageButtonSize"
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="@dimen/imageButtonMargin"
+                android:background="@drawable/circle_button"
+                android:text="@string/image_previous"
+                />
+            <Button android:id="@+id/imagePlay"
+                android:layout_width="@dimen/imageButtonSize"
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="@dimen/imageButtonMargin"
+                android:background="@drawable/circle_button"
+                android:text="@string/image_play"
+                />
+            <Button android:id="@+id/nextImage"
+                android:layout_width="@dimen/imageButtonSize"
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="@dimen/imageButtonMargin"
+                android:background="@drawable/circle_button"
+                android:text="@string/image_next"
+                />
+            <Button android:id="@+id/lastImage"
+                android:layout_width="@dimen/imageButtonSize"
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="@dimen/imageButtonMargin"
+                android:background="@drawable/circle_button"
+                android:text="@string/image_to_last"
+                />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/progressController"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            >
+            <SeekBar android:id="@+id/imageSeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
     </LinearLayout>
 
 

@@ -5,8 +5,8 @@ package com.github.charleslzq.pacsdemo.component.event
  */
 class ClickEvent {
     data class ChangeLayout(val layoutOrdinal: Int)
-    class TurnToMeasureLine
-    class TurnToMeasureAngle
+    class TurnToMeasureLine(layoutPosition: Int) : ImageCellEvent(layoutPosition)
+    class TurnToMeasureAngle(layoutPosition: Int) : ImageCellEvent(layoutPosition)
     class ReverseColor(layoutPosition: Int) : ImageCellEvent(layoutPosition)
     class PseudoColor(layoutPosition: Int) : ImageCellEvent(layoutPosition)
     class ImageCellClicked(layoutPosition: Int) : ImageCellEvent(layoutPosition)

@@ -37,11 +37,11 @@ class ButtonPanel(
         }
 
         measureAngleButton.setOnClickListener {
-            EventBus.post(ClickEvent.TurnToMeasureAngle())
+            EventBus.post(ClickEvent.TurnToMeasureAngle(0))
         }
 
         measureLineButton.setOnClickListener {
-            EventBus.post(ClickEvent.TurnToMeasureLine())
+            EventBus.post(ClickEvent.TurnToMeasureLine(0))
         }
 
         reverseButton.setOnClickListener {

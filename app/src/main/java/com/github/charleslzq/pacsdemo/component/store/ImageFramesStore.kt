@@ -24,7 +24,6 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
     var linePaint = Paint()
     var stringPaint = Paint()
     private var allowPlay = true
-    private var allowMeasure = true
     private var imageWidth = 500
 
     var imageFramesModel by ObservableStatus(ImageFramesModel())
@@ -73,13 +72,13 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
             on<ClickEvent.ChangeLayout> { ImagePlayModel() }
             on<BindingEvent.SeriesListUpdated> { ImagePlayModel() }
             on<ImageDisplayEvent.ChangePlayStatus>(precondition = { targetAtThis(it) && playable() }) {
-                state.copy(playing = !state.playing)
+                state.copy(playing = !state.playing, currentIndex = if (state.currentIndex == imageFramesModel.size - 1) 0 else state.currentIndex)
             }
             on<ImageDisplayEvent.PlayModeReset>(precondition = { targetAtThis(it) }) {
                 state.copy(playing = false, currentIndex = 0)
             }
             on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) && it.index in (0..(imageFramesModel.size - 1)) }) {
-                state.copy(currentIndex = event.index)
+                if (event.fromUser || event.index == imageFramesModel.size - 1) state.copy(playing = false, currentIndex = event.index) else state.copy(currentIndex = event.index)
             }
             on<ClickEvent.ReverseColor>(precondition = { targetAtThis(it) }) {
                 state.copy(playing = false)
@@ -147,14 +146,10 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
             }
         }
 
-        reduce(ImageFramesStore::allowMeasure) {
-            on<ClickEvent.ChangeLayout> { event.layoutOrdinal == 0 }
-        }
-
         reduce(ImageFramesStore::measure) {
-            on<ClickEvent.TurnToMeasureLine> { Measure.LINE }
-            on<ClickEvent.TurnToMeasureAngle> { Measure.ANGEL }
-            on<ImageDisplayEvent.MeasureModeReset> { Measure.NONE }
+            on<ClickEvent.TurnToMeasureLine>(precondition = { targetAtThis(it) }) { Measure.LINE }
+            on<ClickEvent.TurnToMeasureAngle>(precondition = { targetAtThis(it) }) { Measure.ANGEL }
+            on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) { Measure.NONE }
         }
 
         reduce(ImageFramesStore::imageCanvasModel) {
