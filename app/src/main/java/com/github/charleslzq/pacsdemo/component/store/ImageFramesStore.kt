@@ -150,6 +150,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
             on<ClickEvent.TurnToMeasureLine>(precondition = { targetAtThis(it) }) { Measure.LINE }
             on<ClickEvent.TurnToMeasureAngle>(precondition = { targetAtThis(it) }) { Measure.ANGEL }
             on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) { Measure.NONE }
+            on<ImageDisplayEvent.IndexChange>(precondition = {targetAtThis(it)}) { Measure.NONE }
         }
 
         reduce(ImageFramesStore::imageCanvasModel) {
@@ -166,9 +167,8 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
                         state.texts.toMutableMap().apply { put(event.text.first, event.text.second) }
                 )
             }
-            on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) {
-                ImageCanvasModel()
-            }
+            on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) { ImageCanvasModel() }
+            on<ImageDisplayEvent.IndexChange>(precondition = {targetAtThis(it)}) { ImageCanvasModel() }
         }
 
         reduce(property = ImageFramesStore::currentPath) {
