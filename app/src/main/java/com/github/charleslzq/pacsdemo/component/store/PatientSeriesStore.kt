@@ -13,10 +13,6 @@ class PatientSeriesStore(
 ) : WithReducer<PatientSeriesStore> {
     var patientSeriesModel by ObservableStatus(PatientSeriesModel())
         private set
-    var selected by ObservableStatus(false)
-        private set
-    var selectable = false
-        private set
 
     init {
         reduce(PatientSeriesStore::patientSeriesModel) {
@@ -27,19 +23,6 @@ class PatientSeriesStore(
                 event.patientSeriesModel
             }
             on<BindingEvent.SeriesListUpdated> { PatientSeriesModel() }
-        }
-
-        reduce(PatientSeriesStore::selectable) {
-            on<ClickEvent.ChangeLayout> { event.layoutOrdinal != 0 }
-        }
-
-        reduce(PatientSeriesStore::selected) {
-            on<ClickEvent.ImageCellClicked>(precondition = { selectable && it.layoutPosition == imageFramesStore.layoutPosition }) {
-                !state
-            }
-            on<BindingEvent.ModelSelected> { false }
-            on<BindingEvent.ModelDropped> { false }
-            on<BindingEvent.SeriesListUpdated> { false }
         }
     }
 }

@@ -24,10 +24,6 @@ class ImageCell(
 )) {
 
     init {
-        render(PatientSeriesStore::selected) {
-            view.isSelected = store.selected
-        }
-
         view.setOnClickListener {
             EventBus.post(ClickEvent.ImageCellClicked(store.imageFramesStore.layoutPosition))
         }
