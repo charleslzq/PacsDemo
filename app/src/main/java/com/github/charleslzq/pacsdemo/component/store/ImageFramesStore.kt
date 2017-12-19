@@ -45,6 +45,8 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         private set
     var currentPath by ObservableStatus(Path())
         private set
+    var currentLines by ObservableStatus(FloatArray(0))
+        private set
 
     init {
         linePaint.color = Color.RED
@@ -170,20 +172,15 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
             on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) { ImageCanvasModel() }
         }
 
-        reduce(property = ImageFramesStore::currentPath) {
+        reduce(property = ImageFramesStore::currentLines) {
             on<ImageDisplayEvent.AddPath>(precondition = { targetAtThis(it) }) {
-                Path()
+                FloatArray(0)
             }
-            on<ImageDisplayEvent.DrawPath>(precondition = { targetAtThis(it) }) {
-                Path().apply {
-                    moveTo(event.points[0].x, event.points[0].y)
-                    (1..(event.points.size - 1)).forEach {
-                        lineTo(event.points[it].x, event.points[it].y)
-                    }
-                }
+            on<ImageDisplayEvent.DrawLines>(precondition = { targetAtThis(it) }) {
+                event.points
             }
             on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) {
-                Path()
+                FloatArray(0)
             }
         }
     }

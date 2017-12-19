@@ -24,7 +24,7 @@ class MeasureModeGestureListener(
                 if (firstPath) {
                     startPoint = currentPoint
                 } else {
-                    EventBus.post(ImageDisplayEvent.DrawPath(layoutPosition, listOf(startPoint, secondPoint, currentPoint)))
+                    EventBus.post(ImageDisplayEvent.DrawLines(layoutPosition, toLines(startPoint, secondPoint, currentPoint)))
                 }
             }
             MotionEvent.ACTION_MOVE -> {
@@ -35,7 +35,7 @@ class MeasureModeGestureListener(
                     pointList.add(secondPoint)
                 }
                 pointList.add(currentPoint)
-                EventBus.post(ImageDisplayEvent.DrawPath(layoutPosition, pointList))
+                EventBus.post(ImageDisplayEvent.DrawLines(layoutPosition, toLines(*pointList.toTypedArray())))
             }
             MotionEvent.ACTION_UP -> {
                 val currentPoint = getPoint(motionEvent)
@@ -46,7 +46,7 @@ class MeasureModeGestureListener(
                         EventBus.post(ImageDisplayEvent.AddPath(layoutPosition, listOf(startPoint, currentPoint), currentPoint to text))
                     } else if (framesStore.measure == ImageFramesStore.Measure.ANGEL) {
                         if (firstPath) {
-                            EventBus.post(ImageDisplayEvent.DrawPath(layoutPosition, listOf(startPoint, currentPoint)))
+                            EventBus.post(ImageDisplayEvent.DrawLines(layoutPosition, toLines(startPoint, currentPoint)))
                             secondPoint = currentPoint
                             firstPath = false
                         } else {
@@ -64,6 +64,18 @@ class MeasureModeGestureListener(
     override fun onDoubleTap(e: MotionEvent?): Boolean {
         EventBus.post(ImageDisplayEvent.MeasureModeReset(layoutPosition))
         return true
+    }
+
+    private fun toLines(vararg points: PointF): FloatArray {
+        return FloatArray((points.size - 1) * 4).apply {
+            (0..(points.size - 2)).forEach {
+                val start = it * 4
+                this[start] = points[it].x
+                this[start + 1] = points[it].y
+                this[start + 2] = points[it + 1].x
+                this[start + 3] = points[it + 1].y
+            }
+        }
     }
 
     private fun getPoint(motionEvent: MotionEvent): PointF {

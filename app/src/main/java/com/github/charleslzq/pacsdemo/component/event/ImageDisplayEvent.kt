@@ -13,7 +13,7 @@ class ImageDisplayEvent {
     class IndexScroll(layoutPosition: Int, val scroll: Float) : ImageCellEvent(layoutPosition)
     class LocationTranslate(layoutPosition: Int, val distanceX: Float, val distanceY: Float) : ImageCellEvent(layoutPosition)
     class StudyModeReset(layoutPosition: Int) : ImageCellEvent(layoutPosition)
-    class DrawPath(layoutPosition: Int, val points: List<PointF>) : ImageCellEvent(layoutPosition)
     class AddPath(layoutPosition: Int, val points: List<PointF>, val text: Pair<PointF, String>) : ImageCellEvent(layoutPosition)
+    class DrawLines(layoutPosition: Int, val points: FloatArray) : ImageCellEvent(layoutPosition)
     class MeasureModeReset(layoutPosition: Int) : ImageCellEvent(layoutPosition)
 }

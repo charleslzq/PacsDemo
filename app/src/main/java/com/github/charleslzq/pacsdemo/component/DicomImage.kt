@@ -101,6 +101,14 @@ class DicomImage(
                 true -> {
                     createDrawingCache()
                     initCanvas()
+                    store.imageCanvasModel.paths.forEach {
+                        drawingCanvas?.drawPath(it, store.linePaint)
+                    }
+                    store.imageCanvasModel.texts.forEach {
+                        drawingCanvas?.drawText(it.value, it.key.x, it.key.y, store.stringPaint)
+                    }
+                    canvas.drawBitmap(drawingCache, 0f, 0f, store.linePaint)
+                    view.invalidate()
                     MeasureMode(view.context, MeasureModeGestureListener(store))
                 }
                 false -> {
@@ -128,11 +136,11 @@ class DicomImage(
             view.invalidate()
         }
 
-        render(property = ImageFramesStore::currentPath, guard = { store.hasImage() }) {
-            if (store.measure != ImageFramesStore.Measure.NONE) {
+        render(property = ImageFramesStore::currentLines, guard = { store.hasImage() && store.measure != ImageFramesStore.Measure.NONE }) {
+            if (it.size >= 4) {
                 initCanvas()
                 canvas.drawBitmap(drawingCache, 0f, 0f, store.linePaint)
-                canvas.drawPath(it, store.linePaint)
+                canvas.drawLines(it, store.linePaint)
                 view.invalidate()
             }
         }

@@ -36,7 +36,7 @@ class ThumbList(
                 ItemClickSupport.addTo(view).setOnItemClickListener(object : ItemClickSupport.OnItemClickListener {
                     override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
                         EventBus.post(ClickEvent.ThumbListItemClicked(position))
-                        if (position in (0..(store.seriesList.size-1))) {
+                        if (position in (0..(store.seriesList.size - 1))) {
                             EventBus.post(ImageDisplayEvent.PlayModeReset(0))
                             EventBus.post(BindingEvent.ModelSelected(store.seriesList[position]))
                         }
