@@ -41,10 +41,6 @@ class DicomImage(
 
         render(ImageFramesStore::imageFramesModel) {
             if (store.hasImage()) {
-                CacheUtil.resizeCache(CacheUtil.BITMAP, Bitmap::class.java, Math.max(20, it.size))
-                Observable.range(0, it.size - 1).subscribeOn(Schedulers.io()).subscribe {
-                    store.getFrame(it)
-                }
                 store.autoAdjustScale(view)
                 view.setImageBitmap(store.getCurrentFrame())
             } else {

@@ -86,7 +86,7 @@ class ImageControllPanel(
         }
 
         render(store.imageFramesStore::imageFramesModel) {
-            if (it.size > 0) {
+            val visible = if (it.size > 1) {
                 imageSeekBar.max = it.size - 1
                 imageSeekBar.progress = 0
                 imageSeekBar.visibility = View.VISIBLE
@@ -104,8 +104,27 @@ class ImageControllPanel(
                     }
 
                 })
+                View.VISIBLE
             } else {
-                imageSeekBar.visibility = View.INVISIBLE
+                View.INVISIBLE
+            }
+
+            imageSeekBar.visibility = visible
+            measureAngle.visibility = visible
+            measureLine.visibility = visible
+            pseudo.visibility = visible
+            reverse.visibility = visible
+            first.visibility = visible
+            previous.visibility = visible
+            play.visibility = visible
+            next.visibility = visible
+            last.visibility = visible
+
+            if (store.imageFramesStore.imageFramesModel.size == 1) {
+                measureAngle.visibility = View.VISIBLE
+                measureLine.visibility = View.VISIBLE
+                pseudo.visibility = View.VISIBLE
+                reverse.visibility = View.VISIBLE
             }
         }
 

@@ -10,24 +10,12 @@ import com.github.charleslzq.dicom.data.DicomPatient
  */
 object CacheUtil {
     val PATIENT = "patient"
-    val BITMAP = "bitmap"
     private val registry = mutableMapOf<CacheKey<*>, LruCache<String, *>>()
 
     init {
         with(registry) {
             put(CacheKey(PATIENT, DicomPatient::class.java), LruCache<String, DicomPatient>(3))
-
-            put(CacheKey(BITMAP, Bitmap::class.java), LruCache<String, Bitmap>(20))
         }
-    }
-
-    fun <T> resizeCache(
-            cacheName: String,
-            storageType: Class<T>,
-            newSize: Int) {
-        val key = CacheKey(cacheName, storageType)
-        registry.remove(key)
-        registry[key] = LruCache<String, T>(newSize)
     }
 
     fun <T> cache(
