@@ -24,10 +24,6 @@ class ImageCell(
 )) {
 
     init {
-        view.setOnClickListener {
-            EventBus.post(ClickEvent.ImageCellClicked(store.imageFramesStore.layoutPosition))
-        }
-
         view.setOnDragListener { _, dragEvent ->
             when (dragEvent.action) {
                 DragEvent.ACTION_DROP -> {

@@ -50,5 +50,9 @@ class ImageRightTopPanel(
                 description.visibility = visible
             }
         }
+
+        render(store::hideMeta) {
+            view.visibility = if (it) View.INVISIBLE else View.VISIBLE
+        }
     }
 }

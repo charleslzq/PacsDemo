@@ -2,6 +2,7 @@ package com.github.charleslzq.pacsdemo.component.gesture
 
 import android.view.MotionEvent
 import com.github.charleslzq.kotlin.react.EventBus
+import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 
@@ -11,11 +12,6 @@ import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 class PlayModeGestureListener(
         layoutPosition: Int
 ) : ScaleCompositeGestureListener(layoutPosition) {
-
-    override fun onSingleTapConfirmed(motionEvent: MotionEvent): Boolean {
-        EventBus.post(ImageDisplayEvent.ChangePlayStatus(layoutPosition))
-        return true
-    }
 
     override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
         if (Math.abs(distanceX) > 3 * Math.abs(distanceY)) {

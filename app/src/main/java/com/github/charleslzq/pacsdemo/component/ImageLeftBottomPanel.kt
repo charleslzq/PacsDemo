@@ -36,5 +36,9 @@ class ImageLeftBottomPanel(
             val seriesTime = it.dicomSeriesMetaInfo.time ?: "unknown"
             timeInfo.post { timeInfo.text = "$seriesDate $seriesTime" }
         }
+
+        render(store::hideMeta) {
+            view.visibility = if (it) View.INVISIBLE else View.VISIBLE
+        }
     }
 }
