@@ -9,8 +9,8 @@
     <string name="stop_service">STOP SERVICE</string>
     <string name="imageContentDescription">The selected image</string>
     <string name="image_play">&#xf04b;</string>
-    <string name="image_previous">&#xf0d9;</string>
-    <string name="image_next">&#xf0da;</string>
+    <string name="image_previous">&#xf048;</string>
+    <string name="image_next">&#xf051;</string>
     <string name="image_to_first">&#xf049;</string>
     <string name="image_to_last">&#xf050;</string>
     <string name="image_pause">&#xf04c;</string>
