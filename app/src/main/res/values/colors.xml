@@ -5,4 +5,5 @@
     <color name="colorAccent">#FF4081</color>
     <color name="thumbBorder">#8E8E8E</color>
     <color name="borderSelected">#FFC830</color>
+    <color name="common_text_color">#FFFFFF</color>
 </resources>
