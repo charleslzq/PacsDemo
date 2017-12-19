@@ -43,8 +43,6 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         private set
     var imageCanvasModel by ObservableStatus(ImageCanvasModel())
         private set
-    var currentPath by ObservableStatus(Path())
-        private set
     var currentLines by ObservableStatus(FloatArray(0))
         private set
 
