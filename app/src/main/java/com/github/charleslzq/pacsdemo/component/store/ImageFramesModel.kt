@@ -7,6 +7,7 @@ import java.net.URI
  * Created by charleslzq on 17-11-29.
  */
 data class ImageFramesModel(
+        val seriesId: String = "",
         val frames: List<DicomImageMetaInfo> = emptyList(),
         val size: Int = frames.size,
         val frameUrls: List<URI> = frames.sortedBy { it.instanceNumber?.toInt() }.mapNotNull { it.files[DEFAULT] },

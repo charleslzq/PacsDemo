@@ -109,10 +109,10 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
 
         reduce(ImageFramesStore::matrix) {
             on<ImageDisplayEvent.ScaleChange>(precondition = { targetAtThis(it) }) {
-                val matrix = Matrix(state)
-                val newScale = getNewScaleFactor(event.scaleFactor)
-                matrix.setScale(newScale, newScale)
-                matrix
+                Matrix(state).apply {
+                    val newScale = getNewScaleFactor(event.scaleFactor)
+                    setScale(newScale, newScale)
+                }
             }
             on<ImageDisplayEvent.StudyModeReset>(precondition = { targetAtThis(it) }) {
                 Matrix()
@@ -121,9 +121,9 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
 
         reduce(ImageFramesStore::colorMatrix) {
             on<ClickEvent.ReverseColor>(precondition = { targetAtThis(it) }) {
-                val colorMatrix = ColorMatrix(state)
-                colorMatrix.postConcat(reverseMatrix)
-                colorMatrix
+                ColorMatrix(state).apply {
+                    postConcat(reverseMatrix)
+                }
             }
             on<ImageDisplayEvent.PlayModeReset>(precondition = { targetAtThis(it) }) {
                 ColorMatrix()

@@ -1,5 +1,6 @@
 package com.github.charleslzq.pacsdemo.support
 
+import android.graphics.Bitmap
 import android.util.Log
 import android.util.LruCache
 import com.github.charleslzq.dicom.data.DicomPatient
@@ -9,12 +10,19 @@ import com.github.charleslzq.dicom.data.DicomPatient
  */
 object CacheUtil {
     val PATIENT = "patient"
+    val BITMAP = "bitmap"
+    val BITMAP_SIZE = 100
     private val registry = mutableMapOf<CacheKey<*>, LruCache<String, *>>()
 
     init {
         with(registry) {
             put(CacheKey(PATIENT, DicomPatient::class.java), LruCache<String, DicomPatient>(3))
+            put(CacheKey(BITMAP, Bitmap::class.java), LruCache<String, Bitmap>(BITMAP_SIZE))
         }
+    }
+
+    fun <T> resize(cacheName: String, storageType: Class<T>, newSize: Int) {
+        registry[CacheKey(cacheName, storageType)] = LruCache<String, T>(newSize)
     }
 
     fun <T> cache(
@@ -33,7 +41,7 @@ object CacheUtil {
             val objectKey = keyGenerator(arguments)
             val objectInCache = storageType.cast(cache[objectKey])
             val debugOnMiss: (Array<String>) -> T? = {
-                Log.d("Cache $cacheName", "miss for $objectKey")
+                Log.i("Cache $cacheName", "miss for $objectKey")
                 onMiss(it)
             }
             return objectInCache ?: debugOnMiss(arguments)?.also { cache.put(objectKey, it) }

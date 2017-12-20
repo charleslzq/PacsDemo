@@ -70,7 +70,7 @@ class PacsDemoActivity : AppCompatActivity() {
                                     patient.metaInfo,
                                     study.metaInfo,
                                     it.metaInfo,
-                                    ImageFramesModel(it.images.sortedBy { it.instanceNumber?.toInt() })
+                                    ImageFramesModel(it.metaInfo.instanceUID!!, it.images.sortedBy { it.instanceNumber?.toInt() })
                             )
                         }
                     }.toMutableList()

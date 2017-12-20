@@ -6,6 +6,7 @@ import android.content.ClipDescription
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.widget.ImageView
 import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
@@ -45,28 +46,45 @@ class ThumbList(
                 ItemClickSupport.addTo(view).setOnItemLongClickListener(object : ItemClickSupport.OnItemLongClickListener {
                     @Suppress("DEPRECATION")
                     override fun onItemLongClicked(recyclerView: RecyclerView, position: Int, v: View): Boolean {
-                        if (position >= 0 && position < view.childCount) {
-                            val targetView = view.getChildAt(position)
-                            val dragBuilder = View.DragShadowBuilder(targetView)
+                        getThumbView(position)?.let {
+                            val dragBuilder = View.DragShadowBuilder(it)
                             val clipDataItem = ClipData.Item(tag, position.toString())
                             val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), clipDataItem)
-                            targetView.startDrag(clipData, dragBuilder, null, 0)
+                            it.startDrag(clipData, dragBuilder, null, 0)
                         }
                         return true
                     }
                 })
 
-                (1..view.childCount).forEach { view.getChildAt(it - 1).isSelected = false }
-                if (store.selected >= 0 && store.selected < view.childCount) {
-                    view.getChildAt(store.selected).isSelected = true
-                }
+                setSelected(store.selected)
             }
         }
 
         render(store::selected) {
-            (1..view.childCount).forEach { view.getChildAt(it - 1).isSelected = false }
-            if (it >= 0 && it < view.childCount) {
-                view.getChildAt(it).isSelected = true
+            setSelected(it)
+        }
+    }
+
+    private fun setSelected(selected: Int) {
+        (1..store.seriesList.size).forEach {
+            setSelected(it, false)
+        }
+        if (selected in (0..(store.seriesList.size - 1))) {
+            setSelected(selected, true)
+        }
+    }
+
+    private fun setSelected(position: Int, selected: Boolean) {
+        getThumbView(position)?.isSelected = selected
+    }
+
+    private fun getThumbView(position: Int): ImageView? {
+        val viewHolder = view.findViewHolderForAdapterPosition(position)
+        return viewHolder?.let {
+            if (it is DicomSeriesThumbListAdpater.ViewHolder) {
+                it.thumbView
+            } else {
+                null
             }
         }
     }
