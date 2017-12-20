@@ -4,6 +4,8 @@ import com.github.charleslzq.kotlin.react.ObservableStatus
 import com.github.charleslzq.kotlin.react.WithReducer
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -15,7 +17,9 @@ class PacsStore : WithReducer<PacsStore> {
         private set
     var layoutOption: LayoutOption by ObservableStatus(LayoutOption.ONE_ONE)
         private set
-    val imageCells: List<PatientSeriesStore> = (0..8).map { PatientSeriesStore(ImageFramesStore(it)) }
+    val imageCells: List<PatientSeriesStore> = Observable.range(0, 9).observeOn(Schedulers.io()).map {
+        PatientSeriesStore(ImageFramesStore(it))
+    }.toList().blockingGet()
 
     init {
         reduce(PacsStore::seriesList) {

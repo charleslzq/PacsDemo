@@ -41,10 +41,8 @@ class DicomImage(
         render(ImageFramesStore::imageFramesModel) {
             if (store.hasImage()) {
                 store.autoAdjustScale(view)
-                view.setImageBitmap(store.getCurrentFrame())
-            } else {
-                view.setImageBitmap(null)
             }
+            resetFrame()
         }
 
         render(ImageFramesStore::imagePlayModel) {
@@ -68,11 +66,7 @@ class DicomImage(
                     view.clearAnimation()
                     view.background = null
                 }
-                if (store.hasImage()) {
-                    view.setImageBitmap(store.getCurrentFrame())
-                } else {
-                    view.setImageBitmap(null)
-                }
+                resetFrame()
             }
         }
 
@@ -93,7 +87,7 @@ class DicomImage(
         }
 
         render(property = ImageFramesStore::pseudoColor, guard = { store.hasImage() }) {
-            view.setImageBitmap(store.getCurrentFrame())
+            resetFrame()
         }
 
         render(property = ImageFramesStore::measure, guard = { store.hasImage() }) {
@@ -145,6 +139,17 @@ class DicomImage(
             }
         }
 
+    }
+
+    private fun resetFrame() {
+        if (store.hasImage()) {
+            Observable.fromCallable { store.getCurrentFrame() }
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { view.setImageBitmap(it) }
+        } else {
+            view.setImageBitmap(null)
+        }
     }
 
     private fun onDragStart(dragCopyCellMessage: DragEventMessage.StartCopyCell) {

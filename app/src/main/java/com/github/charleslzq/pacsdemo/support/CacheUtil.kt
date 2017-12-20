@@ -37,7 +37,7 @@ object CacheUtil {
             val objectKey = keyGenerator(arguments)
             val objectInCache = storageType.cast(cache[objectKey])
             val debugOnMiss: (Array<String>) -> T? = {
-                Log.i("Cache $cacheName", "miss for $objectKey")
+                Log.d("Cache $cacheName", "miss for $objectKey")
                 onMiss(it)
             }
             return objectInCache ?: debugOnMiss(arguments)?.also { cache.put(objectKey, it) }

@@ -6,7 +6,7 @@ import com.github.charleslzq.dicom.data.DicomPatient
 import com.github.charleslzq.dicom.store.DicomDataStore
 import com.github.charleslzq.pacsdemo.broker.DicomMessageBroker
 import com.github.charleslzq.pacsdemo.service.DicomDataService
-import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackgroud
+import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackground
 import com.github.charleslzq.pacsdemo.support.CacheUtil
 
 /**
@@ -29,11 +29,11 @@ class DicomDataServiceImpl(
     }
 
     override fun requirePatients(vararg patientId: String) {
-        val patients = sharedPreferences.getStringSet(DicomDataServiceBackgroud.PATIENTS, emptySet()).toMutableSet()
+        val patients = sharedPreferences.getStringSet(DicomDataServiceBackground.PATIENTS, emptySet()).toMutableSet()
         patients.addAll(patientId)
 
         val editor = sharedPreferences.edit()
-        editor.putStringSet(DicomDataServiceBackgroud.PATIENTS, patients)
+        editor.putStringSet(DicomDataServiceBackground.PATIENTS, patients)
         editor.apply()
 
         messageBroker.requirePatients(*patientId)
@@ -43,7 +43,7 @@ class DicomDataServiceImpl(
         dataStore.clearData()
 
         val editor = sharedPreferences.edit()
-        editor.putStringSet(DicomDataServiceBackgroud.PATIENTS, setOf(*patientId))
+        editor.putStringSet(DicomDataServiceBackground.PATIENTS, setOf(*patientId))
         editor.apply()
 
         messageBroker.refreshPatients(*patientId)
@@ -51,7 +51,7 @@ class DicomDataServiceImpl(
 
     override fun setUrl(url: String) {
         val editor = sharedPreferences.edit()
-        editor.putString(DicomDataServiceBackgroud.WS_URL, url)
+        editor.putString(DicomDataServiceBackground.WS_URL, url)
         editor.apply()
     }
 }

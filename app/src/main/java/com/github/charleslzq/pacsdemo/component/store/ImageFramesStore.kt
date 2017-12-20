@@ -13,6 +13,9 @@ import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageCellEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 
 /**
@@ -209,23 +212,27 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
 
     fun autoAdjustScale(view: View) {
         if (hasImage()) {
-            val viewHeight = view.measuredHeight
-            val viewWidth = view.measuredWidth
-            val firstImage = getFrame(0)
-            val imageWidth = firstImage.width
-            val imageHeight = firstImage.height
-            val ratio = imageWidth.toFloat() / imageHeight.toFloat()
-            val desiredWidth = Math.ceil((viewHeight * ratio).toDouble()).toInt()
-            rawScale = if (desiredWidth <= viewWidth) {
-                view.layoutParams.width = desiredWidth
-                this.imageWidth = desiredWidth
-                desiredWidth.toFloat() / imageWidth
-            } else {
-                val desiredHeight = Math.ceil((viewWidth / ratio).toDouble()).toInt()
-                this.imageWidth = viewWidth
-                view.layoutParams.height = desiredHeight
-                desiredHeight.toFloat() / imageHeight
-            }
+            Observable.fromCallable { getFrame(0) }
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        val viewHeight = view.measuredHeight
+                        val viewWidth = view.measuredWidth
+                        val imageWidth = it.width
+                        val imageHeight = it.height
+                        val ratio = imageWidth.toFloat() / imageHeight.toFloat()
+                        val desiredWidth = Math.ceil((viewHeight * ratio).toDouble()).toInt()
+                        rawScale = if (desiredWidth <= viewWidth) {
+                            view.layoutParams.width = desiredWidth
+                            this.imageWidth = desiredWidth
+                            desiredWidth.toFloat() / imageWidth
+                        } else {
+                            val desiredHeight = Math.ceil((viewWidth / ratio).toDouble()).toInt()
+                            this.imageWidth = viewWidth
+                            view.layoutParams.height = desiredHeight
+                            desiredHeight.toFloat() / imageHeight
+                        }
+                    }
         }
     }
 
