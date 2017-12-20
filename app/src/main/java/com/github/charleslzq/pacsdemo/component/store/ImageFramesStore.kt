@@ -71,12 +71,12 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
             on<BindingEvent.ModelSelected>(precondition = { layoutPosition == 0 }) {
                 val size = Math.max(event.patientSeriesModel.imageFramesModel.size, 10)
                 BitmapCache(layoutPosition, size).apply {
-                    preloadAll(*event.patientSeriesModel.imageFramesModel.frameUrls.toTypedArray())
+                    preload(*event.patientSeriesModel.imageFramesModel.frameUrls.toTypedArray())
                 }
             }
             on<BindingEvent.ModelDropped>(precondition = { it.layoutPosition == layoutPosition }) {
                 BitmapCache(layoutPosition).apply {
-                    preloadAll(*urisInRange(0, preloadRange).toTypedArray())
+                    preload(*urisInRange(0, preloadRange).toTypedArray())
                 }
             }
             on<BindingEvent.SeriesListUpdated> { BitmapCache(layoutPosition) }
@@ -249,6 +249,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
 
     private fun getFrame(index: Int): Bitmap {
         val rawBitmap = bitmapCache.load(imageFramesModel.frameUrls[index])
+        bitmapCache.preload(*urisInRange(index - preloadRange, index + preloadRange).toTypedArray())
         if (rawBitmap != null) {
             if (pseudoColor) {
                 val pixels = IntArray(rawBitmap.height * rawBitmap.width)

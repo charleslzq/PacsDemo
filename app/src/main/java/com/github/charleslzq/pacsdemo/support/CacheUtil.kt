@@ -17,7 +17,7 @@ object CacheUtil {
         }
     }
 
-    fun <T> resize(cacheName: String, storageType: Class<T>, newSize: Int) {
+    fun <T> create(cacheName: String, storageType: Class<T>, newSize: Int) {
         registry[CacheKey(cacheName, storageType)] = LruCache<String, T>(newSize)
     }
 

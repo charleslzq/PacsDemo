@@ -16,7 +16,7 @@ class BitmapCache(
         size: Int = 10
 ) {
     init {
-        CacheUtil.resize(getCacheName(), Bitmap::class.java, size)
+        CacheUtil.create(getCacheName(), Bitmap::class.java, size)
     }
 
     fun load(uri: URI): Bitmap? {
@@ -25,7 +25,7 @@ class BitmapCache(
         }
     }
 
-    fun preloadAll(vararg uris: URI) {
+    fun preload(vararg uris: URI) {
         Observable.fromArray(*uris).observeOn(Schedulers.io()).forEach { load(it) }
     }
 
