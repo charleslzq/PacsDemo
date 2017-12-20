@@ -3,6 +3,7 @@ package com.github.charleslzq.pacsdemo
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.StrictMode
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.charleslzq.dicom.data.DicomStudy
@@ -41,6 +42,11 @@ class PacsDemoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_pacs_demo)
         Log.d("PacsActivity", "onCreate execute")
+
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build())
+            StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build())
+        }
 
         pacs = PacsMain(pacsPanel, PacsStore())
         backButton.setOnClickListener { this.finish() }

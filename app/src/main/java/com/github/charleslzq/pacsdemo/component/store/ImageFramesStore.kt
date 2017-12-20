@@ -13,7 +13,6 @@ import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageCellEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
-import java.io.File
 
 
 /**
@@ -45,6 +44,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         private set
     var currentLines by ObservableStatus(FloatArray(0))
         private set
+    var bitmapCache by ObservableStatus(BitmapCache(layoutPosition))
 
     init {
         linePaint.color = Color.RED
@@ -65,6 +65,22 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
             }
             on<BindingEvent.SeriesListUpdated> { ImageFramesModel() }
             on<ClickEvent.ChangeLayout> { ImageFramesModel() }
+        }
+
+        reduce(ImageFramesStore::bitmapCache) {
+            on<BindingEvent.ModelSelected>(precondition = { layoutPosition == 0 }) {
+                val size = Math.max(event.patientSeriesModel.imageFramesModel.size, 10)
+                BitmapCache(layoutPosition, size).apply {
+                    preloadAll(*event.patientSeriesModel.imageFramesModel.frameUrls.toTypedArray())
+                }
+            }
+            on<BindingEvent.ModelDropped>(precondition = { it.layoutPosition == layoutPosition }) {
+                BitmapCache(layoutPosition).apply {
+                    preloadAll(*urisInRange(0, preloadRange).toTypedArray())
+                }
+            }
+            on<BindingEvent.SeriesListUpdated> { BitmapCache(layoutPosition) }
+            on<ClickEvent.ChangeLayout> { BitmapCache(layoutPosition) }
         }
 
         reduce(ImageFramesStore::imagePlayModel) {
@@ -229,19 +245,23 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
 
     private fun targetAtThis(event: ImageCellEvent) = event.layoutPosition == layoutPosition
 
+    private fun urisInRange(start: Int, end: Int) = imageFramesModel.frameUrls.subList(Math.max(0, start), Math.min(end + 1, imageFramesModel.size))
+
     private fun getFrame(index: Int): Bitmap {
-        val rawBitmap = BitmapFactory.decodeFile(File(imageFramesModel.frameUrls[index]).absolutePath, BitmapFactory.Options().apply {
-            inMutable = pseudoColor || measure != Measure.NONE
-        })
-        if (pseudoColor) {
-            val pixels = IntArray(rawBitmap.height * rawBitmap.width)
-            rawBitmap.getPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
-            (0..(pixels.size - 1)).forEach {
-                pixels[it] = calculateColor(pixels[it])
+        val rawBitmap = bitmapCache.load(imageFramesModel.frameUrls[index])
+        if (rawBitmap != null) {
+            if (pseudoColor) {
+                val pixels = IntArray(rawBitmap.height * rawBitmap.width)
+                rawBitmap.getPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
+                (0..(pixels.size - 1)).forEach {
+                    pixels[it] = calculateColor(pixels[it])
+                }
+                rawBitmap.setPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
             }
-            rawBitmap.setPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
+            return rawBitmap
+        } else {
+            throw IllegalAccessError("Can't load image file ${imageFramesModel.frameUrls[index]}")
         }
-        return rawBitmap
     }
 
     private fun getScaledFrame(index: Int): Bitmap {
@@ -314,6 +334,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
                 0f, 0f, -1f, 0f, 255f,
                 0f, 0f, 0f, 1f, 0f
         ))
+        private val preloadRange = 5
     }
 
     enum class Measure {

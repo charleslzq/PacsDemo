@@ -36,10 +36,12 @@ class ThumbList(
             if (store.seriesList.isNotEmpty()) {
                 ItemClickSupport.addTo(view).setOnItemClickListener(object : ItemClickSupport.OnItemClickListener {
                     override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
-                        EventBus.post(ClickEvent.ThumbListItemClicked(position))
-                        if (position in (0..(store.seriesList.size - 1))) {
-                            EventBus.post(ImageDisplayEvent.PlayModeReset(0))
-                            EventBus.post(BindingEvent.ModelSelected(store.seriesList[position]))
+                        if (store.layoutOption == PacsStore.LayoutOption.ONE_ONE) {
+                            EventBus.post(ClickEvent.ThumbListItemClicked(position))
+                            if (position in (0..(store.seriesList.size - 1))) {
+                                EventBus.post(ImageDisplayEvent.PlayModeReset(0))
+                                EventBus.post(BindingEvent.ModelSelected(store.seriesList[position]))
+                            }
                         }
                     }
                 })
@@ -67,7 +69,7 @@ class ThumbList(
 
     private fun setSelected(selected: Int) {
         (1..store.seriesList.size).forEach {
-            setSelected(it, false)
+            setSelected(it - 1, false)
         }
         if (selected in (0..(store.seriesList.size - 1))) {
             setSelected(selected, true)
