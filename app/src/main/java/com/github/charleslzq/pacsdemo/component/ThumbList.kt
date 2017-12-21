@@ -57,8 +57,6 @@ class ThumbList(
                         return true
                     }
                 })
-
-                setSelected(store.selected)
             }
         }
 
