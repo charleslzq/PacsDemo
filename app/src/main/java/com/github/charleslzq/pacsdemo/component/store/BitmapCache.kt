@@ -2,7 +2,7 @@ package com.github.charleslzq.pacsdemo.component.store
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import com.github.charleslzq.pacsdemo.support.CacheUtil
+import com.github.charleslzq.pacsdemo.support.MemCache
 import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 import java.io.File
 import java.net.URI
@@ -10,17 +10,18 @@ import java.net.URI
 /**
  * Created by charleslzq on 17-12-20.
  */
-class BitmapCache(
-        private val position: Int,
-        size: Int = 10
-) : RxScheduleSupport {
-    init {
-        CacheUtil.create(getCacheName(), Bitmap::class.java, size)
-    }
+class BitmapCache(size: Int = 10) : RxScheduleSupport {
+    private val cache = MemCache(Bitmap::class.java, size)
 
     fun load(uri: URI): Bitmap? {
-        return CacheUtil.cache(getCacheName(), Bitmap::class.java, uri.toString()) {
-            decode(uri)
+        return bigImageCache.load(uri.toString()) {
+            cache.load(args = uri.toString(), autoUpdate = false) {
+                decode(uri)
+            }
+        }?.also {
+            if (it.byteCount < ONE_MB) {
+                cache.save(args = uri.toString(), data = it)
+            }
         }
     }
 
@@ -42,9 +43,8 @@ class BitmapCache(
         }
     }
 
-    private fun getCacheName() = CACHE_PREFIX + position.toString()
-
     companion object {
-        val CACHE_PREFIX = "Bitmap#"
+        private val ONE_MB = 1024 * 1024
+        private val bigImageCache = MemCache(Bitmap::class.java, 10, { it.byteCount > ONE_MB })
     }
 }

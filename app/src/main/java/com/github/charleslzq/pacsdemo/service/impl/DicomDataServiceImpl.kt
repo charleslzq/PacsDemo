@@ -7,7 +7,7 @@ import com.github.charleslzq.dicom.store.DicomDataStore
 import com.github.charleslzq.pacsdemo.broker.DicomMessageBroker
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackground
-import com.github.charleslzq.pacsdemo.support.CacheUtil
+import com.github.charleslzq.pacsdemo.support.MemCache
 
 /**
  * Created by charleslzq on 17-11-15.
@@ -17,9 +17,10 @@ class DicomDataServiceImpl(
         private val dataStore: DicomDataStore,
         private val sharedPreferences: SharedPreferences
 ) : Binder(), DicomDataService {
+    private val cache = MemCache(DicomPatient::class.java, 5)
 
     override fun findPatient(patientId: String): DicomPatient? {
-        return CacheUtil.cache(CacheUtil.PATIENT, DicomPatient::class.java, patientId) {
+        return cache.load(patientId) {
             val patientInStore = dataStore.getPatient(patientId)
             if (patientInStore == null) {
                 requirePatients(patientId)

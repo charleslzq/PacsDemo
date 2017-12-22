@@ -21,7 +21,7 @@ class DicomWebSocketClient(
         private val url: String,
         private val dicomMessageListener: DicomMessageListener,
         private val gson: Gson = Converters.registerLocalDateTime(GsonBuilder()).create()
-): RxScheduleSupport {
+) : RxScheduleSupport {
     private var webSocket: WebSocket? = null
     private val logTag = this.javaClass.name
     private val heartBeat = "@heart"
