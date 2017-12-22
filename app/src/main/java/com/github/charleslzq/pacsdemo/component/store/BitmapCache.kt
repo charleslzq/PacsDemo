@@ -11,16 +11,12 @@ import java.net.URI
  * Created by charleslzq on 17-12-20.
  */
 class BitmapCache(size: Int = 10) : RxScheduleSupport {
-    private val cache = MemCache(Bitmap::class.java, size)
+    private val cache = MemCache(Bitmap::class.java, size, { it.byteCount <= ONE_MB })
 
     fun load(uri: URI): Bitmap? {
         return bigImageCache.load(uri.toString()) {
-            cache.load(args = uri.toString(), autoUpdate = false) {
+            cache.load(uri.toString()) {
                 decode(uri)
-            }
-        }?.also {
-            if (it.byteCount < ONE_MB) {
-                cache.save(args = uri.toString(), data = it)
             }
         }
     }
