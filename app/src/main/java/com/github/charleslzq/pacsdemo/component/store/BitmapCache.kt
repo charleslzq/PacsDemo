@@ -44,7 +44,7 @@ class BitmapCache(size: Int = 10) : RxScheduleSupport {
     }
 
     companion object {
-        private val ONE_MB = 1024 * 1024
+        private val ONE_MB = 1024 * 1024 * 8
         private val bigImageCache = MemCache(Bitmap::class.java, 10, { it.byteCount > ONE_MB })
     }
 }
