@@ -1,8 +1,11 @@
 package com.github.charleslzq.pacsdemo
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.os.StrictMode
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -17,25 +20,26 @@ import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackground
-import com.github.charleslzq.pacsdemo.support.ObservableServiceConnection
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_pacs_demo.*
 
 class PacsDemoActivity : AppCompatActivity() {
-    private val observableServiceConnection = ObservableServiceConnection<DicomDataService>(
-            onConnect = {
-                it.subscribeOn(Schedulers.io()).subscribe {
-                    this.dicomDataService = it
-                    val patientId = intent.getStringExtra(PATIENT_ID) ?: this.patientId
-                    val studyId = intent.getStringExtra(STUDY_ID) ?: this.studyId
-                    val seriesId = intent.getStringExtra(SERIES_ID) ?: this.seriesId
-                    val imageNum = intent.getStringExtra(IMAGE_NUM) ?: this.imageNum
-                    load(patientId, studyId, seriesId, imageNum)
-                }
-            },
-            onDisConnect = { this.dicomDataService = null }
-    )
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceDisconnected(name: ComponentName?) {
+            dicomDataService = null
+        }
+
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            dicomDataService = service as DicomDataService
+            val patientId = intent.getStringExtra(PATIENT_ID) ?: patientId
+            val studyId = intent.getStringExtra(STUDY_ID) ?: studyId
+            val seriesId = intent.getStringExtra(SERIES_ID) ?: seriesId
+            val imageNum = intent.getStringExtra(IMAGE_NUM) ?: imageNum
+            load(patientId, studyId, seriesId, imageNum)
+        }
+
+    }
     private var dicomDataService: DicomDataService? = null
     private val patientId = "03117795"
     private val studyId = "1.2.840.113619.186.388521824370.20111208084338939.716"
@@ -56,11 +60,11 @@ class PacsDemoActivity : AppCompatActivity() {
         pacs = PacsMain(pacsPanel, PacsStore())
         backButton.setOnClickListener { this.finish() }
 
-        bindService(Intent(this, DicomDataServiceBackground::class.java), observableServiceConnection, Context.BIND_AUTO_CREATE)
+        bindService(Intent(this, DicomDataServiceBackground::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
     override fun onDestroy() {
-        unbindService(observableServiceConnection)
+        unbindService(serviceConnection)
         super.onDestroy()
     }
 

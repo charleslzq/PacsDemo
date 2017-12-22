@@ -14,7 +14,7 @@ class DicomWebSocketMessageBroker(
         private val gson: Gson = Converters.registerLocalDateTime(GsonBuilder()).create()
 ) : DicomMessageBroker {
     private val dicomMessageListener = CompositeDicomMessageListener()
-    private val dicomClient = DicomWebsocketClient(url, dicomMessageListener, gson)
+    private val dicomClient = DicomWebSocketClient(url, dicomMessageListener, gson)
 
     override fun requirePatients(vararg patientId: String) {
         val headers = mapOf(
@@ -58,7 +58,7 @@ class DicomWebSocketMessageBroker(
 
     override fun connect() {
         if (!dicomClient.isOpen()) {
-            dicomClient.init()
+            dicomClient.connect()
         }
     }
 }

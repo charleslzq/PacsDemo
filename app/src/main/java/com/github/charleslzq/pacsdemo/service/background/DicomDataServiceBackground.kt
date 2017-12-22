@@ -13,66 +13,42 @@ import com.github.charleslzq.pacsdemo.broker.DicomMessageBroker
 import com.github.charleslzq.pacsdemo.broker.DicomWebSocketMessageBroker
 import com.github.charleslzq.pacsdemo.broker.RemoteSaveHandler
 import com.github.charleslzq.pacsdemo.broker.message.StoreMessageListener
-import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.impl.DicomDataServiceImpl
-import com.github.charleslzq.pacsdemo.support.ObservableService
 import java.io.File
 import java.util.*
 
 class DicomDataServiceBackground : Service() {
     private val logTag = this.javaClass.name
-    private var messageBroker: DicomMessageBroker? = null
-    private var dataStore: DicomDataStore? = null
-    private var sharedPreferces: SharedPreferences? = null
+    private lateinit var messageBroker: DicomMessageBroker
+    private lateinit var dataStore: DicomDataStore
+    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var clientId: String
     private lateinit var patients: Set<String>
     private lateinit var wsUrl: String
 
     override fun onBind(intent: Intent): IBinder? {
-        return ObservableService<DicomDataService> {
-            if (messageBroker == null || dataStore == null || sharedPreferces == null) {
-                val components = createServiceComponents()
-                messageBroker = components.first
-                dataStore = components.second
-                sharedPreferces = components.third
-            }
-            DicomDataServiceImpl(messageBroker!!, dataStore!!, sharedPreferces!!)
-        }
+        return DicomDataServiceImpl(messageBroker, dataStore, sharedPreferences)
     }
 
     override fun onCreate() {
         super.onCreate()
-        Log.i(logTag, "Service Created")
-    }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        Log.i(logTag, "Service Started")
-        return super.onStartCommand(intent, flags, startId)
-    }
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCE, Context.MODE_PRIVATE)
+        clientId = sharedPreferences.getString(CLIENT_ID, UUID.randomUUID().toString().toUpperCase())
+        patients = sharedPreferences.getStringSet(PATIENTS, setOf("03117795"))
+        wsUrl = sharedPreferences.getString(WS_URL, "ws://10.0.2.2:8080/pacs")
 
-    override fun onDestroy() {
-        Log.i(logTag, "Service destroyed")
-        super.onDestroy()
-    }
-
-    private fun createServiceComponents(): Triple<DicomMessageBroker, DicomDataStore, SharedPreferences> {
-        val preferces = getSharedPreferences(SHARED_PREFERENCE, Context.MODE_PRIVATE)
-        clientId = preferces.getString(CLIENT_ID, UUID.randomUUID().toString().toUpperCase())
-        patients = preferces.getStringSet(PATIENTS, setOf("03117795"))
-        wsUrl = preferces.getString(WS_URL, "ws://10.0.2.2:8080/pacs")
-
-        val editor = preferces.edit()
+        val editor = sharedPreferences.edit()
         editor.putString(CLIENT_ID, clientId)
         editor.putString(WS_URL, wsUrl)
         editor.putStringSet(PATIENTS, patients)
         editor.apply()
 
+        messageBroker = DicomWebSocketMessageBroker(wsUrl, clientId)
         if (patients.isNotEmpty()) {
-            messageBroker?.refreshPatients(*patients.toTypedArray())
+            messageBroker.refreshPatients(*patients.toTypedArray())
         }
-
-        val broker = DicomWebSocketMessageBroker(wsUrl, clientId)
-        val saveHandler = RemoteSaveHandler(broker)
+        val saveHandler = RemoteSaveHandler(messageBroker)
 
         val storeRoot = Environment.getExternalStorageDirectory().absolutePath + STORE_BASE
         val file = File(storeRoot)
@@ -83,12 +59,12 @@ class DicomDataServiceBackground : Service() {
                 stopSelf()
             }
         }
-        val store = DicomDataFileStore(storeRoot, saveHandler)
+        dataStore = DicomDataFileStore(storeRoot, saveHandler)
 
-        val messageListener = StoreMessageListener(store)
-        broker.register(messageListener)
+        val messageListener = StoreMessageListener(dataStore)
+        messageBroker.register(messageListener)
 
-        return Triple(broker, store, preferces)
+        Log.i(logTag, "Service Created")
     }
 
     companion object {

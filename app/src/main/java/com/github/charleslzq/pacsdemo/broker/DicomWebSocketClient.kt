@@ -16,7 +16,7 @@ import com.koushikdutta.async.http.WebSocket
 /**
  * Created by charleslzq on 17-11-15.
  */
-class DicomWebsocketClient(
+class DicomWebSocketClient(
         private val url: String,
         private val dicomMessageListener: DicomMessageListener,
         private val gson: Gson = Converters.registerLocalDateTime(GsonBuilder()).create()
@@ -25,26 +25,25 @@ class DicomWebsocketClient(
     private val logTag = this.javaClass.name
     private val heartBeat = "@heart"
 
-    fun init() {
+    fun connect() {
         AsyncHttpClient.getDefaultInstance().websocket(url, "dicom", this::onComplete)
     }
 
     fun isOpen(): Boolean {
-        val result = webSocket?.isOpen
-        return result != null && result
+        return webSocket?.isOpen ?: false
     }
 
     fun send(message: String) {
         webSocket?.send(message)
     }
 
-    private fun onComplete(ex: Exception?, webSocket: WebSocket) {
-        when (ex) {
-            null -> {
-                webSocket.setStringCallback { onMessage(it) }
+    private fun onComplete(ex: Exception?, webSocket: WebSocket?) {
+        when (ex == null && webSocket != null) {
+            true -> {
+                webSocket!!.setStringCallback { onMessage(it) }
                 this.webSocket = webSocket
             }
-            else -> {
+            false -> {
                 Log.e(logTag, "Error when connecting $url", ex)
             }
         }

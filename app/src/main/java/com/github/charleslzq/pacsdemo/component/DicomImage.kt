@@ -5,7 +5,6 @@ import android.content.ClipDescription
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.ColorMatrixColorFilter
-import android.graphics.drawable.AnimationDrawable
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.kotlin.react.Component
@@ -14,9 +13,6 @@ import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -39,25 +35,17 @@ class DicomImage(
         view.setOnTouchListener(operationMode)
 
         render(ImageFramesStore::imageFramesModel) {
-            if (store.hasImage()) {
-                store.autoAdjustScale(view)
-            }
             resetFrame()
         }
 
         render(ImageFramesStore::imagePlayModel) {
             if (it.playing && view.background == null && store.playable()) {
                 if (store.hasImage()) {
-                    Observable.create<AnimationDrawable> {
-                        it.onNext(store.getCurrentAnimation(view))
-                    }.subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe {
-                                view.setImageBitmap(null)
-                                view.clearAnimation()
-                                view.background = it
-                                view.post(it)
-                            }
+                    val animation = store.getCurrentAnimation(view)
+                    view.setImageBitmap(null)
+                    view.clearAnimation()
+                    view.background = animation
+                    view.post(animation)
                 }
             } else if (!it.playing) {
                 val background = view.background
@@ -106,7 +94,7 @@ class DicomImage(
                     MeasureMode(view.context, MeasureModeGestureListener(store))
                 }
                 false -> {
-                    view.setImageBitmap(store.getCurrentFrame())
+                    resetFrame()
                     drawingCache = null
                     if (store.scaleFactor > 1.0f) {
                         StudyMode(view.context, StudyModeGestureListener(store.layoutPosition))
@@ -138,15 +126,12 @@ class DicomImage(
                 view.invalidate()
             }
         }
-
     }
 
     private fun resetFrame() {
+        store.autoAdjustScale(view)
         if (store.hasImage()) {
-            Observable.fromCallable { store.getCurrentFrame() }
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { view.setImageBitmap(it) }
+            view.setImageBitmap(store.getCurrentFrame())
         } else {
             view.setImageBitmap(null)
         }

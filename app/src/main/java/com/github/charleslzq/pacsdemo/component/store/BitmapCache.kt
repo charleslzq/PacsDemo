@@ -30,9 +30,15 @@ class BitmapCache(
     }
 
     private fun decode(uri: URI): Bitmap? {
-        return BitmapFactory.decodeFile(File(uri).absolutePath, BitmapFactory.Options().apply {
-            inMutable = true
-        })
+        return Observable.just(uri).observeOn(Schedulers.io()).map {
+            try {
+                BitmapFactory.decodeFile(File(uri).absolutePath, BitmapFactory.Options().apply {
+                    inMutable = true
+                })
+            } catch (ex: Throwable) {
+                null
+            }
+        }.blockingSingle()
     }
 
     private fun getCacheName() = CACHE_PREFIX + position.toString()
