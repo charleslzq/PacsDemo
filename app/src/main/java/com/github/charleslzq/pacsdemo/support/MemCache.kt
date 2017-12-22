@@ -13,18 +13,14 @@ class MemCache<T>(
 ) {
     private val cache = LruCache<String, T>(size)
 
-    fun load(vararg args: String, autoUpdate: Boolean = true, onMiss: (Array<String>) -> T?): T? {
+    fun load(vararg args: String, onMiss: (Array<String>) -> T?): T? {
         val arguments = arrayOf(*args)
         val objectKey = keyGenerator(arguments)
         val objectInCache = storageType.cast(cache[objectKey])
         return objectInCache ?: onMiss(arguments)?.also {
-            if (autoUpdate && updateWhen(it)) {
+            if (updateWhen(it)) {
                 cache.put(objectKey, it)
             }
         }
-    }
-
-    fun save(vararg args: String, data: T) {
-        cache.put(keyGenerator(arrayOf(*args)), data)
     }
 }
