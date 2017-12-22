@@ -3,8 +3,7 @@ package com.github.charleslzq.pacsdemo.component.store
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.github.charleslzq.pacsdemo.support.CacheUtil
-import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
+import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 import java.io.File
 import java.net.URI
 
@@ -14,7 +13,7 @@ import java.net.URI
 class BitmapCache(
         private val position: Int,
         size: Int = 10
-) {
+) : RxScheduleSupport {
     init {
         CacheUtil.create(getCacheName(), Bitmap::class.java, size)
     }
@@ -26,11 +25,13 @@ class BitmapCache(
     }
 
     fun preload(vararg uris: URI) {
-        Observable.fromArray(*uris).observeOn(Schedulers.io()).forEach { load(it) }
+        runOnIo {
+            uris.forEach { load(it) }
+        }
     }
 
     private fun decode(uri: URI): Bitmap? {
-        return Observable.just(uri).observeOn(Schedulers.io()).map {
+        return callOnIo {
             try {
                 BitmapFactory.decodeFile(File(uri).absolutePath, BitmapFactory.Options().apply {
                     inMutable = true
@@ -38,7 +39,7 @@ class BitmapCache(
             } catch (ex: Throwable) {
                 null
             }
-        }.blockingSingle()
+        }
     }
 
     private fun getCacheName() = CACHE_PREFIX + position.toString()

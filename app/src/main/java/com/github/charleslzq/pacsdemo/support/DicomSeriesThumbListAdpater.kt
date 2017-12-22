@@ -8,9 +8,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.R
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import java.io.File
 
 /**
@@ -18,13 +15,11 @@ import java.io.File
  */
 class DicomSeriesThumbListAdpater(
         val seriesModels: MutableList<PatientSeriesModel>
-) : RecyclerView.Adapter<DicomSeriesThumbListAdpater.ViewHolder>() {
+) : RecyclerView.Adapter<DicomSeriesThumbListAdpater.ViewHolder>(), RxScheduleSupport {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        Observable.fromCallable {
+        holder.thumbView.setImageBitmap(callOnIo {
             BitmapFactory.decodeFile(File(seriesModels[position].imageFramesModel.thumbUrl).absolutePath)
-        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe {
-            holder.thumbView.setImageBitmap(it)
-        }
+        })
     }
 
     override fun getItemCount(): Int {

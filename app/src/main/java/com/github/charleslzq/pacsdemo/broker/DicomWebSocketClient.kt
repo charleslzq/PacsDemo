@@ -7,6 +7,7 @@ import com.github.charleslzq.pacsdemo.broker.message.DicomMessageListener
 import com.github.charleslzq.pacsdemo.broker.message.Message
 import com.github.charleslzq.pacsdemo.broker.message.MessageHeaders
 import com.github.charleslzq.pacsdemo.broker.message.ServerMessagePayloadType
+import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -20,13 +21,15 @@ class DicomWebSocketClient(
         private val url: String,
         private val dicomMessageListener: DicomMessageListener,
         private val gson: Gson = Converters.registerLocalDateTime(GsonBuilder()).create()
-) {
+): RxScheduleSupport {
     private var webSocket: WebSocket? = null
     private val logTag = this.javaClass.name
     private val heartBeat = "@heart"
 
     fun connect() {
-        AsyncHttpClient.getDefaultInstance().websocket(url, "dicom", this::onComplete)
+        runOnIo {
+            AsyncHttpClient.getDefaultInstance().websocket(url, "dicom", this::onComplete)
+        }
     }
 
     fun isOpen(): Boolean {
@@ -34,7 +37,9 @@ class DicomWebSocketClient(
     }
 
     fun send(message: String) {
-        webSocket?.send(message)
+        runOnIo {
+            webSocket?.send(message)
+        }
     }
 
     private fun onComplete(ex: Exception?, webSocket: WebSocket?) {

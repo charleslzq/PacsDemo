@@ -20,11 +20,12 @@ import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackground
+import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_pacs_demo.*
 
-class PacsDemoActivity : AppCompatActivity() {
+class PacsDemoActivity : AppCompatActivity(), RxScheduleSupport {
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             dicomDataService = null
@@ -69,6 +70,9 @@ class PacsDemoActivity : AppCompatActivity() {
     }
 
     fun load(patientId: String?, studyId: String?, seriesId: String?, imageNum: String?) {
+        callOnIo {
+
+        }
         Observable.create<MutableList<PatientSeriesModel>> {
             val patient = patientId?.let { dicomDataService?.findPatient(it) }
             it.onNext(when (patient == null) {

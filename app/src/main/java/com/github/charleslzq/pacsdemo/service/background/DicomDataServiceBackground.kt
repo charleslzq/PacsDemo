@@ -14,10 +14,11 @@ import com.github.charleslzq.pacsdemo.broker.DicomWebSocketMessageBroker
 import com.github.charleslzq.pacsdemo.broker.RemoteSaveHandler
 import com.github.charleslzq.pacsdemo.broker.message.StoreMessageListener
 import com.github.charleslzq.pacsdemo.service.impl.DicomDataServiceImpl
+import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 import java.io.File
 import java.util.*
 
-class DicomDataServiceBackground : Service() {
+class DicomDataServiceBackground : Service(), RxScheduleSupport {
     private val logTag = this.javaClass.name
     private lateinit var messageBroker: DicomMessageBroker
     private lateinit var dataStore: DicomDataStore
@@ -33,16 +34,35 @@ class DicomDataServiceBackground : Service() {
     override fun onCreate() {
         super.onCreate()
 
-        sharedPreferences = getSharedPreferences(SHARED_PREFERENCE, Context.MODE_PRIVATE)
-        clientId = sharedPreferences.getString(CLIENT_ID, UUID.randomUUID().toString().toUpperCase())
-        patients = sharedPreferences.getStringSet(PATIENTS, setOf("03117795"))
-        wsUrl = sharedPreferences.getString(WS_URL, "ws://10.0.2.2:8080/pacs")
+        sharedPreferences = callOnIo {
+            getSharedPreferences(SHARED_PREFERENCE, Context.MODE_PRIVATE)
+        }
+        clientId = callOnIo {
+            sharedPreferences.getString(CLIENT_ID, UUID.randomUUID().toString().toUpperCase())
+        }
+        patients = callOnIo {
+            sharedPreferences.getStringSet(PATIENTS, setOf("03117795"))
+        }
 
-        val editor = sharedPreferences.edit()
-        editor.putString(CLIENT_ID, clientId)
-        editor.putString(WS_URL, wsUrl)
-        editor.putStringSet(PATIENTS, patients)
-        editor.apply()
+        callOnIo {
+            Triple(
+                    sharedPreferences.getString(CLIENT_ID, UUID.randomUUID().toString().toUpperCase()),
+                    sharedPreferences.getStringSet(PATIENTS, setOf("03117795")),
+                    sharedPreferences.getString(WS_URL, "ws://10.0.2.2:8080/pacs")
+            )
+        }.apply {
+            clientId = first
+            patients = second
+            wsUrl = third
+        }
+
+        runOnIo {
+            val editor = sharedPreferences.edit()
+            editor.putString(CLIENT_ID, clientId)
+            editor.putString(WS_URL, wsUrl)
+            editor.putStringSet(PATIENTS, patients)
+            editor.apply()
+        }
 
         messageBroker = DicomWebSocketMessageBroker(wsUrl, clientId)
         if (patients.isNotEmpty()) {
@@ -50,19 +70,20 @@ class DicomDataServiceBackground : Service() {
         }
         val saveHandler = RemoteSaveHandler(messageBroker)
 
-        val storeRoot = Environment.getExternalStorageDirectory().absolutePath + STORE_BASE
-        val file = File(storeRoot)
-        when (Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()) {
-            true -> file.mkdirs()
-            false -> {
-                Log.e(logTag, "SD Storage Not Mounted, Can't Start This Service")
-                stopSelf()
+        dataStore = callOnIo {
+            val storeRoot = Environment.getExternalStorageDirectory().absolutePath + STORE_BASE
+            val file = File(storeRoot)
+            when (Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()) {
+                true -> file.mkdirs()
+                false -> {
+                    Log.e(logTag, "SD Storage Not Mounted, Can't Start This Service")
+                    stopSelf()
+                }
             }
+            DicomDataFileStore(storeRoot, saveHandler)
         }
-        dataStore = DicomDataFileStore(storeRoot, saveHandler)
 
-        val messageListener = StoreMessageListener(dataStore)
-        messageBroker.register(messageListener)
+        messageBroker.register(StoreMessageListener(dataStore))
 
         Log.i(logTag, "Service Created")
     }
