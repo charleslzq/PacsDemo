@@ -37,12 +37,6 @@ class DicomDataServiceBackground : Service(), RxScheduleSupport {
         sharedPreferences = callOnIo {
             getSharedPreferences(SHARED_PREFERENCE, Context.MODE_PRIVATE)
         }
-        clientId = callOnIo {
-            sharedPreferences.getString(CLIENT_ID, UUID.randomUUID().toString().toUpperCase())
-        }
-        patients = callOnIo {
-            sharedPreferences.getStringSet(PATIENTS, setOf("03117795"))
-        }
 
         callOnIo {
             Triple(
