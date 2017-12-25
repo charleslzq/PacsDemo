@@ -7,6 +7,6 @@ import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
  */
 class BindingEvent {
     data class ModelSelected(val patientSeriesModel: PatientSeriesModel)
-    class ModelDropped(layoutPosition: Int, val patientSeriesModel: PatientSeriesModel) : ImageCellEvent(layoutPosition)
+    data class ModelDropped(override val layoutPosition: Int, val patientSeriesModel: PatientSeriesModel) : ImageCellEvent()
     data class SeriesListUpdated(val seriesList: MutableList<PatientSeriesModel>)
 }

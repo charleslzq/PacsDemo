@@ -5,10 +5,10 @@ package com.github.charleslzq.pacsdemo.component.event
  */
 class ClickEvent {
     data class ChangeLayout(val layoutOrdinal: Int)
-    class ImageClicked(layoutPosition: Int) : ImageCellEvent(layoutPosition)
-    class TurnToMeasureLine(layoutPosition: Int) : ImageCellEvent(layoutPosition)
-    class TurnToMeasureAngle(layoutPosition: Int) : ImageCellEvent(layoutPosition)
-    class ReverseColor(layoutPosition: Int) : ImageCellEvent(layoutPosition)
-    class PseudoColor(layoutPosition: Int) : ImageCellEvent(layoutPosition)
-    class ThumbListItemClicked(val position: Int)
+    data class ImageClicked(override val layoutPosition: Int) : ImageCellEvent()
+    data class TurnToMeasureLine(override val layoutPosition: Int) : ImageCellEvent()
+    data class TurnToMeasureAngle(override val layoutPosition: Int) : ImageCellEvent()
+    data class ReverseColor(override val layoutPosition: Int) : ImageCellEvent()
+    data class PseudoColor(override val layoutPosition: Int) : ImageCellEvent()
+    data class ThumbListItemClicked(val position: Int)
 }
