@@ -250,15 +250,18 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         val rawBitmap = bitmapCache.load(imageFramesModel.frameUrls[index])
         bitmapCache.preload(*urisInRange(index - preloadRange, index + preloadRange).toTypedArray())
         if (rawBitmap != null) {
-            if (pseudoColor) {
+            return if (pseudoColor) {
                 val pixels = IntArray(rawBitmap.height * rawBitmap.width)
                 rawBitmap.getPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
                 (0..(pixels.size - 1)).forEach {
                     pixels[it] = calculateColor(pixels[it])
                 }
-                rawBitmap.setPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
+                Bitmap.createBitmap(rawBitmap.width, rawBitmap.height, rawBitmap.config).apply {
+                    setPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
+                }
+            } else {
+                rawBitmap
             }
-            return rawBitmap
         } else {
             throw IllegalAccessError("Can't load image file ${imageFramesModel.frameUrls[index]}")
         }
