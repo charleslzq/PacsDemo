@@ -72,9 +72,6 @@ class PacsDemoActivity : AppCompatActivity(), RxScheduleSupport {
     }
 
     fun load(patientId: String?, studyId: String?, seriesId: String?, imageNum: String?) {
-        callOnIo {
-
-        }
         Observable.create<MutableList<PatientSeriesModel>> {
             val patient = patientId?.let { dicomDataService?.findPatient(it) }
             it.onNext(when (patient == null) {
