@@ -92,7 +92,9 @@ class ImageControllPanel(
                 imageSeekBar.visibility = View.VISIBLE
                 imageSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                        EventBus.post(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, progress, fromUser))
+                        if (fromUser) {
+                            EventBus.post(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, progress, true))
+                        }
                     }
 
                     override fun onStartTrackingTouch(seekBar: SeekBar?) {
