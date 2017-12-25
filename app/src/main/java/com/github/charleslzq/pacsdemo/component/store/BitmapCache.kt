@@ -10,12 +10,22 @@ import java.net.URI
 /**
  * Created by charleslzq on 17-12-20.
  */
-class BitmapCache(size: Int = 10) : RxScheduleSupport {
-    private val cache = MemCache(Bitmap::class.java, size, { it.byteCount <= ONE_MB })
+class BitmapCache(size: Int = 10, private val useBigImageCache: Boolean = true) : RxScheduleSupport {
+    private val cache = MemCache(Bitmap::class.java, size, { !useBigImageCache || it.byteCount <= ONE_MB })
+
+    init {
+        if (!useBigImageCache) {
+            bigImageCache.clear()
+        }
+    }
 
     fun load(uri: URI): Bitmap? {
-        return bigImageCache.load(uri.toString()) {
-            cache.load(uri.toString()) {
+        return cache.load(uri.toString()) {
+            if (useBigImageCache) {
+                bigImageCache.load(uri.toString()) {
+                    decode(uri)
+                }
+            } else {
                 decode(uri)
             }
         }

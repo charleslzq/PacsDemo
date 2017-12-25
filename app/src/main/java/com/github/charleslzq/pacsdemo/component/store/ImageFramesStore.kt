@@ -44,7 +44,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         private set
     var currentLines by ObservableStatus(FloatArray(0))
         private set
-    private var bitmapCache by ObservableStatus(BitmapCache())
+    private var bitmapCache = BitmapCache()
 
     init {
         linePaint.color = Color.RED
@@ -69,7 +69,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
 
         reduce(ImageFramesStore::bitmapCache) {
             on<BindingEvent.ModelSelected>(precondition = { layoutPosition == 0 }) {
-                BitmapCache(Math.max(event.patientSeriesModel.imageFramesModel.size, 10)).apply {
+                BitmapCache(Math.max(event.patientSeriesModel.imageFramesModel.size, 10), false).apply {
                     preload(*event.patientSeriesModel.imageFramesModel.frameUrls.toTypedArray())
                 }
             }
