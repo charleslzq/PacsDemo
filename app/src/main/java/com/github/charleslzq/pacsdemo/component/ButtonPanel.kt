@@ -5,7 +5,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.PopupMenu
-import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.R
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
@@ -40,16 +39,16 @@ class ButtonPanel(
     private fun onLayoutSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.one_one -> {
-                EventBus.post(ClickEvent.ChangeLayout(0))
+                dispatch(ClickEvent.ChangeLayout(0))
             }
             R.id.one_two -> {
-                EventBus.post(ClickEvent.ChangeLayout(1))
+                dispatch(ClickEvent.ChangeLayout(1))
             }
             R.id.two_two -> {
-                EventBus.post(ClickEvent.ChangeLayout(2))
+                dispatch(ClickEvent.ChangeLayout(2))
             }
             R.id.three_three -> {
-                EventBus.post(ClickEvent.ChangeLayout(3))
+                dispatch(ClickEvent.ChangeLayout(3))
             }
         }
         return true

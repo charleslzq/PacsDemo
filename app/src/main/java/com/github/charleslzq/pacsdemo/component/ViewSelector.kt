@@ -24,8 +24,8 @@ class ViewSelector(
             val layoutPosition = it.layoutPosition
             val dataPosition = it.dataPosition
             if (dataPosition >= 0 && dataPosition < store.seriesList.size) {
-                EventBus.post(ImageDisplayEvent.PlayModeReset(layoutPosition))
-                EventBus.post(BindingEvent.ModelDropped(layoutPosition, store.seriesList[dataPosition]))
+                dispatch(ImageDisplayEvent.PlayModeReset(layoutPosition))
+                dispatch(BindingEvent.ModelDropped(layoutPosition, store.seriesList[dataPosition]))
             }
         }
         EventBus.onEvent<DragEventMessage.DropToCopyCell> {
@@ -33,10 +33,10 @@ class ViewSelector(
             val destPosition = it.targetPosition
             if (sourcePosition >= 0 && sourcePosition < store.imageCells.size) {
                 val data = store.imageCells[sourcePosition].patientSeriesModel
-                EventBus.post(ImageDisplayEvent.PlayModeReset(destPosition))
-                EventBus.post(BindingEvent.ModelDropped(destPosition, data))
-                EventBus.post(ImageDisplayEvent.PlayModeReset(sourcePosition))
-                EventBus.post(BindingEvent.ModelDropped(sourcePosition, PatientSeriesModel()))
+                dispatch(ImageDisplayEvent.PlayModeReset(destPosition))
+                dispatch(BindingEvent.ModelDropped(destPosition, data))
+                dispatch(ImageDisplayEvent.PlayModeReset(sourcePosition))
+                dispatch(BindingEvent.ModelDropped(sourcePosition, PatientSeriesModel()))
             }
         }
 

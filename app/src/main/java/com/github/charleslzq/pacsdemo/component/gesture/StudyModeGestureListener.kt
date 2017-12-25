@@ -1,7 +1,6 @@
 package com.github.charleslzq.pacsdemo.component.gesture
 
 import android.view.MotionEvent
-import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 
 /**
@@ -12,12 +11,12 @@ class StudyModeGestureListener(
 ) : ScaleCompositeGestureListener(layoutPosition) {
 
     override fun onDoubleTap(motionEvent: MotionEvent?): Boolean {
-        EventBus.post(ImageDisplayEvent.StudyModeReset(layoutPosition))
+        dispatch(ImageDisplayEvent.StudyModeReset(layoutPosition))
         return true
     }
 
     override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
-        EventBus.post(ImageDisplayEvent.LocationTranslate(layoutPosition, distanceX, distanceY))
+        dispatch(ImageDisplayEvent.LocationTranslate(layoutPosition, distanceX, distanceY))
         return true
     }
 }

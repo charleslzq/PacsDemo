@@ -3,7 +3,6 @@ package com.github.charleslzq.pacsdemo.component.gesture
 import android.graphics.PointF
 import android.view.MotionEvent
 import android.view.View
-import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 
@@ -24,7 +23,7 @@ class MeasureModeGestureListener(
                 if (firstPath) {
                     startPoint = currentPoint
                 } else {
-                    EventBus.post(ImageDisplayEvent.DrawLines(layoutPosition, toLines(startPoint, secondPoint, currentPoint)))
+                    dispatch(ImageDisplayEvent.DrawLines(layoutPosition, toLines(startPoint, secondPoint, currentPoint)))
                 }
             }
             MotionEvent.ACTION_MOVE -> {
@@ -35,7 +34,7 @@ class MeasureModeGestureListener(
                     pointList.add(secondPoint)
                 }
                 pointList.add(currentPoint)
-                EventBus.post(ImageDisplayEvent.DrawLines(layoutPosition, toLines(*pointList.toTypedArray())))
+                dispatch(ImageDisplayEvent.DrawLines(layoutPosition, toLines(*pointList.toTypedArray())))
             }
             MotionEvent.ACTION_UP -> {
                 val currentPoint = getPoint(motionEvent)
@@ -43,15 +42,15 @@ class MeasureModeGestureListener(
                 if (length > 5.0) {
                     if (framesStore.measure == ImageFramesStore.Measure.LINE) {
                         val text = length.toString()
-                        EventBus.post(ImageDisplayEvent.AddPath(layoutPosition, listOf(startPoint, currentPoint), currentPoint to text))
+                        dispatch(ImageDisplayEvent.AddPath(layoutPosition, listOf(startPoint, currentPoint), currentPoint to text))
                     } else if (framesStore.measure == ImageFramesStore.Measure.ANGEL) {
                         if (firstPath) {
-                            EventBus.post(ImageDisplayEvent.DrawLines(layoutPosition, toLines(startPoint, currentPoint)))
+                            dispatch(ImageDisplayEvent.DrawLines(layoutPosition, toLines(startPoint, currentPoint)))
                             secondPoint = currentPoint
                             firstPath = false
                         } else {
                             val text = calculateAngle(secondPoint, currentPoint).toString()
-                            EventBus.post(ImageDisplayEvent.AddPath(layoutPosition, listOf(startPoint, secondPoint, currentPoint), secondPoint to text))
+                            dispatch(ImageDisplayEvent.AddPath(layoutPosition, listOf(startPoint, secondPoint, currentPoint), secondPoint to text))
                             firstPath = true
                         }
                     }
@@ -62,7 +61,7 @@ class MeasureModeGestureListener(
     }
 
     override fun onDoubleTap(e: MotionEvent?): Boolean {
-        EventBus.post(ImageDisplayEvent.MeasureModeReset(layoutPosition))
+        dispatch(ImageDisplayEvent.MeasureModeReset(layoutPosition))
         return true
     }
 

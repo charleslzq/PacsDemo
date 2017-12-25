@@ -7,12 +7,12 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
-import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.support.DicomSeriesThumbListAdpater
+import io.reactivex.android.schedulers.AndroidSchedulers
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -37,10 +37,10 @@ class ThumbList(
                 ItemClickSupport.addTo(view).setOnItemClickListener(object : ItemClickSupport.OnItemClickListener {
                     override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
                         if (store.layoutOption == PacsStore.LayoutOption.ONE_ONE) {
-                            EventBus.post(ClickEvent.ThumbListItemClicked(position))
+                            dispatch(ClickEvent.ThumbListItemClicked(position))
                             if (position in (0..(store.seriesList.size - 1))) {
-                                EventBus.post(ImageDisplayEvent.PlayModeReset(0))
-                                EventBus.post(BindingEvent.ModelSelected(store.seriesList[position]))
+                                dispatch(ImageDisplayEvent.PlayModeReset(0))
+                                dispatch(BindingEvent.ModelSelected(store.seriesList[position]))
                             }
                         }
                     }

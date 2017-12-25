@@ -10,7 +10,6 @@ import android.os.StrictMode
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.charleslzq.dicom.data.DicomStudy
-import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.PacsMain
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
@@ -20,12 +19,15 @@ import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackground
+import com.github.charleslzq.pacsdemo.support.GlobalDispatch
 import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_pacs_demo.*
 
 class PacsDemoActivity : AppCompatActivity(), RxScheduleSupport {
+    private val dispatch = GlobalDispatch.DEBUG_DISPATCH
+
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             dicomDataService = null
@@ -98,18 +100,18 @@ class PacsDemoActivity : AppCompatActivity(), RxScheduleSupport {
         }.subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation())
                 .subscribe {
-                    EventBus.post(BindingEvent.SeriesListUpdated(it))
+                    dispatch(BindingEvent.SeriesListUpdated(it))
                     if (seriesId != null) {
                         it.indices.find { index -> it[index].dicomSeriesMetaInfo.instanceUID == seriesId }?.let { index ->
-                            EventBus.post(ClickEvent.ThumbListItemClicked(index))
-                            EventBus.post(BindingEvent.ModelSelected(it[index]))
+                            dispatch(ClickEvent.ThumbListItemClicked(index))
+                            dispatch(BindingEvent.ModelSelected(it[index]))
                             if (imageNum != null && imageNum.toInt() in (1..it[index].imageFramesModel.size)) {
-                                EventBus.post(ImageDisplayEvent.IndexChange(0, imageNum.toInt() - 1, false))
+                                dispatch(ImageDisplayEvent.IndexChange(0, imageNum.toInt() - 1, false))
                             }
                         }
                     } else if (it.isNotEmpty()) {
-                        EventBus.post(ClickEvent.ThumbListItemClicked(0))
-                        EventBus.post(BindingEvent.ModelSelected(it[0]))
+                        dispatch(ClickEvent.ThumbListItemClicked(0))
+                        dispatch(BindingEvent.ModelSelected(it[0]))
                     }
                 }
     }
