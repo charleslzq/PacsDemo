@@ -1,5 +1,6 @@
 package com.github.charleslzq.pacsdemo.component
 
+import android.support.constraint.ConstraintLayout
 import android.view.View
 import android.widget.*
 import com.github.charleslzq.kotlin.react.EventBus
@@ -54,11 +55,11 @@ class ViewSelector(
                     listOf(displayedChild)
                 }
                 PacsStore.LayoutOption.ONE_TWO -> {
-                    ViewUtils.getTypedChildren(displayedChild as LinearLayout, RelativeLayout::class.java)
+                    ViewUtils.getTypedChildren(displayedChild as LinearLayout, ConstraintLayout::class.java)
                 }
                 else -> {
                     ViewUtils.getTypedChildren(displayedChild as TableLayout, TableRow::class.java)
-                            .flatMap { ViewUtils.getTypedChildren(it, RelativeLayout::class.java) }
+                            .flatMap { ViewUtils.getTypedChildren(it, ConstraintLayout::class.java) }
                 }
             }
         }

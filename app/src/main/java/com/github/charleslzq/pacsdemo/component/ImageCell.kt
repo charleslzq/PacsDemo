@@ -15,7 +15,7 @@ class ImageCell(
         baseView: View,
         patientSeriesStore: PatientSeriesStore
 ) : ComponentGroup<View, PatientSeriesStore>(baseView, patientSeriesStore, listOf(
-        Sub(ImageLeftTopPanel::class, { listOf(baseView) }, sameAsParent()),
+        Sub(ImageLeftTopPanel::class, byId(R.id.leftTopPanel), sameAsParent()),
 //        Sub(ImageRightTopPanel::class, byId(R.id.rightTopPanel), sameAsParent()),
 //        Sub(ImageLeftBottomPanel::class, byId(R.id.leftBottomPanel), sameAsParent()),
 //        Sub(ImageControllPanel::class, byId(R.id.imageController), sameAsParent()),
