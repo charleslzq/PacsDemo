@@ -68,7 +68,7 @@ class MeasureModeGestureListener(
 
     private fun toLines(vararg points: PointF): FloatArray {
         return FloatArray((points.size - 1) * 4).apply {
-            (0..(points.size - 2)).forEach {
+            repeat(points.size - 1) {
                 val start = it * 4
                 this[start] = points[it].x
                 this[start + 1] = points[it].y

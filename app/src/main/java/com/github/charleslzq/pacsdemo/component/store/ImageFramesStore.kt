@@ -173,8 +173,8 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
                         state.paths.toMutableList().apply {
                             val path = Path()
                             path.moveTo(event.points[0].x, event.points[0].y)
-                            (1..(event.points.size - 1)).forEach {
-                                path.lineTo(event.points[it].x, event.points[it].y)
+                            repeat(event.points.size - 1) {
+                                path.lineTo(event.points[it + 1].x, event.points[it + 1].y)
                             }
                             add(path)
                         },
@@ -253,7 +253,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
             return if (pseudoColor) {
                 val pixels = IntArray(rawBitmap.height * rawBitmap.width)
                 rawBitmap.getPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
-                (0..(pixels.size - 1)).forEach {
+                repeat(pixels.size) {
                     pixels[it] = calculateColor(pixels[it])
                 }
                 Bitmap.createBitmap(rawBitmap.width, rawBitmap.height, rawBitmap.config).apply {
