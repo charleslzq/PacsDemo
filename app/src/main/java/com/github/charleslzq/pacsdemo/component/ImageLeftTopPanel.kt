@@ -11,9 +11,9 @@ import com.github.charleslzq.pacsdemo.component.store.PatientSeriesStore
  * Created by charleslzq on 17-12-6.
  */
 class ImageLeftTopPanel(
-        panelView: LinearLayout,
+        panelView: View,
         patientSeriesStore: PatientSeriesStore
-) : Component<LinearLayout, PatientSeriesStore>(panelView, patientSeriesStore) {
+) : Component<View, PatientSeriesStore>(panelView, patientSeriesStore) {
     private val windowInfo: TextView = view.findViewById(R.id.windowInfo)
     private val sliceInfo: TextView = view.findViewById(R.id.sliceInfo)
     private val scaleInfo: TextView = view.findViewById(R.id.scaleInfo)

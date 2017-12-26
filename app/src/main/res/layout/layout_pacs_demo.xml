@@ -25,7 +25,7 @@
             android:layout_height="match_parent">
 
             <include
-                layout="@layout/piece_image_item" />
+                layout="@layout/piece_image" />
 
             <LinearLayout
                 android:layout_width="match_parent"
