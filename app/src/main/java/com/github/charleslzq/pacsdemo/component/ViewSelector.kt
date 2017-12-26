@@ -2,7 +2,10 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.support.constraint.ConstraintLayout
 import android.view.View
-import android.widget.*
+import android.widget.LinearLayout
+import android.widget.TableLayout
+import android.widget.TableRow
+import android.widget.ViewFlipper
 import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage

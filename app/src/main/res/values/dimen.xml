@@ -6,4 +6,7 @@
     <dimen name="button_text_size">17sp</dimen>
     <dimen name="imageButtonSize">20dp</dimen>
     <dimen name="imageButtonMargin">2dp</dimen>
+    <dimen name="image_meta_card_radius">10dp</dimen>
+    <dimen name="image_meta_card_elevation">10dp</dimen>
+    <dimen name="image_meta_card_internal_padding">10dp</dimen>
 </resources>

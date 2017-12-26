@@ -37,7 +37,7 @@ class ImageLeftBottomPanel(
             timeInfo.post { timeInfo.text = "$seriesDate $seriesTime" }
         }
 
-        render(store::hideMeta) {
+        render(property = store::hideMeta, guard = { store.imageFramesStore.hasImage() }) {
             view.visibility = if (it) View.INVISIBLE else View.VISIBLE
         }
     }

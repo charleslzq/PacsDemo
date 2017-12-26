@@ -67,7 +67,7 @@ class ThumbList(
 
     private fun setSelected(selected: Int) {
         repeat(store.seriesList.size) {
-            setSelected(it , false)
+            setSelected(it, false)
         }
         if (selected in (0..(store.seriesList.size - 1))) {
             setSelected(selected, true)

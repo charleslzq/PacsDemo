@@ -2,6 +2,7 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.SeekBar
 import com.github.charleslzq.kotlin.react.Component
 import com.github.charleslzq.kotlin.react.EventBus
@@ -30,6 +31,10 @@ class ImageControllPanel(
     private val reverse: Button = view.findViewById(R.id.reverseButton)
 
     private val imageSeekBar: SeekBar = view.findViewById(R.id.imageSeekBar)
+
+    private val displayController: LinearLayout = view.findViewById(R.id.displayController)
+    private val indexController: LinearLayout = view.findViewById(R.id.indexController)
+    private val progressController: LinearLayout = view.findViewById(R.id.progressController)
 
     init {
         val fontAwesomeTypeface = TypefaceUtil.getTypeFace(view.context, TypefaceUtil.fontAwesome)
@@ -108,25 +113,21 @@ class ImageControllPanel(
                 })
                 View.VISIBLE
             } else {
-                View.INVISIBLE
+                View.GONE
             }
 
-            imageSeekBar.visibility = visible
-            measureAngle.visibility = visible
-            measureLine.visibility = visible
-            pseudo.visibility = visible
-            reverse.visibility = visible
-            first.visibility = visible
-            previous.visibility = visible
-            play.visibility = visible
-            next.visibility = visible
-            last.visibility = visible
+            displayController.visibility = visible
+            indexController.visibility = visible
+            progressController.visibility = visible
 
             if (store.imageFramesStore.imageFramesModel.size == 1) {
-                measureAngle.visibility = View.VISIBLE
-                measureLine.visibility = View.VISIBLE
-                pseudo.visibility = View.VISIBLE
-                reverse.visibility = View.VISIBLE
+                displayController.visibility = View.VISIBLE
+            }
+
+            if (!store.imageFramesStore.playable()) {
+                play.visibility = View.GONE
+            } else {
+                play.visibility = View.VISIBLE
             }
         }
 
@@ -137,7 +138,7 @@ class ImageControllPanel(
             }
         }
 
-        render(store::hideMeta) {
+        render(property = store::hideMeta, guard = { store.imageFramesStore.hasImage() }) {
             view.visibility = if (it) View.INVISIBLE else View.VISIBLE
         }
     }

@@ -1,7 +1,6 @@
 package com.github.charleslzq.pacsdemo.component
 
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.TextView
 import com.github.charleslzq.kotlin.react.Component
 import com.github.charleslzq.pacsdemo.R
@@ -45,7 +44,7 @@ class ImageLeftTopPanel(
                 imageProgress.post { imageProgress.text = "IMAGE: ${store.imageFramesStore.currentIndex() + 1}/${store.imageFramesStore.framesSize()}" }
             }
         }
-        render(store::hideMeta) {
+        render(property = store::hideMeta, guard = { store.imageFramesStore.hasImage() }) {
             view.visibility = if (it) View.INVISIBLE else View.VISIBLE
         }
     }

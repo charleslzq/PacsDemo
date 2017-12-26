@@ -6,5 +6,5 @@
     <color name="thumbBorder">#8E8E8E</color>
     <color name="borderSelected">#FFC830</color>
     <color name="common_text_color">#FFFFFF</color>
-    <color name="pure_black">#000000</color>
+    <color name="image_meta_card_color">#000000</color>
 </resources>

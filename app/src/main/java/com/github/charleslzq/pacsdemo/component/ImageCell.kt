@@ -16,9 +16,9 @@ class ImageCell(
         patientSeriesStore: PatientSeriesStore
 ) : ComponentGroup<View, PatientSeriesStore>(baseView, patientSeriesStore, listOf(
         Sub(ImageLeftTopPanel::class, byId(R.id.leftTopPanel), sameAsParent()),
-//        Sub(ImageRightTopPanel::class, byId(R.id.rightTopPanel), sameAsParent()),
-//        Sub(ImageLeftBottomPanel::class, byId(R.id.leftBottomPanel), sameAsParent()),
-//        Sub(ImageControllPanel::class, byId(R.id.imageController), sameAsParent()),
+        Sub(ImageRightTopPanel::class, byId(R.id.rightTopPanel), sameAsParent()),
+        Sub(ImageLeftBottomPanel::class, byId(R.id.leftBottomPanel), sameAsParent()),
+        Sub(ImageControllPanel::class, byId(R.id.imageController), sameAsParent()),
         Sub(DicomImage::class, byId(R.id.imagesContainer), { patientState, _ -> patientState.imageFramesStore })
 )) {
 
