@@ -35,7 +35,8 @@ class DicomImage(
         view.setOnTouchListener(operationMode)
 
         render(ImageFramesStore::imageFramesModel) {
-            resetFrame()
+            store.autoAdjustScale(view)
+            view.setImageBitmap(store.getCurrentFrame())
         }
 
         render(ImageFramesStore::imagePlayModel) {
@@ -54,7 +55,7 @@ class DicomImage(
                     view.clearAnimation()
                     view.background = null
                 }
-                resetFrame()
+                view.setImageBitmap(store.getCurrentFrame())
             }
         }
 
@@ -75,7 +76,7 @@ class DicomImage(
         }
 
         render(property = ImageFramesStore::pseudoColor, guard = { store.hasImage() }) {
-            resetFrame()
+            view.setImageBitmap(store.getCurrentFrame())
         }
 
         render(property = ImageFramesStore::measure, guard = { store.hasImage() }) {
@@ -94,7 +95,7 @@ class DicomImage(
                     MeasureMode(view.context, MeasureModeGestureListener(store))
                 }
                 false -> {
-                    resetFrame()
+                    view.setImageBitmap(store.getCurrentFrame())
                     drawingCache = null
                     if (store.scaleFactor > 1.0f) {
                         StudyMode(view.context, StudyModeGestureListener(store.layoutPosition))
@@ -125,15 +126,6 @@ class DicomImage(
                 canvas.drawLines(it, store.linePaint)
                 view.invalidate()
             }
-        }
-    }
-
-    private fun resetFrame() {
-        store.autoAdjustScale(view)
-        if (store.hasImage()) {
-            view.setImageBitmap(store.getCurrentFrame())
-        } else {
-            view.setImageBitmap(null)
         }
     }
 
