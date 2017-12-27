@@ -30,6 +30,7 @@ class ImageControllPanel(
     private val measureLine: Button = view.findViewById(R.id.measureLineButton)
     private val pseudo: Button = view.findViewById(R.id.pseudoColorButton)
     private val reverse: Button = view.findViewById(R.id.reverseButton)
+    private val undo: Button = view.findViewById(R.id.undoButton)
 
     private val imageSeekBar: SeekBar = view.findViewById(R.id.imageSeekBar)
 
@@ -43,6 +44,7 @@ class ImageControllPanel(
         measureAngle.typeface = fontAwesomeTypeface
         pseudo.typeface = fontAwesomeTypeface
         reverse.typeface = fontAwesomeTypeface
+        undo.typeface = fontAwesomeTypeface
         play.typeface = fontAwesomeTypeface
         previous.typeface = fontAwesomeTypeface
         next.typeface = fontAwesomeTypeface
@@ -50,11 +52,11 @@ class ImageControllPanel(
         last.typeface = fontAwesomeTypeface
 
         measureAngle.setOnClickListener {
-            EventBus.post(ClickEvent.TurnToMeasureAngle(store.imageFramesStore.layoutPosition))
+            EventBus.post(ClickEvent.MeasureAngleTurned(store.imageFramesStore.layoutPosition, measureAngle.isSelected))
         }
 
         measureLine.setOnClickListener {
-            EventBus.post(ClickEvent.TurnToMeasureLine(store.imageFramesStore.layoutPosition))
+            EventBus.post(ClickEvent.MeasureLineTurned(store.imageFramesStore.layoutPosition, measureLine.isSelected))
         }
 
         reverse.setOnClickListener {
@@ -63,6 +65,10 @@ class ImageControllPanel(
 
         pseudo.setOnClickListener {
             EventBus.post(ClickEvent.PseudoColor(store.imageFramesStore.layoutPosition))
+        }
+
+        undo.setOnClickListener {
+            EventBus.post(ClickEvent.Undo(store.imageFramesStore.layoutPosition))
         }
 
         first.setOnClickListener {
@@ -154,6 +160,10 @@ class ImageControllPanel(
 
         render(property = store::hideMeta, guard = { store.imageFramesStore.hasImage() }) {
             view.visibility = if (it) View.INVISIBLE else View.VISIBLE
+        }
+
+        render(property = store.imageFramesStore::drawingMap, guard = { store.imageFramesStore.hasImage() && store.imageFramesStore.measure != ImageFramesStore.Measure.NONE }) {
+            undo.visibility = if (store.imageFramesStore.canUndo()) View.VISIBLE else View.GONE
         }
     }
 }

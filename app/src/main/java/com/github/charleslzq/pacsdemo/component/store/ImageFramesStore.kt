@@ -22,6 +22,7 @@ import java.util.*
 class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> {
     var linePaint = Paint()
     var stringPaint = Paint()
+    var pointPaint = Paint()
     private var allowPlay = true
     private var imageWidth = 500
 
@@ -43,7 +44,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         private set
     var measure by ObservableStatus(Measure.NONE)
         private set
-    var currentLines by ObservableStatus(FloatArray(0))
+    var currentPoints by ObservableStatus(emptyList<PointF>())
         private set
     var drawingMap: Bitmap? by ObservableStatus(null)
         private set
@@ -59,6 +60,9 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         stringPaint.strokeWidth = 1f
         stringPaint.color = Color.RED
         stringPaint.isLinearText = true
+        pointPaint.color = Color.RED
+        pointPaint.strokeWidth = 3f
+        pointPaint.style = Paint.Style.FILL_AND_STROKE
 
         reduce(ImageFramesStore::imageFramesModel) {
             on<BindingEvent.ModelSelected>(precondition = { layoutPosition == 0 }) {
@@ -177,17 +181,11 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         }
 
         reduce(ImageFramesStore::measure) {
-            on<ClickEvent.TurnToMeasureLine>(precondition = { targetAtThis(it) }) {
-                when (state) {
-                    Measure.LINE -> Measure.NONE.also { drawingStack.clear() }
-                    else -> Measure.LINE
-                }
+            on<ClickEvent.MeasureLineTurned>(precondition = { targetAtThis(it) }) {
+                if (event.isSelected) Measure.NONE else Measure.LINE
             }
-            on<ClickEvent.TurnToMeasureAngle>(precondition = { targetAtThis(it) }) {
-                when (state) {
-                    Measure.ANGEL -> Measure.NONE.also { drawingStack.clear() }
-                    else -> Measure.ANGEL
-                }
+            on<ClickEvent.MeasureAngleTurned>(precondition = { targetAtThis(it) }) {
+                if (event.isSelected) Measure.NONE else Measure.ANGEL
             }
             on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) { Measure.NONE }
             on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) { Measure.NONE }
@@ -208,28 +206,41 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
                     canvas.drawText(event.text.second, event.text.first.x, event.text.first.y, stringPaint)
                 }.also { drawingStack.push(it) }
             }
-            on<ClickEvent.ImageContextClicked>(precondition = { targetAtThis(it) && hasImage() && !drawingStack.empty() }) {
-                drawingStack.pop()
+            on<ClickEvent.Undo>(precondition = { targetAtThis(it) }) {
+                if (!drawingStack.empty()) {
+                    drawingStack.pop()
+                }
                 topOfStack()
             }
             on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) { null }
             on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) { null }
+            on<ClickEvent.MeasureLineTurned>(precondition = { targetAtThis(it) && it.isSelected }) {
+                null
+            }
+            on<ClickEvent.MeasureAngleTurned>(precondition = { targetAtThis(it) && it.isSelected }) {
+                null
+            }
         }
 
-        reduce(property = ImageFramesStore::currentLines) {
+        reduce(property = ImageFramesStore::currentPoints) {
             on<ImageDisplayEvent.AddPath>(precondition = { targetAtThis(it) }) {
-                FloatArray(0)
+                emptyList()
             }
             on<ImageDisplayEvent.DrawLines>(precondition = { targetAtThis(it) }) {
                 event.points
             }
             on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) {
-                FloatArray(0)
+                emptyList()
+            }
+            on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) {
+                emptyList()
             }
         }
     }
 
     fun playable() = imageFramesModel.size > 1 && allowPlay
+
+    fun canUndo() = drawingStack.size > 1
 
     fun hasImage() = imageFramesModel.frames.isNotEmpty()
 

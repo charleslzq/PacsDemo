@@ -2,11 +2,9 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.view.DragEvent
 import android.view.View
-import android.widget.RelativeLayout
 import com.github.charleslzq.kotlin.react.ComponentGroup
 import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.R
-import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesStore
 
@@ -23,13 +21,8 @@ class ImageCell(
         Sub(ImageControllPanel::class, byId(R.id.imageController), sameAsParent()),
         Sub(DicomImage::class, byId(R.id.imagesContainer), { patientState, _ -> patientState.imageFramesStore })
 )) {
-    private val imageContext: RelativeLayout = view.findViewById(R.id.imageContext)
 
     init {
-        imageContext.setOnClickListener {
-            EventBus.post(ClickEvent.ImageContextClicked(store.imageFramesStore.layoutPosition))
-        }
-
         view.setOnDragListener { _, dragEvent ->
             when (dragEvent.action) {
                 DragEvent.ACTION_DROP -> {

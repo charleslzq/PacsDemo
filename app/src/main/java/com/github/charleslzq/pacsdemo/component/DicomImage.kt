@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipDescription
 import android.graphics.Canvas
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.PointF
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.kotlin.react.Component
@@ -96,10 +97,8 @@ class DicomImage(
             drawOnImage()
         }
 
-        render(property = ImageFramesStore::currentLines, guard = { store.hasImage() && store.measure != ImageFramesStore.Measure.NONE }) {
-            if (it.size >= 4) {
-                drawOnImage(it)
-            }
+        render(property = ImageFramesStore::currentPoints, guard = { store.hasImage() && store.measure != ImageFramesStore.Measure.NONE }) {
+            drawOnImage()
         }
     }
 
@@ -117,12 +116,39 @@ class DicomImage(
         return Canvas(store.getCurrentFrame()!!.also { view.setImageBitmap(it) })
     }
 
-    private fun drawOnImage(lines: FloatArray? = null) {
+    private fun drawOnImage() {
         createCanvas().apply {
             store.drawingMap?.let { drawBitmap(it, 0f, 0f, store.linePaint) }
-            lines?.let { drawLines(it, store.linePaint) }
+            toLines(*store.currentPoints.toTypedArray()).let {
+                if (it.size > 1) {
+                    drawCircle(it[it.size - 2], it[it.size - 1], 5f, store.pointPaint)
+                    if (it.size > 3) {
+                        drawLines(it, store.linePaint)
+                    }
+                }
+            }
         }
         view.invalidate()
+    }
+
+    private fun toLines(vararg points: PointF): FloatArray {
+        return when (points.size) {
+            0 -> FloatArray(0)
+            1 -> FloatArray(2).apply {
+                val point = points.first()
+                this[0] = point.x
+                this[1] = point.y
+            }
+            else -> FloatArray((points.size - 1) * 4).apply {
+                repeat(points.size - 1) {
+                    val start = it * 4
+                    this[start] = points[it].x
+                    this[start + 1] = points[it].y
+                    this[start + 2] = points[it + 1].x
+                    this[start + 3] = points[it + 1].y
+                }
+            }
+        }
     }
 
     companion object {
