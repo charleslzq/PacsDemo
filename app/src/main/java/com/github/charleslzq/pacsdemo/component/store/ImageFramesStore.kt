@@ -3,7 +3,6 @@ package com.github.charleslzq.pacsdemo.component.store
 import android.content.res.Resources
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.dicom.data.DicomImageMetaInfo
@@ -254,9 +253,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
                 emptyArray()
             }
             on<ImageDisplayEvent.DrawLines>(precondition = { targetAtThis(it) }) {
-                event.points.toTypedArray().also {
-                    Log.i("test1", it.joinToString(",") { it.toString() })
-                }
+                event.points.toTypedArray()
             }
             on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) {
                 emptyArray()
