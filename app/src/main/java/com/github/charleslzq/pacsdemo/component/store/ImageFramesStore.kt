@@ -36,6 +36,8 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         private set
     var colorMatrix by ObservableStatus(ColorMatrix())
         private set
+    var reverseColor by ObservableStatus(false)
+        private set
     var pseudoColor by ObservableStatus(false)
         private set
     var measure by ObservableStatus(Measure.NONE)
@@ -134,6 +136,18 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
             }
         }
 
+        reduce(ImageFramesStore::reverseColor) {
+            on<ClickEvent.ReverseColor>(precondition = { targetAtThis(it) }) {
+                !state
+            }
+            on<ImageDisplayEvent.PlayModeReset>(precondition = { targetAtThis(it) }) {
+                false
+            }
+            on<ImageDisplayEvent.StudyModeReset>(precondition = { targetAtThis(it) }) {
+                false
+            }
+        }
+
         reduce(ImageFramesStore::colorMatrix) {
             on<ClickEvent.ReverseColor>(precondition = { targetAtThis(it) }) {
                 ColorMatrix(state).apply {
@@ -161,8 +175,18 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         }
 
         reduce(ImageFramesStore::measure) {
-            on<ClickEvent.TurnToMeasureLine>(precondition = { targetAtThis(it) }) { Measure.LINE }
-            on<ClickEvent.TurnToMeasureAngle>(precondition = { targetAtThis(it) }) { Measure.ANGEL }
+            on<ClickEvent.TurnToMeasureLine>(precondition = { targetAtThis(it) }) {
+                when(state) {
+                    Measure.LINE -> Measure.NONE
+                    else -> Measure.LINE
+                }
+            }
+            on<ClickEvent.TurnToMeasureAngle>(precondition = { targetAtThis(it) }) {
+                when(state) {
+                    Measure.ANGEL -> Measure.NONE
+                    else -> Measure.ANGEL
+                }
+            }
             on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) { Measure.NONE }
             on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) { Measure.NONE }
         }

@@ -220,7 +220,7 @@
                     android:layout_height="@dimen/imageButtonSize"
                     android:layout_margin="@dimen/imageButtonMargin"
                     style="?android:attr/buttonBarButtonStyle"
-                    android:background="@drawable/circle_button"
+                    android:background="@drawable/circle_button_selector"
                     android:textColor="@color/common_text_color"
                     android:text="角"/>
                 <Button
@@ -229,7 +229,7 @@
                     android:layout_height="@dimen/imageButtonSize"
                     android:layout_margin="@dimen/imageButtonMargin"
                     style="?android:attr/buttonBarButtonStyle"
-                    android:background="@drawable/circle_button"
+                    android:background="@drawable/circle_button_selector"
                     android:textColor="@color/common_text_color"
                     android:text="线"/>
                 <Button
@@ -238,7 +238,7 @@
                     android:layout_height="@dimen/imageButtonSize"
                     android:layout_margin="@dimen/imageButtonMargin"
                     style="?android:attr/buttonBarButtonStyle"
-                    android:background="@drawable/circle_button"
+                    android:background="@drawable/circle_button_selector"
                     android:textColor="@color/common_text_color"
                     android:text="@string/pseudo_icon"/>
                 <Button
@@ -247,7 +247,7 @@
                     android:layout_height="@dimen/imageButtonSize"
                     android:layout_margin="@dimen/imageButtonMargin"
                     style="?android:attr/buttonBarButtonStyle"
-                    android:background="@drawable/circle_button"
+                    android:background="@drawable/circle_button_selector"
                     android:textColor="@color/common_text_color"
                     android:text="@string/reverse_icon"/>
             </LinearLayout>
@@ -262,7 +262,7 @@
                     android:layout_height="@dimen/imageButtonSize"
                     android:layout_margin="@dimen/imageButtonMargin"
                     style="?android:attr/buttonBarButtonStyle"
-                    android:background="@drawable/circle_button"
+                    android:background="@drawable/circle_button_selector"
                     android:textColor="@color/common_text_color"
                     android:text="@string/image_to_first"
                     />
@@ -271,7 +271,7 @@
                     android:layout_height="@dimen/imageButtonSize"
                     android:layout_margin="@dimen/imageButtonMargin"
                     style="?android:attr/buttonBarButtonStyle"
-                    android:background="@drawable/circle_button"
+                    android:background="@drawable/circle_button_selector"
                     android:textColor="@color/common_text_color"
                     android:text="@string/image_previous"
                     />
@@ -280,7 +280,7 @@
                     android:layout_height="@dimen/imageButtonSize"
                     android:layout_margin="@dimen/imageButtonMargin"
                     style="?android:attr/buttonBarButtonStyle"
-                    android:background="@drawable/circle_button"
+                    android:background="@drawable/circle_button_selector"
                     android:textColor="@color/common_text_color"
                     android:text="@string/image_play"
                     />
@@ -289,7 +289,7 @@
                     android:layout_height="@dimen/imageButtonSize"
                     android:layout_margin="@dimen/imageButtonMargin"
                     style="?android:attr/buttonBarButtonStyle"
-                    android:background="@drawable/circle_button"
+                    android:background="@drawable/circle_button_selector"
                     android:textColor="@color/common_text_color"
                     android:text="@string/image_next"
                     />
@@ -298,7 +298,7 @@
                     android:layout_height="@dimen/imageButtonSize"
                     android:layout_margin="@dimen/imageButtonMargin"
                     style="?android:attr/buttonBarButtonStyle"
-                    android:background="@drawable/circle_button"
+                    android:background="@drawable/circle_button_selector"
                     android:textColor="@color/common_text_color"
                     android:text="@string/image_to_last"
                     />

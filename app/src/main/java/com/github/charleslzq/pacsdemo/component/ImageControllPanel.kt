@@ -9,6 +9,7 @@ import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.R
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
+import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesStore
 import com.github.charleslzq.pacsdemo.support.TypefaceUtil
 
@@ -88,6 +89,19 @@ class ImageControllPanel(
 
         last.setOnClickListener {
             EventBus.post(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, store.imageFramesStore.imageFramesModel.size - 1, true))
+        }
+
+        render(store.imageFramesStore::measure) {
+            measureAngle.isSelected = it == ImageFramesStore.Measure.ANGEL
+            measureLine.isSelected = it == ImageFramesStore.Measure.LINE
+        }
+
+        render(store.imageFramesStore::pseudoColor) {
+            pseudo.isSelected = it
+        }
+
+        render(store.imageFramesStore::reverseColor) {
+            reverse.isSelected = it
         }
 
         render(store.imageFramesStore::imageFramesModel) {
