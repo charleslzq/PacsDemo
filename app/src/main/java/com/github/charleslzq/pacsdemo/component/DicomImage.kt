@@ -5,6 +5,7 @@ import android.content.ClipDescription
 import android.graphics.Canvas
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.PointF
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.kotlin.react.Component
@@ -77,7 +78,7 @@ class DicomImage(
         }
 
         render(property = ImageFramesStore::measure, guard = { store.hasImage() }) {
-            operationMode = when (store.measure != ImageFramesStore.Measure.NONE && store.hasImage()) {
+            operationMode = when (store.measure != ImageFramesStore.Measure.NONE) {
                 true -> {
                     drawOnImage()
                     MeasureMode(view.context, MeasureModeGestureListener(store.measure, store.layoutPosition))
@@ -122,6 +123,7 @@ class DicomImage(
                 drawBitmap(it, 0f, 0f, store.linePaint)
             }
             toLines(*store.currentPoints).let {
+                Log.i("test1", it.joinToString(",") { it.toString() })
                 if (it.size > 1) {
                     drawCircle(it[it.size - 2], it[it.size - 1], 5f, store.pointPaint)
                     if (it.size > 3) {

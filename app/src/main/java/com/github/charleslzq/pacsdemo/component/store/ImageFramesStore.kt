@@ -3,6 +3,7 @@ package com.github.charleslzq.pacsdemo.component.store
 import android.content.res.Resources
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.dicom.data.DicomImageMetaInfo
@@ -253,7 +254,9 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
                 emptyArray()
             }
             on<ImageDisplayEvent.DrawLines>(precondition = { targetAtThis(it) }) {
-                event.points.toTypedArray()
+                event.points.toTypedArray().also {
+                    Log.i("test1", it.joinToString(",") { it.toString() })
+                }
             }
             on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) {
                 emptyArray()
@@ -334,7 +337,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
                     setPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
                 }
             } else {
-                rawBitmap
+                rawBitmap.let { it.copy(it.config, true) }
             }
         } else {
             throw IllegalAccessError("Can't load image file ${imageFramesModel.frameUrls[index]}")

@@ -16,7 +16,7 @@ class MeasureModeGestureListener(
         layoutPosition: Int
 ) : ScaleCompositeGestureListener(layoutPosition) {
     private val points = Stack<PointF>()
-    private val lengthThreshold = 20f
+    private val lengthThreshold = 5f
 
     override fun onOtherGesture(view: View, motionEvent: MotionEvent): Boolean {
         when (motionEvent.action) {
