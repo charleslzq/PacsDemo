@@ -13,6 +13,7 @@ import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageCellEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
+import java.util.*
 
 
 /**
@@ -42,11 +43,12 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         private set
     var measure by ObservableStatus(Measure.NONE)
         private set
-    var imageCanvasModel by ObservableStatus(ImageCanvasModel())
-        private set
     var currentLines by ObservableStatus(FloatArray(0))
         private set
+    var drawingMap: Bitmap? by ObservableStatus(null)
+        private set
     private var bitmapCache = BitmapCache()
+    private val drawingStack = Stack<Bitmap>()
 
     init {
         linePaint.color = Color.RED
@@ -177,13 +179,13 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         reduce(ImageFramesStore::measure) {
             on<ClickEvent.TurnToMeasureLine>(precondition = { targetAtThis(it) }) {
                 when (state) {
-                    Measure.LINE -> Measure.NONE
+                    Measure.LINE -> Measure.NONE.also { drawingStack.clear() }
                     else -> Measure.LINE
                 }
             }
             on<ClickEvent.TurnToMeasureAngle>(precondition = { targetAtThis(it) }) {
                 when (state) {
-                    Measure.ANGEL -> Measure.NONE
+                    Measure.ANGEL -> Measure.NONE.also { drawingStack.clear() }
                     else -> Measure.ANGEL
                 }
             }
@@ -191,28 +193,27 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
             on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) { Measure.NONE }
         }
 
-        reduce(ImageFramesStore::imageCanvasModel) {
+        reduce(ImageFramesStore::drawingMap) {
             on<ImageDisplayEvent.AddPath>(precondition = { targetAtThis(it) }) {
-                ImageCanvasModel(
-                        state.paths.toMutableList().apply {
-                            val path = Path()
-                            path.moveTo(event.points[0].x, event.points[0].y)
-                            repeat(event.points.size - 1) {
-                                path.lineTo(event.points[it + 1].x, event.points[it + 1].y)
-                            }
-                            add(path)
-                        },
-                        state.texts.toMutableList().apply { add(event.text) }
-                )
+                val oldMap = topOfStack()
+                Bitmap.createBitmap(oldMap.width, oldMap.height, oldMap.config).apply {
+                    val canvas = Canvas(this)
+                    canvas.drawBitmap(topOfStack(), 0f, 0f, linePaint)
+                    canvas.drawPath(Path().apply {
+                        moveTo(event.points[0].x, event.points[0].y)
+                        repeat(event.points.size - 1) {
+                            lineTo(event.points[it + 1].x, event.points[it + 1].y)
+                        }
+                    }, linePaint)
+                    canvas.drawText(event.text.second, event.text.first.x, event.text.first.y, stringPaint)
+                }.also { drawingStack.push(it) }
             }
-            on<ClickEvent.ImageContextClicked>(precondition = { targetAtThis(it) }) {
-                ImageCanvasModel(
-                        state.paths.dropLast(1),
-                        state.texts.dropLast(1)
-                )
+            on<ClickEvent.ImageContextClicked>(precondition = { targetAtThis(it) && hasImage() && !drawingStack.empty() }) {
+                drawingStack.pop()
+                topOfStack()
             }
-            on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) { ImageCanvasModel() }
-            on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) { ImageCanvasModel() }
+            on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) { null }
+            on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) { null }
         }
 
         reduce(property = ImageFramesStore::currentLines) {
@@ -269,6 +270,13 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
     }
 
     fun getCurrentFrameMeta(): DicomImageMetaInfo? = if (hasImage()) imageFramesModel.frames[imagePlayModel.currentIndex] else null
+
+    private fun topOfStack(): Bitmap {
+        if (drawingStack.empty()) {
+            drawingStack.push(getCurrentFrame()!!.let { Bitmap.createBitmap(it.width, it.height, it.config) })
+        }
+        return drawingStack.peek()
+    }
 
     private fun getNewScaleFactor(rawScaleFactor: Float): Float = Math.max(1.0f, Math.min(rawScaleFactor * scaleFactor, 5.0f))
 
