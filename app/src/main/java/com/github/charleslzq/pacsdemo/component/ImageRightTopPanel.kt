@@ -21,33 +21,44 @@ class ImageRightTopPanel(
 
     init {
         render(store::patientSeriesModel) {
+            val visible = View.GONE
+            patientName.visibility = visible
+            patientId.visibility = visible
+            patientInfo.visibility = visible
+            institutionName.visibility = visible
+            description.visibility = visible
+
             if (store.imageFramesStore.hasImage()) {
-                val name = store.patientSeriesModel.patientMetaInfo.name ?: "UNKNOWN"
-                val id = store.patientSeriesModel.patientMetaInfo.id ?: "UNKNOWN"
-                val birthday = store.patientSeriesModel.patientMetaInfo.birthday ?: "UNKNOWN"
-                val gender = store.patientSeriesModel.patientMetaInfo.sex ?: "UNKNOWN"
-                val institution = store.patientSeriesModel.patientMetaInfo.institutionName ?: "UNKNOWN"
-                val des = store.patientSeriesModel.dicomSeriesMetaInfo.description ?: "UNKNOWN"
+                val meta = it.patientMetaInfo
+                meta.name?.let {
+                    patientName.post { patientName.text = it }
+                    patientName.visibility = View.VISIBLE
+                }
+                meta.id?.let {
+                    patientId.post { patientId.text = it }
+                    patientId.visibility = View.VISIBLE
+                }
 
-                patientName.post { patientName.text = name }
-                patientId.post { patientId.text = id }
-                patientInfo.post { patientInfo.text = "$birthday $gender" }
-                institutionName.post { institutionName.text = institution }
-                description.post { description.text = des }
+                if (meta.birthday != null && meta.sex != null) {
+                    patientInfo.post {
+                        patientInfo.text = buildString {
+                            append(meta.birthday!!)
+                            append(" ")
+                            append(meta.sex!!)
+                        }
+                    }
+                    patientInfo.visibility = View.VISIBLE
+                }
 
-                val visible = View.VISIBLE
-                patientName.visibility = visible
-                patientId.visibility = visible
-                patientInfo.visibility = visible
-                institutionName.visibility = visible
-                description.visibility = visible
-            } else {
-                val visible = View.INVISIBLE
-                patientName.visibility = visible
-                patientId.visibility = visible
-                patientInfo.visibility = visible
-                institutionName.visibility = visible
-                description.visibility = visible
+                meta.institutionName?.let {
+                    institutionName.post { institutionName.text = it }
+                    institutionName.visibility = View.VISIBLE
+                }
+
+                it.dicomSeriesMetaInfo.description?.let {
+                    description.post { description.text = it }
+                    description.visibility = View.VISIBLE
+                }
             }
         }
 
