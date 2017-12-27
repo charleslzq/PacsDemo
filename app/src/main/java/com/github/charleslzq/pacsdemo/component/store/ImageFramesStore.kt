@@ -200,12 +200,12 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
                     Measure.ANGEL
                 }
             }
-            on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) {
+            on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) {
                 drawingStack.clear()
                 redoStack.clear()
                 Measure.NONE
             }
-            on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) {
+            on<ClickEvent.ChangeLayout> {
                 drawingStack.clear()
                 redoStack.clear()
                 Measure.NONE
@@ -239,7 +239,6 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
                 }
                 topOfStack()
             }
-            on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) { null }
             on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) { null }
             on<ClickEvent.MeasureLineTurned>(precondition = { targetAtThis(it) && it.isSelected }) {
                 null
@@ -255,9 +254,6 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
             }
             on<ImageDisplayEvent.DrawLines>(precondition = { targetAtThis(it) }) {
                 event.points.toTypedArray()
-            }
-            on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) {
-                emptyArray()
             }
             on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) {
                 emptyArray()

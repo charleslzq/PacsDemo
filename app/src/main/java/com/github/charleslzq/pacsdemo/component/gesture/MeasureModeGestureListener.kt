@@ -16,7 +16,7 @@ class MeasureModeGestureListener(
         layoutPosition: Int
 ) : ScaleCompositeGestureListener(layoutPosition) {
     private val points = Stack<PointF>()
-    private val lengthThreshold = 10f
+    private val lengthThreshold = 20f
 
     override fun onOtherGesture(view: View, motionEvent: MotionEvent): Boolean {
         when (motionEvent.action) {
@@ -43,13 +43,20 @@ class MeasureModeGestureListener(
                         }
                         ImageFramesStore.Measure.ANGEL -> {
                             if (points.size == 3) {
-                                length(points[1], points[2]).takeIf { it > lengthThreshold }?.let {
+                                val length = length(points[1], points[2])
+                                if (length >= lengthThreshold) {
                                     EventBus.post(ImageDisplayEvent.AddPath(layoutPosition, points, points[1] to calculateAngle(points[0], points[1], points[2]).toString()))
-                                } ?: points.pop()
-                            } else {
-                                length(points.first(), points.last()).takeIf { it > lengthThreshold }?.let {
+                                    points.clear()
+                                } else {
+                                    points.pop()
                                     EventBus.post(ImageDisplayEvent.DrawLines(layoutPosition, points))
-                                } ?: points.pop()
+                                }
+                            } else {
+                                val length = length(points.first(), points.last())
+                                if (length < lengthThreshold) {
+                                    points.pop()
+                                }
+                                EventBus.post(ImageDisplayEvent.DrawLines(layoutPosition, points))
                             }
                         }
                     }
@@ -58,11 +65,6 @@ class MeasureModeGestureListener(
                 }
             }
         }
-        return true
-    }
-
-    override fun onDoubleTap(e: MotionEvent?): Boolean {
-        EventBus.post(ImageDisplayEvent.MeasureModeReset(layoutPosition))
         return true
     }
 

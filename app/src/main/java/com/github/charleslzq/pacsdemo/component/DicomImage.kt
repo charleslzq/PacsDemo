@@ -118,7 +118,9 @@ class DicomImage(
 
     private fun drawOnImage() {
         createCanvas().apply {
-            store.drawingMap?.let { drawBitmap(it, 0f, 0f, store.linePaint) }
+            store.drawingMap?.let {
+                drawBitmap(it, 0f, 0f, store.linePaint)
+            }
             toLines(*store.currentPoints).let {
                 if (it.size > 1) {
                     drawCircle(it[it.size - 2], it[it.size - 1], 5f, store.pointPaint)

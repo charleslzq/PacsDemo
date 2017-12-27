@@ -15,5 +15,4 @@ class ImageDisplayEvent {
     data class StudyModeReset(override val layoutPosition: Int) : ImageCellEvent()
     data class AddPath(override val layoutPosition: Int, val points: List<PointF>, val text: Pair<PointF, String>) : ImageCellEvent()
     data class DrawLines(override val layoutPosition: Int, val points: List<PointF>) : ImageCellEvent()
-    data class MeasureModeReset(override val layoutPosition: Int) : ImageCellEvent()
 }
