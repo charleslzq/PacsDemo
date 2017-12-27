@@ -93,11 +93,11 @@ class DicomImage(
             }
         }
 
-        render(property = ImageFramesStore::drawingMap, guard = { store.hasImage() }) {
+        render(property = ImageFramesStore::drawingMap, guard = { store.hasImage() && store.measure != ImageFramesStore.Measure.NONE }) {
             drawOnImage()
         }
 
-        render(property = ImageFramesStore::currentPoints, guard = { store.hasImage() && store.measure != ImageFramesStore.Measure.NONE }) {
+        render(property = ImageFramesStore::currentPoints, guard = { store.hasImage() }) {
             drawOnImage()
         }
     }
@@ -119,7 +119,7 @@ class DicomImage(
     private fun drawOnImage() {
         createCanvas().apply {
             store.drawingMap?.let { drawBitmap(it, 0f, 0f, store.linePaint) }
-            toLines(*store.currentPoints.toTypedArray()).let {
+            toLines(*store.currentPoints).let {
                 if (it.size > 1) {
                     drawCircle(it[it.size - 2], it[it.size - 1], 5f, store.pointPaint)
                     if (it.size > 3) {

@@ -44,12 +44,13 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         private set
     var measure by ObservableStatus(Measure.NONE)
         private set
-    var currentPoints by ObservableStatus(emptyList<PointF>())
+    var currentPoints by ObservableStatus(emptyArray<PointF>())
         private set
     var drawingMap: Bitmap? by ObservableStatus(null)
         private set
     private var bitmapCache = BitmapCache()
     private val drawingStack = Stack<Bitmap>()
+    private val redoStack = Stack<Bitmap>()
 
     init {
         linePaint.color = Color.RED
@@ -182,13 +183,33 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
 
         reduce(ImageFramesStore::measure) {
             on<ClickEvent.MeasureLineTurned>(precondition = { targetAtThis(it) }) {
-                if (event.isSelected) Measure.NONE else Measure.LINE
+                if (event.isSelected) {
+                    drawingStack.clear()
+                    redoStack.clear()
+                    Measure.NONE
+                } else {
+                    Measure.LINE
+                }
             }
             on<ClickEvent.MeasureAngleTurned>(precondition = { targetAtThis(it) }) {
-                if (event.isSelected) Measure.NONE else Measure.ANGEL
+                if (event.isSelected) {
+                    drawingStack.clear()
+                    redoStack.clear()
+                    Measure.NONE
+                } else {
+                    Measure.ANGEL
+                }
             }
-            on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) { Measure.NONE }
-            on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) { Measure.NONE }
+            on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) {
+                drawingStack.clear()
+                redoStack.clear()
+                Measure.NONE
+            }
+            on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) {
+                drawingStack.clear()
+                redoStack.clear()
+                Measure.NONE
+            }
         }
 
         reduce(ImageFramesStore::drawingMap) {
@@ -208,7 +229,13 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
             }
             on<ClickEvent.Undo>(precondition = { targetAtThis(it) }) {
                 if (!drawingStack.empty()) {
-                    drawingStack.pop()
+                    redoStack.push(drawingStack.pop())
+                }
+                topOfStack()
+            }
+            on<ClickEvent.Redo>(precondition = { targetAtThis(it) }) {
+                if (!redoStack.empty()) {
+                    drawingStack.push(redoStack.pop())
                 }
                 topOfStack()
             }
@@ -224,16 +251,16 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
 
         reduce(property = ImageFramesStore::currentPoints) {
             on<ImageDisplayEvent.AddPath>(precondition = { targetAtThis(it) }) {
-                emptyList()
+                emptyArray()
             }
             on<ImageDisplayEvent.DrawLines>(precondition = { targetAtThis(it) }) {
-                event.points
+                event.points.toTypedArray()
             }
             on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) {
-                emptyList()
+                emptyArray()
             }
             on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) {
-                emptyList()
+                emptyArray()
             }
         }
     }
@@ -241,6 +268,8 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
     fun playable() = imageFramesModel.size > 1 && allowPlay
 
     fun canUndo() = drawingStack.size > 1
+
+    fun canRedo() = redoStack.size > 0
 
     fun hasImage() = imageFramesModel.frames.isNotEmpty()
 

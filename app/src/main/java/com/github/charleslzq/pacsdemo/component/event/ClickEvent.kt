@@ -11,5 +11,6 @@ class ClickEvent {
     data class ReverseColor(override val layoutPosition: Int) : ImageCellEvent()
     data class PseudoColor(override val layoutPosition: Int) : ImageCellEvent()
     data class Undo(override val layoutPosition: Int) : ImageCellEvent()
+    data class Redo(override val layoutPosition: Int) : ImageCellEvent()
     data class ThumbListItemClicked(val position: Int)
 }

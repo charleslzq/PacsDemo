@@ -31,6 +31,7 @@ class ImageControllPanel(
     private val pseudo: Button = view.findViewById(R.id.pseudoColorButton)
     private val reverse: Button = view.findViewById(R.id.reverseButton)
     private val undo: Button = view.findViewById(R.id.undoButton)
+    private val redo: Button = view.findViewById(R.id.redoButton)
 
     private val imageSeekBar: SeekBar = view.findViewById(R.id.imageSeekBar)
 
@@ -45,6 +46,7 @@ class ImageControllPanel(
         pseudo.typeface = fontAwesomeTypeface
         reverse.typeface = fontAwesomeTypeface
         undo.typeface = fontAwesomeTypeface
+        redo.typeface = fontAwesomeTypeface
         play.typeface = fontAwesomeTypeface
         previous.typeface = fontAwesomeTypeface
         next.typeface = fontAwesomeTypeface
@@ -69,6 +71,10 @@ class ImageControllPanel(
 
         undo.setOnClickListener {
             EventBus.post(ClickEvent.Undo(store.imageFramesStore.layoutPosition))
+        }
+
+        redo.setOnClickListener {
+            EventBus.post(ClickEvent.Redo(store.imageFramesStore.layoutPosition))
         }
 
         first.setOnClickListener {
@@ -164,6 +170,7 @@ class ImageControllPanel(
 
         render(property = store.imageFramesStore::drawingMap, guard = { store.imageFramesStore.hasImage() && store.imageFramesStore.measure != ImageFramesStore.Measure.NONE }) {
             undo.visibility = if (store.imageFramesStore.canUndo()) View.VISIBLE else View.GONE
+            redo.visibility = if (store.imageFramesStore.canRedo()) View.VISIBLE else View.GONE
         }
     }
 }
