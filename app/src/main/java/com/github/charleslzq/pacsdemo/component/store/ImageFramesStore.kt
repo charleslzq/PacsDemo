@@ -261,6 +261,12 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
             on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) {
                 emptyArray()
             }
+            on<ClickEvent.MeasureLineTurned>(precondition = { targetAtThis(it) && it.isSelected }) {
+                emptyArray()
+            }
+            on<ClickEvent.MeasureAngleTurned>(precondition = { targetAtThis(it) && it.isSelected }) {
+                emptyArray()
+            }
         }
     }
 
