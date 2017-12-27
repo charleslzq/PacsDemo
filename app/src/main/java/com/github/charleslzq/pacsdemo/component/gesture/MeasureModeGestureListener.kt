@@ -16,6 +16,7 @@ class MeasureModeGestureListener(
         layoutPosition: Int
 ) : ScaleCompositeGestureListener(layoutPosition) {
     private val points = Stack<PointF>()
+    private val lengthThreshold = 10f
 
     override fun onOtherGesture(view: View, motionEvent: MotionEvent): Boolean {
         when (motionEvent.action) {
@@ -35,14 +36,20 @@ class MeasureModeGestureListener(
                     when (measure) {
                         ImageFramesStore.Measure.NONE -> throw IllegalStateException("Unexpected measure mode")
                         ImageFramesStore.Measure.LINE -> {
-                            EventBus.post(ImageDisplayEvent.AddPath(layoutPosition, points, points.last() to length(points.first(), points.last()).toString()))
+                            length(points.first(), points.last()).takeIf { it > lengthThreshold }?.let {
+                                EventBus.post(ImageDisplayEvent.AddPath(layoutPosition, points, points.last() to it.toString()))
+                            }
                             points.clear()
                         }
                         ImageFramesStore.Measure.ANGEL -> {
                             if (points.size == 3) {
-                                EventBus.post(ImageDisplayEvent.AddPath(layoutPosition, points, points[1] to calculateAngle(points[0], points[1], points[2]).toString()))
+                                length(points[1], points[2]).takeIf { it > lengthThreshold }?.let {
+                                    EventBus.post(ImageDisplayEvent.AddPath(layoutPosition, points, points[1] to calculateAngle(points[0], points[1], points[2]).toString()))
+                                } ?: points.pop()
                             } else {
-                                EventBus.post(ImageDisplayEvent.DrawLines(layoutPosition, points))
+                                length(points.first(), points.last()).takeIf { it > lengthThreshold }?.let {
+                                    EventBus.post(ImageDisplayEvent.DrawLines(layoutPosition, points))
+                                } ?: points.pop()
                             }
                         }
                     }
