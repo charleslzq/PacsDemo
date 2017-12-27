@@ -7,16 +7,19 @@
     android:background="@drawable/background_thumb"
     android:padding="3dp">
 
-    <ImageView
-        android:id="@+id/imagesContainer"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:contentDescription="@string/imageContentDescription"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <RelativeLayout
+        android:id="@+id/imageContext"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/imagesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/imageContentDescription"
+            android:scaleType="matrix" />
+    </RelativeLayout>
 
     <android.support.constraint.Guideline
         android:id="@+id/leftVerticalGuideLine"

@@ -8,5 +8,5 @@ import android.graphics.PointF
  */
 data class ImageCanvasModel(
         val paths: List<Path> = emptyList(),
-        val texts: Map<PointF, String> = emptyMap()
+        val texts: List<Pair<PointF, String>> = emptyList()
 )

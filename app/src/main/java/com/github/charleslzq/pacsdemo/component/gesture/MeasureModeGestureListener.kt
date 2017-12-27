@@ -11,8 +11,9 @@ import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
  * Created by charleslzq on 17-11-30.
  */
 class MeasureModeGestureListener(
-        val framesStore: ImageFramesStore
-) : ScaleCompositeGestureListener(framesStore.layoutPosition) {
+        val measure: ImageFramesStore.Measure,
+        layoutPosition: Int
+) : ScaleCompositeGestureListener(layoutPosition) {
     lateinit var startPoint: PointF
     lateinit var secondPoint: PointF
     private var firstPath = true
@@ -41,10 +42,10 @@ class MeasureModeGestureListener(
                 val currentPoint = getPoint(motionEvent)
                 val length = if (firstPath) length(startPoint, currentPoint) else length(secondPoint, currentPoint)
                 if (length > 5.0) {
-                    if (framesStore.measure == ImageFramesStore.Measure.LINE) {
+                    if (measure == ImageFramesStore.Measure.LINE) {
                         val text = length.toString()
                         EventBus.post(ImageDisplayEvent.AddPath(layoutPosition, listOf(startPoint, currentPoint), currentPoint to text))
-                    } else if (framesStore.measure == ImageFramesStore.Measure.ANGEL) {
+                    } else if (measure == ImageFramesStore.Measure.ANGEL) {
                         if (firstPath) {
                             EventBus.post(ImageDisplayEvent.DrawLines(layoutPosition, toLines(startPoint, currentPoint)))
                             secondPoint = currentPoint

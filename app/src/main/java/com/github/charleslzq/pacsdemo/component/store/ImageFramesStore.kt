@@ -176,13 +176,13 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
 
         reduce(ImageFramesStore::measure) {
             on<ClickEvent.TurnToMeasureLine>(precondition = { targetAtThis(it) }) {
-                when(state) {
+                when (state) {
                     Measure.LINE -> Measure.NONE
                     else -> Measure.LINE
                 }
             }
             on<ClickEvent.TurnToMeasureAngle>(precondition = { targetAtThis(it) }) {
-                when(state) {
+                when (state) {
                     Measure.ANGEL -> Measure.NONE
                     else -> Measure.ANGEL
                 }
@@ -202,7 +202,13 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
                             }
                             add(path)
                         },
-                        state.texts.toMutableMap().apply { put(event.text.first, event.text.second) }
+                        state.texts.toMutableList().apply { add(event.text) }
+                )
+            }
+            on<ClickEvent.ImageContextClicked>(precondition = { targetAtThis(it) }) {
+                ImageCanvasModel(
+                        state.paths.dropLast(1),
+                        state.texts.dropLast(1)
                 )
             }
             on<ImageDisplayEvent.MeasureModeReset>(precondition = { targetAtThis(it) }) { ImageCanvasModel() }

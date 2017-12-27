@@ -9,10 +9,12 @@ import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.kotlin.react.Component
 import com.github.charleslzq.kotlin.react.EventBus
+import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
+import java.util.*
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -27,11 +29,18 @@ class DicomImage(
             view.setOnTouchListener(operationMode)
         }
     lateinit var canvas: Canvas
-    var drawingCache: Bitmap? = null
-    var drawingCanvas: Canvas? = null
+    private val drawingStack = Stack<Bitmap>()
+    private var drawingCanvas: Canvas? = null
 
     init {
         EventBus.onEvent<DragEventMessage.StartCopyCell> { onDragStart(it) }
+        EventBus.onEvent<ClickEvent.ImageContextClicked> {
+            if (it.layoutPosition == store.layoutPosition && store.measure != ImageFramesStore.Measure.NONE && !drawingStack.empty()) {
+                drawingStack.pop()
+                resetRawCanvas()
+                drawOnRaw()
+            }
+        }
         view.setOnTouchListener(operationMode)
 
         render(ImageFramesStore::imageFramesModel) {
@@ -82,21 +91,15 @@ class DicomImage(
         render(property = ImageFramesStore::measure, guard = { store.hasImage() }) {
             operationMode = when (store.measure != ImageFramesStore.Measure.NONE && store.hasImage()) {
                 true -> {
-                    createDrawingCache()
-                    initCanvas()
-                    store.imageCanvasModel.paths.forEach {
-                        drawingCanvas?.drawPath(it, store.linePaint)
-                    }
-                    store.imageCanvasModel.texts.forEach {
-                        drawingCanvas?.drawText(it.value, it.key.x, it.key.y, store.stringPaint)
-                    }
-                    canvas.drawBitmap(drawingCache, 0f, 0f, store.linePaint)
-                    view.invalidate()
-                    MeasureMode(view.context, MeasureModeGestureListener(store))
+                    resetRawCanvas()
+                    resetDrawingCanvas()
+                    drawOnRaw()
+                    MeasureMode(view.context, MeasureModeGestureListener(store.measure, store.layoutPosition))
                 }
                 false -> {
                     view.setImageBitmap(store.getCurrentFrame())
-                    drawingCache = null
+                    drawingCanvas = null
+                    drawingStack.clear()
                     if (store.scaleFactor > 1.0f) {
                         StudyMode(view.context, StudyModeGestureListener(store.layoutPosition))
                     } else {
@@ -107,24 +110,15 @@ class DicomImage(
         }
 
         render(property = ImageFramesStore::imageCanvasModel, guard = { store.hasImage() }) {
-            createDrawingCache()
-            initCanvas()
-            store.imageCanvasModel.paths.forEach {
-                drawingCanvas?.drawPath(it, store.linePaint)
-            }
-            store.imageCanvasModel.texts.forEach {
-                drawingCanvas?.drawText(it.value, it.key.x, it.key.y, store.stringPaint)
-            }
-            canvas.drawBitmap(drawingCache, 0f, 0f, store.linePaint)
-            view.invalidate()
+            resetRawCanvas()
+            updateDrawingCanvas()
+            drawOnRaw()
         }
 
         render(property = ImageFramesStore::currentLines, guard = { store.hasImage() && store.measure != ImageFramesStore.Measure.NONE }) {
             if (it.size >= 4) {
-                initCanvas()
-                canvas.drawBitmap(drawingCache, 0f, 0f, store.linePaint)
-                canvas.drawLines(it, store.linePaint)
-                view.invalidate()
+                resetRawCanvas()
+                drawOnRaw(it)
             }
         }
     }
@@ -139,17 +133,39 @@ class DicomImage(
         }
     }
 
-    private fun initCanvas() {
+    private fun resetRawCanvas() {
         val bitmap = store.getCurrentFrame()
         canvas = Canvas(bitmap)
         view.setImageBitmap(bitmap)
     }
 
-    private fun createDrawingCache() {
-        store.getCurrentFrame()?.let {
-            drawingCache = Bitmap.createBitmap(it.width, it.height, Bitmap.Config.ARGB_8888)
-            drawingCanvas = Canvas(drawingCache)
+    private fun resetDrawingCanvas(): Bitmap {
+        return store.getCurrentFrame()!!
+                .let { Bitmap.createBitmap(it.width, it.height, it.config) }
+                .also {
+                    drawingCanvas = Canvas(it)
+                }
+    }
+
+    private fun updateDrawingCanvas() {
+        val drawingCache = resetDrawingCanvas()
+
+        store.imageCanvasModel.paths.forEach {
+            drawingCanvas!!.drawPath(it, store.linePaint)
         }
+        store.imageCanvasModel.texts.forEach {
+            drawingCanvas!!.drawText(it.second, it.first.x, it.first.y, store.stringPaint)
+        }
+
+        drawingStack.push(drawingCache)
+    }
+
+    private fun drawOnRaw(lines: FloatArray? = null) {
+        if (!drawingStack.empty()) {
+            canvas.drawBitmap(drawingStack.peek(), 0f, 0f, store.linePaint)
+        }
+        lines?.let { canvas.drawLines(it, store.linePaint) }
+        view.invalidate()
     }
 
     companion object {
