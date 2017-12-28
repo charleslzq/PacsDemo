@@ -17,10 +17,9 @@ sealed class OperationMode(
 
     override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
         view.performClick()
-        val gestureResult = gestureDetector.onTouchEvent(motionEvent)
-        val scaleResult = scaleGestureDetector.onTouchEvent(motionEvent)
-        val otherResult = additionalHandler(view, motionEvent)
-        return gestureResult || scaleResult || otherResult
+        val gestureResult = gestureDetector.onTouchEvent(motionEvent) || scaleGestureDetector.onTouchEvent(motionEvent)
+        val additionResult = additionalHandler(view, motionEvent)
+        return gestureResult || additionResult
     }
 }
 

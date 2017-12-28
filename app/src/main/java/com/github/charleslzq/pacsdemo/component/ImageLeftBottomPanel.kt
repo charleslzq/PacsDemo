@@ -18,26 +18,34 @@ class ImageLeftBottomPanel(
 
     init {
         renderByAll(store.imageFramesStore::imagePlayModel, store.imageFramesStore::imageFramesModel) {
-            xRayInfo.visibility = View.INVISIBLE
-            timeInfo.visibility = View.INVISIBLE
+            xRayInfo.visibility = View.GONE
 
             store.imageFramesStore.getCurrentFrameMeta()?.let {
-                xRayInfo.visibility = View.VISIBLE
-                timeInfo.visibility = View.VISIBLE
-
-                val kvp = it.kvp ?: "unknown"
-                val xRay = it.xRayTubCurrent ?: "unknown"
-                xRayInfo.post { xRayInfo.text = "${xRay}mA ${kvp}KV" }
+                buildString {
+                    it.xRayTubCurrent?.let { append("$it mA ") }
+                    it.kvp?.let { append("$it KV") }
+                }.takeIf { it.isNotBlank() }?.let {
+                    xRayInfo.post { xRayInfo.text = it }
+                    xRayInfo.visibility = View.VISIBLE
+                }
             }
         }
 
         render(store::patientSeriesModel) {
-            val seriesDate = it.dicomSeriesMetaInfo.date ?: "unknown"
-            val seriesTime = it.dicomSeriesMetaInfo.time ?: "unknown"
-            timeInfo.post { timeInfo.text = "$seriesDate $seriesTime" }
+            timeInfo.visibility = View.GONE
+
+            it.dicomSeriesMetaInfo.let {
+                buildString {
+                    it.date?.apply { append(this + " ") }
+                    it.time?.apply { append(this) }
+                }.takeIf { it.isNotBlank() }?.let {
+                    timeInfo.post { timeInfo.text = it }
+                    timeInfo.visibility = View.VISIBLE
+                }
+            }
         }
 
-        render(store::hideMeta) {
+        render(property = store::hideMeta, guard = { store.imageFramesStore.hasImage() }) {
             view.visibility = if (it) View.INVISIBLE else View.VISIBLE
         }
     }

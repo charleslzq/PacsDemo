@@ -2,13 +2,15 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.SeekBar
 import com.github.charleslzq.kotlin.react.Component
+import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.R
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
+import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesStore
-import com.github.charleslzq.pacsdemo.support.GlobalDispatch
 import com.github.charleslzq.pacsdemo.support.TypefaceUtil
 
 /**
@@ -18,8 +20,6 @@ class ImageControllPanel(
         baseView: View,
         patientStore: PatientSeriesStore
 ) : Component<View, PatientSeriesStore>(baseView, patientStore) {
-    private val dispatch = GlobalDispatch.DEBUG_DISPATCH
-
     private val play: Button = view.findViewById(R.id.imagePlay)
     private val first: Button = view.findViewById(R.id.firstImage)
     private val previous: Button = view.findViewById(R.id.previousImage)
@@ -30,8 +30,14 @@ class ImageControllPanel(
     private val measureLine: Button = view.findViewById(R.id.measureLineButton)
     private val pseudo: Button = view.findViewById(R.id.pseudoColorButton)
     private val reverse: Button = view.findViewById(R.id.reverseButton)
+    private val undo: Button = view.findViewById(R.id.undoButton)
+    private val redo: Button = view.findViewById(R.id.redoButton)
 
     private val imageSeekBar: SeekBar = view.findViewById(R.id.imageSeekBar)
+
+    private val displayController: LinearLayout = view.findViewById(R.id.displayController)
+    private val indexController: LinearLayout = view.findViewById(R.id.indexController)
+    private val progressController: LinearLayout = view.findViewById(R.id.progressController)
 
     init {
         val fontAwesomeTypeface = TypefaceUtil.getTypeFace(view.context, TypefaceUtil.fontAwesome)
@@ -39,6 +45,8 @@ class ImageControllPanel(
         measureAngle.typeface = fontAwesomeTypeface
         pseudo.typeface = fontAwesomeTypeface
         reverse.typeface = fontAwesomeTypeface
+        undo.typeface = fontAwesomeTypeface
+        redo.typeface = fontAwesomeTypeface
         play.typeface = fontAwesomeTypeface
         previous.typeface = fontAwesomeTypeface
         next.typeface = fontAwesomeTypeface
@@ -46,45 +54,66 @@ class ImageControllPanel(
         last.typeface = fontAwesomeTypeface
 
         measureAngle.setOnClickListener {
-            dispatch(ClickEvent.TurnToMeasureAngle(store.imageFramesStore.layoutPosition))
+            EventBus.post(ClickEvent.MeasureAngleTurned(store.imageFramesStore.layoutPosition, measureAngle.isSelected))
         }
 
         measureLine.setOnClickListener {
-            dispatch(ClickEvent.TurnToMeasureLine(store.imageFramesStore.layoutPosition))
+            EventBus.post(ClickEvent.MeasureLineTurned(store.imageFramesStore.layoutPosition, measureLine.isSelected))
         }
 
         reverse.setOnClickListener {
-            dispatch(ClickEvent.ReverseColor(store.imageFramesStore.layoutPosition))
+            EventBus.post(ClickEvent.ReverseColor(store.imageFramesStore.layoutPosition))
         }
 
         pseudo.setOnClickListener {
-            dispatch(ClickEvent.PseudoColor(store.imageFramesStore.layoutPosition))
+            EventBus.post(ClickEvent.PseudoColor(store.imageFramesStore.layoutPosition))
+        }
+
+        undo.setOnClickListener {
+            EventBus.post(ClickEvent.Undo(store.imageFramesStore.layoutPosition))
+        }
+
+        redo.setOnClickListener {
+            EventBus.post(ClickEvent.Redo(store.imageFramesStore.layoutPosition))
         }
 
         first.setOnClickListener {
-            dispatch(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, 0, true))
+            EventBus.post(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, 0, true))
         }
 
         play.setOnClickListener {
-            dispatch(ImageDisplayEvent.ChangePlayStatus(store.imageFramesStore.layoutPosition))
+            EventBus.post(ImageDisplayEvent.ChangePlayStatus(store.imageFramesStore.layoutPosition))
         }
 
         previous.setOnClickListener {
             val currentIndex = store.imageFramesStore.imagePlayModel.currentIndex
             if (currentIndex > 0) {
-                dispatch(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, currentIndex - 1, true))
+                EventBus.post(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, currentIndex - 1, true))
             }
         }
 
         next.setOnClickListener {
             val currentIndex = store.imageFramesStore.imagePlayModel.currentIndex
             if (currentIndex < store.imageFramesStore.imageFramesModel.size - 1) {
-                dispatch(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, currentIndex + 1, true))
+                EventBus.post(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, currentIndex + 1, true))
             }
         }
 
         last.setOnClickListener {
-            dispatch(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, store.imageFramesStore.imageFramesModel.size - 1, true))
+            EventBus.post(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, store.imageFramesStore.imageFramesModel.size - 1, true))
+        }
+
+        render(store.imageFramesStore::measure) {
+            measureAngle.isSelected = it == ImageFramesStore.Measure.ANGEL
+            measureLine.isSelected = it == ImageFramesStore.Measure.LINE
+        }
+
+        render(store.imageFramesStore::pseudoColor) {
+            pseudo.isSelected = it
+        }
+
+        render(store.imageFramesStore::reverseColor) {
+            reverse.isSelected = it
         }
 
         render(store.imageFramesStore::imageFramesModel) {
@@ -95,7 +124,7 @@ class ImageControllPanel(
                 imageSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                         if (fromUser) {
-                            dispatch(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, progress, true))
+                            EventBus.post(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, progress, true))
                         }
                     }
 
@@ -110,25 +139,21 @@ class ImageControllPanel(
                 })
                 View.VISIBLE
             } else {
-                View.INVISIBLE
+                View.GONE
             }
 
-            imageSeekBar.visibility = visible
-            measureAngle.visibility = visible
-            measureLine.visibility = visible
-            pseudo.visibility = visible
-            reverse.visibility = visible
-            first.visibility = visible
-            previous.visibility = visible
-            play.visibility = visible
-            next.visibility = visible
-            last.visibility = visible
+            displayController.visibility = visible
+            indexController.visibility = visible
+            progressController.visibility = visible
 
             if (store.imageFramesStore.imageFramesModel.size == 1) {
-                measureAngle.visibility = View.VISIBLE
-                measureLine.visibility = View.VISIBLE
-                pseudo.visibility = View.VISIBLE
-                reverse.visibility = View.VISIBLE
+                displayController.visibility = View.VISIBLE
+            }
+
+            if (!store.imageFramesStore.playable()) {
+                play.visibility = View.GONE
+            } else {
+                play.visibility = View.VISIBLE
             }
         }
 
@@ -139,8 +164,13 @@ class ImageControllPanel(
             }
         }
 
-        render(store::hideMeta) {
+        render(property = store::hideMeta, guard = { store.imageFramesStore.hasImage() }) {
             view.visibility = if (it) View.INVISIBLE else View.VISIBLE
+        }
+
+        render(property = store.imageFramesStore::drawingMap, guard = { store.imageFramesStore.hasImage() && store.imageFramesStore.measure != ImageFramesStore.Measure.NONE }) {
+            undo.visibility = if (store.imageFramesStore.canUndo()) View.VISIBLE else View.GONE
+            redo.visibility = if (store.imageFramesStore.canRedo()) View.VISIBLE else View.GONE
         }
     }
 }

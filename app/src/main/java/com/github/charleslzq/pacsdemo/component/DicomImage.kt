@@ -2,9 +2,9 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.content.ClipData
 import android.content.ClipDescription
-import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.PointF
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.kotlin.react.Component
@@ -26,16 +26,14 @@ class DicomImage(
             field = value
             view.setOnTouchListener(operationMode)
         }
-    lateinit var canvas: Canvas
-    var drawingCache: Bitmap? = null
-    var drawingCanvas: Canvas? = null
 
     init {
         EventBus.onEvent<DragEventMessage.StartCopyCell> { onDragStart(it) }
         view.setOnTouchListener(operationMode)
 
         render(ImageFramesStore::imageFramesModel) {
-            resetFrame()
+            store.autoAdjustScale(view)
+            view.setImageBitmap(store.getCurrentFrame())
         }
 
         render(ImageFramesStore::imagePlayModel) {
@@ -54,7 +52,7 @@ class DicomImage(
                     view.clearAnimation()
                     view.background = null
                 }
-                resetFrame()
+                view.setImageBitmap(store.getCurrentFrame())
             }
         }
 
@@ -75,27 +73,17 @@ class DicomImage(
         }
 
         render(property = ImageFramesStore::pseudoColor, guard = { store.hasImage() }) {
-            resetFrame()
+            view.setImageBitmap(store.getCurrentFrame())
         }
 
         render(property = ImageFramesStore::measure, guard = { store.hasImage() }) {
-            operationMode = when (store.measure != ImageFramesStore.Measure.NONE && store.hasImage()) {
+            operationMode = when (store.measure != ImageFramesStore.Measure.NONE) {
                 true -> {
-                    createDrawingCache()
-                    initCanvas()
-                    store.imageCanvasModel.paths.forEach {
-                        drawingCanvas?.drawPath(it, store.linePaint)
-                    }
-                    store.imageCanvasModel.texts.forEach {
-                        drawingCanvas?.drawText(it.value, it.key.x, it.key.y, store.stringPaint)
-                    }
-                    canvas.drawBitmap(drawingCache, 0f, 0f, store.linePaint)
-                    view.invalidate()
-                    MeasureMode(view.context, MeasureModeGestureListener(store))
+                    drawOnImage()
+                    MeasureMode(view.context, MeasureModeGestureListener(store.measure, store.layoutPosition))
                 }
                 false -> {
-                    resetFrame()
-                    drawingCache = null
+                    view.setImageBitmap(store.getCurrentFrame())
                     if (store.scaleFactor > 1.0f) {
                         StudyMode(view.context, StudyModeGestureListener(store.layoutPosition))
                     } else {
@@ -105,35 +93,12 @@ class DicomImage(
             }
         }
 
-        render(property = ImageFramesStore::imageCanvasModel, guard = { store.hasImage() }) {
-            createDrawingCache()
-            initCanvas()
-            store.imageCanvasModel.paths.forEach {
-                drawingCanvas?.drawPath(it, store.linePaint)
-            }
-            store.imageCanvasModel.texts.forEach {
-                drawingCanvas?.drawText(it.value, it.key.x, it.key.y, store.stringPaint)
-            }
-            canvas.drawBitmap(drawingCache, 0f, 0f, store.linePaint)
-            view.invalidate()
+        render(property = ImageFramesStore::drawingMap, guard = { store.hasImage() && store.measure != ImageFramesStore.Measure.NONE }) {
+            drawOnImage()
         }
 
-        render(property = ImageFramesStore::currentLines, guard = { store.hasImage() && store.measure != ImageFramesStore.Measure.NONE }) {
-            if (it.size >= 4) {
-                initCanvas()
-                canvas.drawBitmap(drawingCache, 0f, 0f, store.linePaint)
-                canvas.drawLines(it, store.linePaint)
-                view.invalidate()
-            }
-        }
-    }
-
-    private fun resetFrame() {
-        store.autoAdjustScale(view)
-        if (store.hasImage()) {
-            view.setImageBitmap(store.getCurrentFrame())
-        } else {
-            view.setImageBitmap(null)
+        render(property = ImageFramesStore::currentPoints, guard = { store.hasImage() }) {
+            drawOnImage()
         }
     }
 
@@ -147,16 +112,44 @@ class DicomImage(
         }
     }
 
-    private fun initCanvas() {
-        val bitmap = store.getCurrentFrame()
-        canvas = Canvas(bitmap)
-        view.setImageBitmap(bitmap)
+    private fun createCanvas(): Canvas {
+        return Canvas(store.getCurrentFrame()!!.also { view.setImageBitmap(it) })
     }
 
-    private fun createDrawingCache() {
-        store.getCurrentFrame()?.let {
-            drawingCache = Bitmap.createBitmap(it.width, it.height, Bitmap.Config.ARGB_8888)
-            drawingCanvas = Canvas(drawingCache)
+    private fun drawOnImage() {
+        createCanvas().apply {
+            store.drawingMap?.let {
+                drawBitmap(it, 0f, 0f, store.linePaint)
+            }
+            toLines(*store.currentPoints).let {
+                if (it.size > 1) {
+                    drawCircle(it[it.size - 2], it[it.size - 1], 5f, store.pointPaint)
+                    if (it.size > 3) {
+                        drawLines(it, store.linePaint)
+                    }
+                }
+            }
+        }
+        view.invalidate()
+    }
+
+    private fun toLines(vararg points: PointF): FloatArray {
+        return when (points.size) {
+            0 -> FloatArray(0)
+            1 -> FloatArray(2).apply {
+                val point = points.first()
+                this[0] = point.x
+                this[1] = point.y
+            }
+            else -> FloatArray((points.size - 1) * 4).apply {
+                repeat(points.size - 1) {
+                    val start = it * 4
+                    this[start] = points[it].x
+                    this[start + 1] = points[it].y
+                    this[start + 2] = points[it + 1].x
+                    this[start + 3] = points[it + 1].y
+                }
+            }
         }
     }
 

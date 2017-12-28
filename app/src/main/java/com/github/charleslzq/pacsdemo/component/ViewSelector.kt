@@ -1,7 +1,11 @@
 package com.github.charleslzq.pacsdemo.component
 
+import android.support.constraint.ConstraintLayout
 import android.view.View
-import android.widget.*
+import android.widget.LinearLayout
+import android.widget.TableLayout
+import android.widget.TableRow
+import android.widget.ViewFlipper
 import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
@@ -54,11 +58,11 @@ class ViewSelector(
                     listOf(displayedChild)
                 }
                 PacsStore.LayoutOption.ONE_TWO -> {
-                    ViewUtils.getTypedChildren(displayedChild as LinearLayout, RelativeLayout::class.java)
+                    ViewUtils.getTypedChildren(displayedChild as LinearLayout, ConstraintLayout::class.java)
                 }
                 else -> {
                     ViewUtils.getTypedChildren(displayedChild as TableLayout, TableRow::class.java)
-                            .flatMap { ViewUtils.getTypedChildren(it, RelativeLayout::class.java) }
+                            .flatMap { ViewUtils.getTypedChildren(it, ConstraintLayout::class.java) }
                 }
             }
         }

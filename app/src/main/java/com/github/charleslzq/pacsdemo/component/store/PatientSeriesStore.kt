@@ -13,7 +13,7 @@ class PatientSeriesStore(
 ) : WithReducer<PatientSeriesStore> {
     var patientSeriesModel by ObservableStatus(PatientSeriesModel())
         private set
-    var hideMeta by ObservableStatus(false)
+    var hideMeta by ObservableStatus(true)
         private set
 
     init {
@@ -30,6 +30,15 @@ class PatientSeriesStore(
         reduce(PatientSeriesStore::hideMeta) {
             on<ClickEvent.ImageClicked>(precondition = { it.layoutPosition == imageFramesStore.layoutPosition }) {
                 !state
+            }
+            on<ClickEvent.ChangeLayout> {
+                true
+            }
+            on<BindingEvent.ModelSelected>(precondition = { 0 == imageFramesStore.layoutPosition }) {
+                false
+            }
+            on<BindingEvent.ModelDropped>(precondition = { it.layoutPosition == imageFramesStore.layoutPosition }) {
+                false
             }
         }
     }

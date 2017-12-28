@@ -6,6 +6,7 @@
     <string name="table_screen_icon">&#xf00a;</string>
     <string name="refresh_icon">&#xf021;</string>
     <string name="back_icon">&#xf112;</string>
+    <string name="forward_icon">&#xf064;</string>
     <string name="stop_service">STOP SERVICE</string>
     <string name="imageContentDescription">The selected image</string>
     <string name="image_play">&#xf04b;</string>

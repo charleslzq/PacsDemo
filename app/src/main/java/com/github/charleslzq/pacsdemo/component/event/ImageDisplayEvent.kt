@@ -14,6 +14,5 @@ class ImageDisplayEvent {
     data class LocationTranslate(override val layoutPosition: Int, val distanceX: Float, val distanceY: Float) : ImageCellEvent()
     data class StudyModeReset(override val layoutPosition: Int) : ImageCellEvent()
     data class AddPath(override val layoutPosition: Int, val points: List<PointF>, val text: Pair<PointF, String>) : ImageCellEvent()
-    data class DrawLines(override val layoutPosition: Int, val points: FloatArray) : ImageCellEvent()
-    data class MeasureModeReset(override val layoutPosition: Int) : ImageCellEvent()
+    data class DrawLines(override val layoutPosition: Int, val points: List<PointF>) : ImageCellEvent()
 }
