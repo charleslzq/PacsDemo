@@ -10,8 +10,12 @@ import android.os.StrictMode
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.charleslzq.dicom.data.DicomStudy
+import com.github.charleslzq.pacsdemo.component.DicomImage
 import com.github.charleslzq.pacsdemo.component.PacsMain
-import com.github.charleslzq.pacsdemo.component.store.*
+import com.github.charleslzq.pacsdemo.component.store.ImageFramesModel
+import com.github.charleslzq.pacsdemo.component.store.PacsStore
+import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
+import com.github.charleslzq.pacsdemo.component.store.PatientSeriesStore
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackground
 import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
@@ -97,15 +101,13 @@ class PacsDemoActivity : AppCompatActivity(), RxScheduleSupport {
                         it.indices.find { index -> it[index].dicomSeriesMetaInfo.instanceUID == seriesId }?.let { index ->
                             base.dispatch(PacsStore.ThumbListItemClicked(index))
                             firstCell.dispatch(PatientSeriesStore.ModelDropped(it[index]))
-                            firstImage.dispatch(ImageFramesStore.ModelDropped(it[index].imageFramesModel))
-                            if (imageNum != null && imageNum.toInt() in (1..it[index].imageFramesModel.size)) {
-                                firstImage.dispatch(ImageFramesStore.IndexChange(imageNum.toInt() - 1, false))
-                            }
+                            val imageIndex = (imageNum?.run { toInt() }?.takeIf { imageIndex -> imageIndex in (1..it[index].imageFramesModel.size) } ?: 1) - 1
+                            firstImage.dispatch(DicomImage.action.bindModel(it[index].imageFramesModel, imageIndex))
                         }
                     } else if (it.isNotEmpty()) {
                         base.dispatch(PacsStore.ThumbListItemClicked(0))
                         firstCell.dispatch(PatientSeriesStore.ModelDropped(it[0]))
-                        firstImage.dispatch(ImageFramesStore.ModelDropped(it[0].imageFramesModel))
+                        firstImage.dispatch(DicomImage.action.bindModel(it[0].imageFramesModel))
                     }
                 }
     }

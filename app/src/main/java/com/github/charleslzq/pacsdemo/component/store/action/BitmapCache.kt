@@ -1,4 +1,4 @@
-package com.github.charleslzq.pacsdemo.component.store
+package com.github.charleslzq.pacsdemo.component.store.action
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

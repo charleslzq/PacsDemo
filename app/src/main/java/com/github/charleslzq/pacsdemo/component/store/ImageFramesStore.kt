@@ -3,11 +3,11 @@ package com.github.charleslzq.pacsdemo.component.store
 import android.content.res.Resources
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
-import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.dicom.data.DicomImageMetaInfo
 import com.github.charleslzq.kotlin.react.ObservableStatus
 import com.github.charleslzq.kotlin.react.Store
+import com.github.charleslzq.pacsdemo.component.store.action.BitmapCache
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
 import com.github.charleslzq.pacsdemo.support.MiddleWare
 import java.util.*
@@ -20,6 +20,8 @@ class ImageFramesStore(val layoutPosition: Int) : Store<ImageFramesStore>(Middle
     var linePaint = Paint()
     var stringPaint = Paint()
     var pointPaint = Paint()
+    var initialImageWidth: Int = -1
+    var initialImageHeight: Int = -1
     private var allowPlay = true
     private var imageWidth = 500
 
@@ -27,10 +29,9 @@ class ImageFramesStore(val layoutPosition: Int) : Store<ImageFramesStore>(Middle
         private set
     var imageFramesModel by ObservableStatus(ImageFramesModel())
         private set
-    var imagePlayModel by ObservableStatus(ImageDisplayModel())
+    var imageDisplayModel by ObservableStatus(ImageDisplayModel())
         private set
-    var rawScale = 1.0f
-        private set
+    var rawScale by ObservableStatus(1.0f)
     var scaleFactor by ObservableStatus(1.0f)
         private set
     var matrix by ObservableStatus(Matrix())
@@ -82,27 +83,33 @@ class ImageFramesStore(val layoutPosition: Int) : Store<ImageFramesStore>(Middle
             }
         }
 
-        reduce(ImageFramesStore::imagePlayModel) {
-            on<ChangePlayStatus>(precondition = { playable() }) {
-                state.copy(playing = !state.playing, currentIndex = if (state.currentIndex == imageFramesModel.size - 1) 0 else state.currentIndex)
+        reduce(ImageFramesStore::imageDisplayModel) {
+            on<ShowImage> {
+                ImageDisplayModel(image = event.bitmap)
             }
-            on<PlayModeReset> {
-                state.copy(playing = false, currentIndex = 0)
+            on<PlayAnimation> {
+                ImageDisplayModel(animation = event.animation)
             }
-            on<IndexChange>(precondition = { it.index in (0..(imageFramesModel.size - 1)) }) {
-                if (event.fromUser || event.index == imageFramesModel.size - 1) state.copy(playing = false, currentIndex = event.index) else state.copy(currentIndex = event.index)
-            }
-            on<ReverseColor> {
-                state.copy(playing = false)
-            }
-            on<PseudoColor> {
-                state.copy(playing = false)
-            }
-            on<IndexScroll> {
-                val offset = (event.scroll * imageFramesModel.size.toFloat() * 2 / imageWidth).toInt()
-                val currentIndex = Math.min(Math.max(imagePlayModel.currentIndex - offset, 0), imageFramesModel.size - 1)
-                state.copy(playing = false, currentIndex = currentIndex)
-            }
+//            on<ChangePlayStatus>(precondition = { playable() }) {
+//                state.copy(playing = !state.playing, currentIndex = if (state.currentIndex == imageFramesModel.size - 1) 0 else state.currentIndex)
+//            }
+//            on<PlayModeReset> {
+//                state.copy(playing = false, currentIndex = 0)
+//            }
+//            on<IndexChange>(precondition = { it.index in (0..(imageFramesModel.size - 1)) }) {
+//                if (event.fromUser || event.index == imageFramesModel.size - 1) state.copy(playing = false, currentIndex = event.index) else state.copy(currentIndex = event.index)
+//            }
+//            on<ReverseColor> {
+//                state.copy(playing = false)
+//            }
+//            on<PseudoColor> {
+//                state.copy(playing = false)
+//            }
+//            on<IndexScroll> {
+//                val offset = (event.scroll * imageFramesModel.size.toFloat() * 2 / imageWidth).toInt()
+//                val currentIndex = Math.min(Math.max(imageDisplayModel.currentIndex - offset, 0), imageFramesModel.size - 1)
+//                state.copy(playing = false, currentIndex = currentIndex)
+//            }
         }
 
 
@@ -234,49 +241,61 @@ class ImageFramesStore(val layoutPosition: Int) : Store<ImageFramesStore>(Middle
 
     fun hasImage() = imageFramesModel.frames.isNotEmpty()
 
-    fun currentIndex() = imagePlayModel.currentIndex
+    fun currentIndex() = imageDisplayModel.currentIndex
 
     fun framesSize() = imageFramesModel.size
 
-    fun autoAdjustScale(view: View) {
-        if (hasImage()) {
-            val image = getCurrentFrame(false)!!
-            val viewHeight = view.measuredHeight
-            val viewWidth = view.measuredWidth
-            val imageWidth = image.width
-            val imageHeight = image.height
-            val ratio = imageWidth.toFloat() / imageHeight.toFloat()
-            val desiredWidth = Math.ceil((viewHeight * ratio).toDouble()).toInt()
-            rawScale = if (desiredWidth <= viewWidth) {
-                view.layoutParams.width = desiredWidth
-                this.imageWidth = desiredWidth
-                desiredWidth.toFloat() / imageWidth
-            } else {
-                val desiredHeight = Math.ceil((viewWidth / ratio).toDouble()).toInt()
-                this.imageWidth = viewWidth
-                view.layoutParams.height = desiredHeight
-                desiredHeight.toFloat() / imageHeight
-            }
+    fun autoAdjustScale(image: Bitmap) {
+        val viewHeight = initialImageHeight
+        val viewWidth = initialImageWidth
+        val imageWidth = image.width
+        val imageHeight = image.height
+        val ratio = imageWidth.toFloat() / imageHeight.toFloat()
+        val desiredWidth = Math.ceil((viewHeight * ratio).toDouble()).toInt()
+        rawScale = if (desiredWidth <= viewWidth) {
+            desiredWidth.toFloat() / imageWidth
+        } else {
+            Math.ceil((viewWidth / ratio).toDouble()).toInt().toFloat() / imageHeight
         }
     }
 
     fun getCurrentFrame(scaled: Boolean = true): Bitmap? {
         return when (hasImage()) {
             true -> when (scaled) {
-                true -> getScaledFrame(imagePlayModel.currentIndex)
-                false -> getFrame(imagePlayModel.currentIndex)
+                true -> getScaledFrame(imageDisplayModel.currentIndex)
+                false -> getFrame(imageDisplayModel.currentIndex)
             }
             false -> null
         }
     }
 
-    fun getCurrentFrameMeta(): DicomImageMetaInfo? = if (hasImage()) imageFramesModel.frames[imagePlayModel.currentIndex] else null
+    fun getCurrentFrameMeta(): DicomImageMetaInfo? = if (hasImage()) imageFramesModel.frames[imageDisplayModel.currentIndex] else null
 
     private fun topOfStack(): Bitmap {
         if (drawingStack.empty()) {
             drawingStack.push(getCurrentFrame()!!.let { Bitmap.createBitmap(it.width, it.height, it.config) })
         }
         return drawingStack.peek()
+    }
+
+    private fun autoScale(image: Bitmap): Triple<Bitmap, Int, Int> {
+        val imageWidth = image.width
+        val imageHeight = image.height
+        val ratio = imageWidth.toFloat() / imageHeight.toFloat()
+        val desiredWidth = Math.ceil((initialImageHeight * ratio).toDouble()).toInt()
+        val newSize = if (desiredWidth <= initialImageWidth) {
+            desiredWidth to (desiredWidth.toFloat() / ratio).toInt()
+        } else {
+            Math.ceil((initialImageWidth / ratio).toDouble()).toInt().let {
+                (it * ratio).toInt() to it
+            }
+        }
+        rawScale = newSize.first.toFloat() / imageWidth
+        return Triple(if (rawScale > 1.0f) {
+            Bitmap.createScaledBitmap(image, newSize.first, newSize.second, false)
+        } else {
+            image
+        }, newSize.first, newSize.second)
     }
 
     private fun getNewScaleFactor(rawScaleFactor: Float): Float = Math.max(1.0f, Math.min(rawScaleFactor * scaleFactor, 5.0f))
@@ -316,7 +335,7 @@ class ImageFramesStore(val layoutPosition: Int) : Store<ImageFramesStore>(Middle
     }
 
     private fun getAnimation(resources: Resources, duration: Int): IndexAwareAnimationDrawable {
-        val startOffset = imagePlayModel.currentIndex
+        val startOffset = imageDisplayModel.currentIndex
         val animation = IndexAwareAnimationDrawable(dispatch, startOffset)
         animation.isOneShot = true
         imageFramesModel.frameUrls.subList(startOffset, imageFramesModel.size).forEachIndexed { index, _ ->
@@ -330,7 +349,7 @@ class ImageFramesStore(val layoutPosition: Int) : Store<ImageFramesStore>(Middle
     }
 
     fun getCurrentAnimation(imageView: ImageView): IndexAwareAnimationDrawable {
-        return getAnimation(imageView.resources, imagePlayModel.duration)
+        return getAnimation(imageView.resources, imageDisplayModel.duration)
     }
 
     private fun calculateColor(color: Int): Int {
@@ -388,6 +407,8 @@ class ImageFramesStore(val layoutPosition: Int) : Store<ImageFramesStore>(Middle
     class PlayModeReset
     class StudyModeReset
     class Reset
+    data class ShowImage(val bitmap: Bitmap, val index: Int)
+    data class PlayAnimation(val animation: IndexAwareAnimationDrawable)
     data class ModelDropped(val imageFramesModel: ImageFramesModel)
     data class ScaleChange(val scaleFactor: Float)
     data class IndexChange(val index: Int, val fromUser: Boolean)

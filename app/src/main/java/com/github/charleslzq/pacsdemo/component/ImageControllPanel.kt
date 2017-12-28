@@ -85,14 +85,14 @@ class ImageControllPanel(
         }
 
         previous.setOnClickListener {
-            val currentIndex = store.imageFramesStore.imagePlayModel.currentIndex
+            val currentIndex = store.imageFramesStore.imageDisplayModel.currentIndex
             if (currentIndex > 0) {
                 imageDispatch(ImageFramesStore.IndexChange(currentIndex - 1, true))
             }
         }
 
         next.setOnClickListener {
-            val currentIndex = store.imageFramesStore.imagePlayModel.currentIndex
+            val currentIndex = store.imageFramesStore.imageDisplayModel.currentIndex
             if (currentIndex < store.imageFramesStore.imageFramesModel.size - 1) {
                 imageDispatch(ImageFramesStore.IndexChange(currentIndex + 1, true))
             }
@@ -156,7 +156,7 @@ class ImageControllPanel(
             }
         }
 
-        render(store.imageFramesStore::imagePlayModel) {
+        render(store.imageFramesStore::imageDisplayModel) {
             imageSeekBar.progress = it.currentIndex
             play.post {
                 play.text = if (it.playing) view.context.resources.getString(R.string.image_pause) else view.context.resources.getString(R.string.image_play)
