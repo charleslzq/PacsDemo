@@ -13,6 +13,7 @@ import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
+import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 
 /**
  * Created by charleslzq on 17-11-27.

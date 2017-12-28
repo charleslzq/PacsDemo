@@ -9,7 +9,7 @@ import com.github.charleslzq.pacsdemo.support.MiddleWare
  */
 class PatientSeriesStore(
         val imageFramesStore: ImageFramesStore
-) : Store<PatientSeriesStore>(MiddleWare.debugLog, thunk) {
+) : Store<PatientSeriesStore>(MiddleWare.debugLog, buildThunk<PatientSeriesStore>()) {
     var patientSeriesModel by ObservableStatus(PatientSeriesModel())
         private set
 
@@ -19,15 +19,6 @@ class PatientSeriesStore(
                 event.patientSeriesModel
             }
         }
-
-//        reduce(PatientSeriesStore::hideMeta) {
-//            on<ClickEvent.ImageClicked> {
-//                !state
-//            }
-//            on<BindingEvent.ModelDropped> {
-//                false
-//            }
-//        }
     }
 
     data class ModelDropped(val patientSeriesModel: PatientSeriesModel)

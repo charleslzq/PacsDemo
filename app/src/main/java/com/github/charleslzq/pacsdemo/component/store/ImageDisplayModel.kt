@@ -3,7 +3,7 @@ package com.github.charleslzq.pacsdemo.component.store
 /**
  * Created by charleslzq on 17-12-8.
  */
-data class ImagePlayModel(
+data class ImageDisplayModel(
         val duration: Int = 40,
         val currentIndex: Int = 0,
         val playing: Boolean = false

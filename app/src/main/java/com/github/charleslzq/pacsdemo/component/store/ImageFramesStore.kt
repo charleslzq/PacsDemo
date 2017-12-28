@@ -16,7 +16,7 @@ import java.util.*
 /**
  * Created by charleslzq on 17-11-27.
  */
-class ImageFramesStore(val layoutPosition: Int) : Store<ImageFramesStore>(MiddleWare.debugLog, thunk) {
+class ImageFramesStore(val layoutPosition: Int) : Store<ImageFramesStore>(MiddleWare.debugLog, buildThunk<ImageFramesStore>()) {
     var linePaint = Paint()
     var stringPaint = Paint()
     var pointPaint = Paint()
@@ -27,7 +27,7 @@ class ImageFramesStore(val layoutPosition: Int) : Store<ImageFramesStore>(Middle
         private set
     var imageFramesModel by ObservableStatus(ImageFramesModel())
         private set
-    var imagePlayModel by ObservableStatus(ImagePlayModel())
+    var imagePlayModel by ObservableStatus(ImageDisplayModel())
         private set
     var rawScale = 1.0f
         private set

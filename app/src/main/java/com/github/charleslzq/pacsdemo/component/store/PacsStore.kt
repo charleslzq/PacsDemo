@@ -8,7 +8,7 @@ import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 /**
  * Created by charleslzq on 17-11-27.
  */
-class PacsStore : Store<PacsStore>(MiddleWare.debugLog, thunk), RxScheduleSupport {
+class PacsStore : Store<PacsStore>(MiddleWare.debugLog, buildThunk<PacsStore>()), RxScheduleSupport {
     var seriesList by ObservableStatus(mutableListOf<PatientSeriesModel>())
         private set
     var selected: Int by ObservableStatus(-1)
