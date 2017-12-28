@@ -49,9 +49,7 @@ class DicomImage(
                     view.clearAnimation()
                     view.background = null
                 }
-                callOnCompute {
-                    autoAdjustScale(this)
-                }.let {
+                callOnCompute { autoAdjustScale(this) }.let {
                     view.layoutParams.width = it.second
                     view.layoutParams.height = it.third
                     view.setImageBitmap(it.first)
@@ -133,7 +131,11 @@ class DicomImage(
             viewWidth to (viewHeight * ratio).toInt()
         }
         store.rawScale = newSize.first.toFloat() / imageWidth
-        return Triple(Bitmap.createScaledBitmap(image, view.layoutParams.width, view.layoutParams.height, false), newSize.first, newSize.second)
+        return Triple(if (store.rawScale > 1.0f) {
+            Bitmap.createScaledBitmap(image, view.layoutParams.width, view.layoutParams.height, false)
+        } else {
+            image
+        }, newSize.first, newSize.second)
     }
 
     private fun createCanvas(): Canvas {
