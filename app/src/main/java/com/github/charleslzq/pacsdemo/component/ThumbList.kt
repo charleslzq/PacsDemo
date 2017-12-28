@@ -12,7 +12,6 @@ import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.support.DicomSeriesThumbListAdpater
-import io.reactivex.android.schedulers.AndroidSchedulers
 
 /**
  * Created by charleslzq on 17-11-27.

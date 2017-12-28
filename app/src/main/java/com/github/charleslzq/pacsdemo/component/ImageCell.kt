@@ -3,10 +3,10 @@ package com.github.charleslzq.pacsdemo.component
 import android.view.DragEvent
 import android.view.View
 import com.github.charleslzq.kotlin.react.ComponentGroup
+import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.R
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesStore
-import com.github.charleslzq.pacsdemo.support.GlobalDispatch
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -21,7 +21,7 @@ class ImageCell(
         Sub(ImageControllPanel::class, byId(R.id.imageController), sameAsParent()),
         Sub(DicomImage::class, byId(R.id.imagesContainer), { patientState, _ -> patientState.imageFramesStore })
 )) {
-    private val dispatch = GlobalDispatch.DEBUG_DISPATCH
+    private val dispatch: (Any) -> Unit = { EventBus.post(it) }
 
     init {
         view.setOnDragListener { _, dragEvent ->

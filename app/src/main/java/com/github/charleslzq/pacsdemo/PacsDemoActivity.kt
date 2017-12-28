@@ -10,6 +10,7 @@ import android.os.StrictMode
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.charleslzq.dicom.data.DicomStudy
+import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.PacsMain
 import com.github.charleslzq.pacsdemo.component.event.BindingEvent
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
@@ -19,14 +20,13 @@ import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackground
-import com.github.charleslzq.pacsdemo.support.GlobalDispatch
 import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_pacs_demo.*
 
 class PacsDemoActivity : AppCompatActivity(), RxScheduleSupport {
-    private val dispatch = GlobalDispatch.DEBUG_DISPATCH
+    private val dispatch: (Any) -> Unit = { EventBus.post(it) }
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {

@@ -2,9 +2,9 @@ package com.github.charleslzq.pacsdemo.component.gesture
 
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
+import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
-import com.github.charleslzq.pacsdemo.support.GlobalDispatch
 
 /**
  * Created by charleslzq on 17-11-29.
@@ -12,7 +12,7 @@ import com.github.charleslzq.pacsdemo.support.GlobalDispatch
 open class ScaleCompositeGestureListener(
         val layoutPosition: Int
 ) : NoOpCompositeGestureListener() {
-    protected val dispatch = GlobalDispatch.DEBUG_DISPATCH
+    protected val dispatch: (Any) -> Unit = { EventBus.post(it) }
 
     override fun onSingleTapConfirmed(motionEvent: MotionEvent): Boolean {
         dispatch(ClickEvent.ImageClicked(layoutPosition))
