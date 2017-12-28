@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.PopupMenu
 import com.github.charleslzq.pacsdemo.R
-import com.github.charleslzq.pacsdemo.component.event.ClickEvent
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.support.TypefaceUtil
 
@@ -39,16 +38,16 @@ class ButtonPanel(
     private fun onLayoutSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.one_one -> {
-                dispatch(ClickEvent.ChangeLayout(0))
+                dispatch(PacsStore.ChangeLayout(0))
             }
             R.id.one_two -> {
-                dispatch(ClickEvent.ChangeLayout(1))
+                dispatch(PacsStore.ChangeLayout(1))
             }
             R.id.two_two -> {
-                dispatch(ClickEvent.ChangeLayout(2))
+                dispatch(PacsStore.ChangeLayout(2))
             }
             R.id.three_three -> {
-                dispatch(ClickEvent.ChangeLayout(3))
+                dispatch(PacsStore.ChangeLayout(3))
             }
         }
         return true

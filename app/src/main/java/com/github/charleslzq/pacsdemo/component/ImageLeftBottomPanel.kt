@@ -45,7 +45,7 @@ class ImageLeftBottomPanel(
             }
         }
 
-        render(property = store::hideMeta, guard = { store.imageFramesStore.hasImage() }) {
+        render(property = store.imageFramesStore::hideMeta, guard = { store.imageFramesStore.hasImage() }) {
             view.visibility = if (it) View.INVISIBLE else View.VISIBLE
         }
     }

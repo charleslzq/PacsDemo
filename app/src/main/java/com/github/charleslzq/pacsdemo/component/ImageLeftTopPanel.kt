@@ -42,7 +42,7 @@ class ImageLeftTopPanel(
                 imageProgress.post { imageProgress.text = "IMAGE: ${store.imageFramesStore.currentIndex() + 1}/${store.imageFramesStore.framesSize()}" }
             }
         }
-        render(property = store::hideMeta, guard = { store.imageFramesStore.hasImage() }) {
+        render(property = store.imageFramesStore::hideMeta, guard = { store.imageFramesStore.hasImage() }) {
             view.visibility = if (it) View.INVISIBLE else View.VISIBLE
         }
     }

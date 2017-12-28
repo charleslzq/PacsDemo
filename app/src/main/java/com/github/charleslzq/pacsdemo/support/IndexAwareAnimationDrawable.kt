@@ -1,16 +1,15 @@
 package com.github.charleslzq.pacsdemo.support
 
 import android.graphics.drawable.AnimationDrawable
-import com.github.charleslzq.kotlin.react.EventBus
-import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
+import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 
 /**
  * Created by charleslzq on 17-11-20.
  */
-class IndexAwareAnimationDrawable(val layoutPosition: Int, val startOffset: Int) : AnimationDrawable() {
+class IndexAwareAnimationDrawable(val dispatch: (Any) -> Unit, val startOffset: Int) : AnimationDrawable() {
 
     override fun selectDrawable(index: Int): Boolean {
-        EventBus.post(ImageDisplayEvent.IndexChange(layoutPosition, startOffset + index, false))
+        dispatch(ImageFramesStore.IndexChange(startOffset + index, false))
         return super.selectDrawable(index)
     }
 }

@@ -3,8 +3,6 @@ package com.github.charleslzq.pacsdemo.component.gesture
 import android.graphics.PointF
 import android.view.MotionEvent
 import android.view.View
-import com.github.charleslzq.kotlin.react.EventBus
-import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 import java.util.*
 
@@ -13,8 +11,8 @@ import java.util.*
  */
 class MeasureModeGestureListener(
         private val measure: ImageFramesStore.Measure,
-        layoutPosition: Int
-) : ScaleCompositeGestureListener(layoutPosition) {
+        dispatch: (Any) -> Unit
+) : ScaleCompositeGestureListener(dispatch) {
     private val points = Stack<PointF>()
     private val lengthThreshold = 5f
 
@@ -22,12 +20,12 @@ class MeasureModeGestureListener(
         when (motionEvent.action) {
             MotionEvent.ACTION_DOWN -> {
                 points.push(getPoint(motionEvent))
-                EventBus.post(ImageDisplayEvent.DrawLines(layoutPosition, points))
+                dispatch(ImageFramesStore.DrawLines(points))
             }
             MotionEvent.ACTION_MOVE -> {
                 points.pop()
                 points.push(getPoint(motionEvent))
-                EventBus.post(ImageDisplayEvent.DrawLines(layoutPosition, points))
+                dispatch(ImageFramesStore.DrawLines(points))
             }
             MotionEvent.ACTION_UP -> {
                 points.pop()
@@ -37,7 +35,7 @@ class MeasureModeGestureListener(
                         ImageFramesStore.Measure.NONE -> throw IllegalStateException("Unexpected measure mode")
                         ImageFramesStore.Measure.LINE -> {
                             length(points.first(), points.last()).takeIf { it > lengthThreshold }?.let {
-                                EventBus.post(ImageDisplayEvent.AddPath(layoutPosition, points, points.last() to it.toString()))
+                                dispatch(ImageFramesStore.AddPath(points, points.last() to it.toString()))
                             }
                             points.clear()
                         }
@@ -45,23 +43,23 @@ class MeasureModeGestureListener(
                             if (points.size == 3) {
                                 val length = length(points[1], points[2])
                                 if (length >= lengthThreshold) {
-                                    EventBus.post(ImageDisplayEvent.AddPath(layoutPosition, points, points[1] to calculateAngle(points[0], points[1], points[2]).toString()))
+                                    dispatch(ImageFramesStore.AddPath(points, points[1] to calculateAngle(points[0], points[1], points[2]).toString()))
                                     points.clear()
                                 } else {
                                     points.pop()
-                                    EventBus.post(ImageDisplayEvent.DrawLines(layoutPosition, points))
+                                    dispatch(ImageFramesStore.DrawLines(points))
                                 }
                             } else {
                                 val length = length(points.first(), points.last())
                                 if (length < lengthThreshold) {
                                     points.pop()
                                 }
-                                EventBus.post(ImageDisplayEvent.DrawLines(layoutPosition, points))
+                                dispatch(ImageFramesStore.DrawLines(points))
                             }
                         }
                     }
                 } else {
-                    EventBus.post(ImageDisplayEvent.DrawLines(layoutPosition, points))
+                    dispatch(ImageFramesStore.DrawLines(points))
                 }
             }
         }

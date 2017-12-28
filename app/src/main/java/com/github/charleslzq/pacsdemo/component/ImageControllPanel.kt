@@ -5,10 +5,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import com.github.charleslzq.kotlin.react.Component
-import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.R
-import com.github.charleslzq.pacsdemo.component.event.ClickEvent
-import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
 import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesStore
 import com.github.charleslzq.pacsdemo.support.TypefaceUtil
@@ -39,6 +36,8 @@ class ImageControllPanel(
     private val indexController: LinearLayout = view.findViewById(R.id.indexController)
     private val progressController: LinearLayout = view.findViewById(R.id.progressController)
 
+    private val imageDispatch = store.imageFramesStore.dispatch
+
     init {
         val fontAwesomeTypeface = TypefaceUtil.getTypeFace(view.context, TypefaceUtil.fontAwesome)
         measureLine.typeface = fontAwesomeTypeface
@@ -54,53 +53,53 @@ class ImageControllPanel(
         last.typeface = fontAwesomeTypeface
 
         measureAngle.setOnClickListener {
-            EventBus.post(ClickEvent.MeasureAngleTurned(store.imageFramesStore.layoutPosition, measureAngle.isSelected))
+            imageDispatch(ImageFramesStore.MeasureAngleTurned())
         }
 
         measureLine.setOnClickListener {
-            EventBus.post(ClickEvent.MeasureLineTurned(store.imageFramesStore.layoutPosition, measureLine.isSelected))
+            imageDispatch(ImageFramesStore.MeasureLineTurned())
         }
 
         reverse.setOnClickListener {
-            EventBus.post(ClickEvent.ReverseColor(store.imageFramesStore.layoutPosition))
+            imageDispatch(ImageFramesStore.ReverseColor())
         }
 
         pseudo.setOnClickListener {
-            EventBus.post(ClickEvent.PseudoColor(store.imageFramesStore.layoutPosition))
+            imageDispatch(ImageFramesStore.PseudoColor())
         }
 
         undo.setOnClickListener {
-            EventBus.post(ClickEvent.Undo(store.imageFramesStore.layoutPosition))
+            imageDispatch(ImageFramesStore.Undo())
         }
 
         redo.setOnClickListener {
-            EventBus.post(ClickEvent.Redo(store.imageFramesStore.layoutPosition))
+            imageDispatch(ImageFramesStore.Redo())
         }
 
         first.setOnClickListener {
-            EventBus.post(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, 0, true))
+            imageDispatch(ImageFramesStore.IndexChange(0, true))
         }
 
         play.setOnClickListener {
-            EventBus.post(ImageDisplayEvent.ChangePlayStatus(store.imageFramesStore.layoutPosition))
+            imageDispatch(ImageFramesStore.ChangePlayStatus())
         }
 
         previous.setOnClickListener {
             val currentIndex = store.imageFramesStore.imagePlayModel.currentIndex
             if (currentIndex > 0) {
-                EventBus.post(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, currentIndex - 1, true))
+                imageDispatch(ImageFramesStore.IndexChange(currentIndex - 1, true))
             }
         }
 
         next.setOnClickListener {
             val currentIndex = store.imageFramesStore.imagePlayModel.currentIndex
             if (currentIndex < store.imageFramesStore.imageFramesModel.size - 1) {
-                EventBus.post(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, currentIndex + 1, true))
+                imageDispatch(ImageFramesStore.IndexChange(currentIndex + 1, true))
             }
         }
 
         last.setOnClickListener {
-            EventBus.post(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, store.imageFramesStore.imageFramesModel.size - 1, true))
+            imageDispatch(ImageFramesStore.IndexChange(store.imageFramesStore.imageFramesModel.size - 1, true))
         }
 
         render(store.imageFramesStore::measure) {
@@ -124,7 +123,7 @@ class ImageControllPanel(
                 imageSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                         if (fromUser) {
-                            EventBus.post(ImageDisplayEvent.IndexChange(store.imageFramesStore.layoutPosition, progress, true))
+                            imageDispatch(ImageFramesStore.IndexChange(progress, true))
                         }
                     }
 
@@ -164,7 +163,7 @@ class ImageControllPanel(
             }
         }
 
-        render(property = store::hideMeta, guard = { store.imageFramesStore.hasImage() }) {
+        render(property = store.imageFramesStore::hideMeta, guard = { store.imageFramesStore.hasImage() }) {
             view.visibility = if (it) View.INVISIBLE else View.VISIBLE
         }
 

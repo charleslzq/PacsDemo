@@ -1,22 +1,22 @@
 package com.github.charleslzq.pacsdemo.component.gesture
 
 import android.view.MotionEvent
-import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
+import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 
 /**
  * Created by charleslzq on 17-11-27.
  */
 class StudyModeGestureListener(
-        layoutPosition: Int
-) : ScaleCompositeGestureListener(layoutPosition) {
+        dispatch: (Any) -> Unit
+) : ScaleCompositeGestureListener(dispatch) {
 
     override fun onDoubleTap(motionEvent: MotionEvent?): Boolean {
-        dispatch(ImageDisplayEvent.StudyModeReset(layoutPosition))
+        dispatch(ImageFramesStore.StudyModeReset())
         return true
     }
 
     override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
-        dispatch(ImageDisplayEvent.LocationTranslate(layoutPosition, distanceX, distanceY))
+        dispatch(ImageFramesStore.LocationTranslate(distanceX, distanceY))
         return true
     }
 }

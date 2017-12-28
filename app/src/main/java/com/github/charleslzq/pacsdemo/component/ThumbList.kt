@@ -7,10 +7,9 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
-import com.github.charleslzq.pacsdemo.component.event.BindingEvent
-import com.github.charleslzq.pacsdemo.component.event.ClickEvent
-import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
+import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
+import com.github.charleslzq.pacsdemo.component.store.PatientSeriesStore
 import com.github.charleslzq.pacsdemo.support.DicomSeriesThumbListAdpater
 
 /**
@@ -35,11 +34,11 @@ class ThumbList(
             if (store.seriesList.isNotEmpty()) {
                 ItemClickSupport.addTo(view).setOnItemClickListener(object : ItemClickSupport.OnItemClickListener {
                     override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
-                        if (store.layoutOption == PacsStore.LayoutOption.ONE_ONE) {
-                            dispatch(ClickEvent.ThumbListItemClicked(position))
-                            if (position in (0..(store.seriesList.size - 1))) {
-                                dispatch(ImageDisplayEvent.PlayModeReset(0))
-                                dispatch(BindingEvent.ModelSelected(store.seriesList[position]))
+                        if (store.layoutOption == PacsStore.LayoutOption.ONE_ONE && position in (0..(store.seriesList.size - 1))) {
+                            store.dispatch(PacsStore.ThumbListItemClicked(position))
+                            store.imageCells.first().apply {
+                                imageFramesStore.dispatch(ImageFramesStore.PlayModeReset())
+                                dispatch(PatientSeriesStore.ModelDropped(store.seriesList[position]))
                             }
                         }
                     }

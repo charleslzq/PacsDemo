@@ -21,7 +21,7 @@ class DicomImage(
         imageView: ImageView,
         imageFramesStore: ImageFramesStore
 ) : Component<ImageView, ImageFramesStore>(imageView, imageFramesStore) {
-    private var operationMode: OperationMode = PlayMode(view.context, PlayModeGestureListener(store.layoutPosition))
+    private var operationMode: OperationMode = PlayMode(view.context, PlayModeGestureListener(store.dispatch))
         set(value) {
             field = value
             view.setOnTouchListener(operationMode)
@@ -58,9 +58,9 @@ class DicomImage(
 
         render(ImageFramesStore::scaleFactor) {
             if (store.scaleFactor > 1 && operationMode is PlayMode) {
-                operationMode = StudyMode(view.context, StudyModeGestureListener(store.layoutPosition))
+                operationMode = StudyMode(view.context, StudyModeGestureListener(store.dispatch))
             } else if (store.scaleFactor == 1.0f && operationMode is StudyMode) {
-                operationMode = PlayMode(view.context, PlayModeGestureListener(store.layoutPosition))
+                operationMode = PlayMode(view.context, PlayModeGestureListener(store.dispatch))
             }
         }
 
@@ -80,14 +80,14 @@ class DicomImage(
             operationMode = when (store.measure != ImageFramesStore.Measure.NONE) {
                 true -> {
                     drawOnImage()
-                    MeasureMode(view.context, MeasureModeGestureListener(store.measure, store.layoutPosition))
+                    MeasureMode(view.context, MeasureModeGestureListener(store.measure, store.dispatch))
                 }
                 false -> {
                     view.setImageBitmap(store.getCurrentFrame())
                     if (store.scaleFactor > 1.0f) {
-                        StudyMode(view.context, StudyModeGestureListener(store.layoutPosition))
+                        StudyMode(view.context, StudyModeGestureListener(store.dispatch))
                     } else {
-                        PlayMode(view.context, PlayModeGestureListener(store.layoutPosition))
+                        PlayMode(view.context, PlayModeGestureListener(store.dispatch))
                     }
                 }
             }

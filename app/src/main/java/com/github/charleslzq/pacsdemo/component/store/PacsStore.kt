@@ -1,15 +1,14 @@
 package com.github.charleslzq.pacsdemo.component.store
 
 import com.github.charleslzq.kotlin.react.ObservableStatus
-import com.github.charleslzq.kotlin.react.WithReducer
-import com.github.charleslzq.pacsdemo.component.event.BindingEvent
-import com.github.charleslzq.pacsdemo.component.event.ClickEvent
+import com.github.charleslzq.kotlin.react.Store
+import com.github.charleslzq.pacsdemo.support.MiddleWare
 import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 
 /**
  * Created by charleslzq on 17-11-27.
  */
-class PacsStore : WithReducer<PacsStore>, RxScheduleSupport {
+class PacsStore : Store<PacsStore>(MiddleWare.debugLog, thunk), RxScheduleSupport {
     var seriesList by ObservableStatus(mutableListOf<PatientSeriesModel>())
         private set
     var selected: Int by ObservableStatus(-1)
@@ -20,19 +19,19 @@ class PacsStore : WithReducer<PacsStore>, RxScheduleSupport {
 
     init {
         reduce(PacsStore::seriesList) {
-            on<BindingEvent.SeriesListUpdated> { event.seriesList }
+            on<SeriesListUpdated> { event.seriesList }
         }
 
         reduce(PacsStore::selected) {
-            on<ClickEvent.ChangeLayout> { -1 }
-            on<BindingEvent.SeriesListUpdated> { -1 }
-            on<ClickEvent.ThumbListItemClicked>(precondition = { layoutOption == LayoutOption.ONE_ONE }) {
+            on<ChangeLayout> { -1 }
+            on<SeriesListUpdated> { -1 }
+            on<ThumbListItemClicked>(precondition = { layoutOption == LayoutOption.ONE_ONE }) {
                 event.position
             }
         }
 
         reduce(PacsStore::layoutOption) {
-            on<ClickEvent.ChangeLayout> { LayoutOption.values()[event.layoutOrdinal] }
+            on<ChangeLayout> { LayoutOption.values()[event.layoutOrdinal] }
         }
     }
 
@@ -42,4 +41,8 @@ class PacsStore : WithReducer<PacsStore>, RxScheduleSupport {
         TWO_TWO,
         THREE_THREE
     }
+
+    data class SeriesListUpdated(val seriesList: MutableList<PatientSeriesModel>)
+    data class ChangeLayout(val layoutOrdinal: Int)
+    data class ThumbListItemClicked(val position: Int)
 }

@@ -7,25 +7,24 @@ import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.dicom.data.DicomImageMetaInfo
 import com.github.charleslzq.kotlin.react.ObservableStatus
-import com.github.charleslzq.kotlin.react.WithReducer
-import com.github.charleslzq.pacsdemo.component.event.BindingEvent
-import com.github.charleslzq.pacsdemo.component.event.ClickEvent
-import com.github.charleslzq.pacsdemo.component.event.ImageCellEvent
-import com.github.charleslzq.pacsdemo.component.event.ImageDisplayEvent
+import com.github.charleslzq.kotlin.react.Store
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
+import com.github.charleslzq.pacsdemo.support.MiddleWare
 import java.util.*
 
 
 /**
  * Created by charleslzq on 17-11-27.
  */
-class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> {
+class ImageFramesStore(val layoutPosition: Int) : Store<ImageFramesStore>(MiddleWare.debugLog, thunk) {
     var linePaint = Paint()
     var stringPaint = Paint()
     var pointPaint = Paint()
     private var allowPlay = true
     private var imageWidth = 500
 
+    var hideMeta by ObservableStatus(true)
+        private set
     var imageFramesModel by ObservableStatus(ImageFramesModel())
         private set
     var imagePlayModel by ObservableStatus(ImagePlayModel())
@@ -65,155 +64,121 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         pointPaint.strokeWidth = 3f
         pointPaint.style = Paint.Style.FILL_AND_STROKE
 
+        reduce(ImageFramesStore::hideMeta) {
+            on<ImageClicked> { !state }
+        }
+
         reduce(ImageFramesStore::imageFramesModel) {
-            on<BindingEvent.ModelSelected>(precondition = { layoutPosition == 0 }) {
-                event.patientSeriesModel.imageFramesModel
+            on<ModelDropped> {
+                event.imageFramesModel
             }
-            on<BindingEvent.ModelDropped>(precondition = { it.layoutPosition == layoutPosition }) {
-                event.patientSeriesModel.imageFramesModel
-            }
-            on<BindingEvent.SeriesListUpdated> { ImageFramesModel() }
-            on<ClickEvent.ChangeLayout> { ImageFramesModel() }
         }
 
         reduce(ImageFramesStore::bitmapCache) {
-            on<BindingEvent.ModelSelected>(precondition = { layoutPosition == 0 }) {
-                BitmapCache(Math.max(event.patientSeriesModel.imageFramesModel.size, 10), false).apply {
-                    preload(*event.patientSeriesModel.imageFramesModel.frameUrls.toTypedArray())
-                }
-            }
-            on<BindingEvent.ModelDropped>(precondition = { it.layoutPosition == layoutPosition }) {
+            on<ModelDropped> {
                 BitmapCache().apply {
                     preload(*urisInRange(0, preloadRange).toTypedArray())
                 }
             }
-            on<BindingEvent.SeriesListUpdated> { BitmapCache() }
-            on<ClickEvent.ChangeLayout> { BitmapCache() }
         }
 
         reduce(ImageFramesStore::imagePlayModel) {
-            on<ClickEvent.ChangeLayout> { ImagePlayModel() }
-            on<BindingEvent.SeriesListUpdated> { ImagePlayModel() }
-            on<ImageDisplayEvent.ChangePlayStatus>(precondition = { targetAtThis(it) && playable() }) {
+            on<ChangePlayStatus>(precondition = { playable() }) {
                 state.copy(playing = !state.playing, currentIndex = if (state.currentIndex == imageFramesModel.size - 1) 0 else state.currentIndex)
             }
-            on<ImageDisplayEvent.PlayModeReset>(precondition = { targetAtThis(it) }) {
+            on<PlayModeReset> {
                 state.copy(playing = false, currentIndex = 0)
             }
-            on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) && it.index in (0..(imageFramesModel.size - 1)) }) {
+            on<IndexChange>(precondition = { it.index in (0..(imageFramesModel.size - 1)) }) {
                 if (event.fromUser || event.index == imageFramesModel.size - 1) state.copy(playing = false, currentIndex = event.index) else state.copy(currentIndex = event.index)
             }
-            on<ClickEvent.ReverseColor>(precondition = { targetAtThis(it) }) {
+            on<ReverseColor> {
                 state.copy(playing = false)
             }
-            on<ClickEvent.PseudoColor>(precondition = { targetAtThis(it) }) {
+            on<PseudoColor> {
                 state.copy(playing = false)
             }
-            on<ImageDisplayEvent.IndexScroll>(precondition = { targetAtThis(it) }) {
+            on<IndexScroll> {
                 val offset = (event.scroll * imageFramesModel.size.toFloat() * 2 / imageWidth).toInt()
                 val currentIndex = Math.min(Math.max(imagePlayModel.currentIndex - offset, 0), imageFramesModel.size - 1)
                 state.copy(playing = false, currentIndex = currentIndex)
             }
         }
 
-        reduce(ImageFramesStore::allowPlay) {
-            on<ClickEvent.ChangeLayout> {
-                event.layoutOrdinal == 0
-            }
-        }
 
         reduce(ImageFramesStore::scaleFactor) {
-            on<ImageDisplayEvent.ScaleChange>(precondition = { targetAtThis(it) }) {
+            on<ScaleChange> {
                 getNewScaleFactor(event.scaleFactor)
             }
-            on<ImageDisplayEvent.StudyModeReset>(precondition = { targetAtThis(it) }) {
+            on<StudyModeReset> {
                 1.0f
             }
         }
 
         reduce(ImageFramesStore::matrix) {
-            on<ImageDisplayEvent.ScaleChange>(precondition = { targetAtThis(it) }) {
+            on<ScaleChange> {
                 Matrix(state).apply {
                     val newScale = getNewScaleFactor(event.scaleFactor)
                     setScale(newScale, newScale)
                 }
             }
-            on<ImageDisplayEvent.StudyModeReset>(precondition = { targetAtThis(it) }) {
+            on<StudyModeReset> {
                 Matrix()
             }
         }
 
         reduce(ImageFramesStore::reverseColor) {
-            on<ClickEvent.ReverseColor>(precondition = { targetAtThis(it) }) {
+            on<ReverseColor> {
                 !state
             }
-            on<ImageDisplayEvent.PlayModeReset>(precondition = { targetAtThis(it) }) {
+            on<PlayModeReset> {
                 false
             }
-            on<ImageDisplayEvent.StudyModeReset>(precondition = { targetAtThis(it) }) {
+            on<StudyModeReset> {
                 false
             }
         }
 
         reduce(ImageFramesStore::colorMatrix) {
-            on<ClickEvent.ReverseColor>(precondition = { targetAtThis(it) }) {
+            on<ReverseColor> {
                 ColorMatrix(state).apply {
                     postConcat(reverseMatrix)
                 }
             }
-            on<ImageDisplayEvent.PlayModeReset>(precondition = { targetAtThis(it) }) {
+            on<PlayModeReset> {
                 ColorMatrix()
             }
-            on<ImageDisplayEvent.StudyModeReset>(precondition = { targetAtThis(it) }) {
+            on<StudyModeReset> {
                 ColorMatrix()
             }
         }
 
         reduce(ImageFramesStore::pseudoColor) {
-            on<ClickEvent.PseudoColor>(precondition = { targetAtThis(it) }) {
+            on<PseudoColor> {
                 !state
             }
-            on<ImageDisplayEvent.PlayModeReset>(precondition = { targetAtThis(it) }) {
+            on<PlayModeReset> {
                 false
             }
-            on<ImageDisplayEvent.StudyModeReset>(precondition = { targetAtThis(it) }) {
+            on<StudyModeReset> {
                 false
             }
         }
 
         reduce(ImageFramesStore::measure) {
-            on<ClickEvent.MeasureLineTurned>(precondition = { targetAtThis(it) }) {
-                if (event.isSelected) {
-                    drawingStack.clear()
-                    redoStack.clear()
-                    Measure.NONE
-                } else {
-                    Measure.LINE
-                }
+            on<MeasureLineTurned> {
+                Measure.LINE
             }
-            on<ClickEvent.MeasureAngleTurned>(precondition = { targetAtThis(it) }) {
-                if (event.isSelected) {
-                    drawingStack.clear()
-                    redoStack.clear()
-                    Measure.NONE
-                } else {
-                    Measure.ANGEL
-                }
+            on<MeasureAngleTurned> {
+                Measure.ANGEL
             }
-            on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) {
-                drawingStack.clear()
-                redoStack.clear()
-                Measure.NONE
-            }
-            on<ClickEvent.ChangeLayout> {
-                drawingStack.clear()
-                redoStack.clear()
+            on<IndexChange> {
                 Measure.NONE
             }
         }
 
         reduce(ImageFramesStore::drawingMap) {
-            on<ImageDisplayEvent.AddPath>(precondition = { targetAtThis(it) }) {
+            on<AddPath> {
                 val oldMap = topOfStack()
                 Bitmap.createBitmap(oldMap.width, oldMap.height, oldMap.config).apply {
                     val canvas = Canvas(this)
@@ -227,41 +192,35 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
                     canvas.drawText(event.text.second, event.text.first.x, event.text.first.y, stringPaint)
                 }.also { drawingStack.push(it) }
             }
-            on<ClickEvent.Undo>(precondition = { targetAtThis(it) }) {
+            on<Undo> {
                 if (!drawingStack.empty()) {
                     redoStack.push(drawingStack.pop())
                 }
                 topOfStack()
             }
-            on<ClickEvent.Redo>(precondition = { targetAtThis(it) }) {
+            on<Redo> {
                 if (!redoStack.empty()) {
                     drawingStack.push(redoStack.pop())
                 }
                 topOfStack()
             }
-            on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) { null }
-            on<ClickEvent.MeasureLineTurned>(precondition = { targetAtThis(it) && it.isSelected }) {
-                null
-            }
-            on<ClickEvent.MeasureAngleTurned>(precondition = { targetAtThis(it) && it.isSelected }) {
-                null
-            }
+            on<IndexChange> { null }
         }
 
         reduce(property = ImageFramesStore::currentPoints) {
-            on<ImageDisplayEvent.AddPath>(precondition = { targetAtThis(it) }) {
+            on<AddPath> {
                 emptyArray()
             }
-            on<ImageDisplayEvent.DrawLines>(precondition = { targetAtThis(it) }) {
+            on<DrawLines> {
                 event.points.toTypedArray()
             }
-            on<ImageDisplayEvent.IndexChange>(precondition = { targetAtThis(it) }) {
+            on<IndexChange> {
                 emptyArray()
             }
-            on<ClickEvent.MeasureLineTurned>(precondition = { targetAtThis(it) }) {
+            on<MeasureLineTurned> {
                 emptyArray()
             }
-            on<ClickEvent.MeasureAngleTurned>(precondition = { targetAtThis(it) }) {
+            on<MeasureAngleTurned> {
                 emptyArray()
             }
         }
@@ -322,8 +281,6 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
 
     private fun getNewScaleFactor(rawScaleFactor: Float): Float = Math.max(1.0f, Math.min(rawScaleFactor * scaleFactor, 5.0f))
 
-    private fun targetAtThis(event: ImageCellEvent) = event.layoutPosition == layoutPosition
-
     private fun urisInRange(start: Int, end: Int) = imageFramesModel.frameUrls.subList(Math.max(0, start), Math.min(end + 1, imageFramesModel.size))
 
     private fun getFrame(index: Int): Bitmap {
@@ -360,7 +317,7 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
 
     private fun getAnimation(resources: Resources, duration: Int): IndexAwareAnimationDrawable {
         val startOffset = imagePlayModel.currentIndex
-        val animation = IndexAwareAnimationDrawable(layoutPosition, startOffset)
+        val animation = IndexAwareAnimationDrawable(dispatch, startOffset)
         animation.isOneShot = true
         imageFramesModel.frameUrls.subList(startOffset, imageFramesModel.size).forEachIndexed { index, _ ->
             val bitmap = BitmapDrawable(resources, getFrame(startOffset + index))
@@ -419,6 +376,25 @@ class ImageFramesStore(val layoutPosition: Int) : WithReducer<ImageFramesStore> 
         ))
         private val preloadRange = 5
     }
+
+    class ImageClicked
+    class MeasureLineTurned
+    class MeasureAngleTurned
+    class ReverseColor
+    class PseudoColor
+    class Undo
+    class Redo
+    class ChangePlayStatus
+    class PlayModeReset
+    class StudyModeReset
+    class Reset
+    data class ModelDropped(val imageFramesModel: ImageFramesModel)
+    data class ScaleChange(val scaleFactor: Float)
+    data class IndexChange(val index: Int, val fromUser: Boolean)
+    data class IndexScroll(val scroll: Float)
+    data class LocationTranslate(val distanceX: Float, val distanceY: Float)
+    data class AddPath(val points: List<PointF>, val text: Pair<PointF, String>)
+    data class DrawLines(val points: List<PointF>)
 
     enum class Measure {
         NONE,
