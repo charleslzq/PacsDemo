@@ -4,6 +4,7 @@ import android.graphics.PointF
 import android.view.MotionEvent
 import android.view.View
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
+import com.github.charleslzq.pacsdemo.component.store.action.ImageActions
 import java.util.*
 
 /**
@@ -35,7 +36,7 @@ class MeasureModeGestureListener(
                         ImageFrameStore.Measure.NONE -> throw IllegalStateException("Unexpected measure mode")
                         ImageFrameStore.Measure.LINE -> {
                             length(points.first(), points.last()).takeIf { it > lengthThreshold }?.let {
-                                dispatch(ImageFrameStore.AddPath(points, points.last() to it.toString()))
+                                dispatch(ImageActions.addPath(points, points.last() to it.toString()))
                             }
                             points.clear()
                         }
@@ -43,7 +44,7 @@ class MeasureModeGestureListener(
                             if (points.size == 3) {
                                 val length = length(points[1], points[2])
                                 if (length >= lengthThreshold) {
-                                    dispatch(ImageFrameStore.AddPath(points, points[1] to calculateAngle(points[0], points[1], points[2]).toString()))
+                                    dispatch(ImageActions.addPath(points, points[1] to calculateAngle(points[0], points[1], points[2]).toString()))
                                     points.clear()
                                 } else {
                                     points.pop()

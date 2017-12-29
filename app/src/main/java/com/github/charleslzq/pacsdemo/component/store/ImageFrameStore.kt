@@ -10,6 +10,9 @@ import com.github.charleslzq.kotlin.react.Store
 import com.github.charleslzq.pacsdemo.support.MiddleWare
 
 
+data class ImageDisplayModel(val images: List<Bitmap> = emptyList())
+data class ImageCanvasModel(val drawing: Bitmap? = null, val points: List<PointF> = emptyList(), val canUndo: Boolean = false, val canRedo: Boolean = false)
+
 /**
  * Created by charleslzq on 17-11-27.
  */
@@ -39,7 +42,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
         private set
     var index by ObservableStatus(0)
         private set
-    var imageDisplayModel by ObservableStatus(ImageDisplayModel())
+    var displayModel by ObservableStatus(ImageDisplayModel())
         private set
 
     var autoScale by ObservableStatus(1.0f)
@@ -56,14 +59,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
 
     var measure by ObservableStatus(Measure.NONE)
         private set
-    var currentPoints by ObservableStatus(emptyArray<PointF>())
-        private set
-    var drawingMap: Bitmap? by ObservableStatus(null)
-        private set
-    var canUndo by ObservableStatus(false)
-        private set
-    var canRedo by ObservableStatus(false)
-        private set
+    var canvasModel by ObservableStatus(ImageCanvasModel())
 
     init {
         linePaint.color = Color.RED
@@ -121,7 +117,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
             on<Reset> { 0 }
         }
 
-        reduce(ImageFrameStore::imageDisplayModel) {
+        reduce(ImageFrameStore::displayModel) {
             on<ShowImage> {
                 ImageDisplayModel(listOf(event.bitmap))
             }
@@ -191,40 +187,27 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
 
         reduce(ImageFrameStore::measure) {
             on<MeasureLineTurned> {
-                Measure.LINE
+                when (state) {
+                    Measure.LINE -> Measure.NONE
+                    else -> Measure.LINE
+                }
             }
             on<MeasureAngleTurned> {
-                Measure.ANGEL
+                when (state) {
+                    Measure.ANGEL -> Measure.NONE
+                    else -> Measure.ANGEL
+                }
             }
-            on<IndexChange> {
-                Measure.NONE
-            }
+            on<ResetMeasure> { Measure.NONE }
         }
 
-        reduce(ImageFrameStore::drawingMap) {
-
-        }
-
-        reduce(property = ImageFrameStore::currentPoints) {
-            on<AddPath> {
-                emptyArray()
-            }
-            on<DrawLines> {
-                event.points.toTypedArray()
-            }
-            on<IndexChange> {
-                emptyArray()
-            }
-            on<MeasureLineTurned> {
-                emptyArray()
-            }
-            on<MeasureAngleTurned> {
-                emptyArray()
-            }
+        reduce(ImageFrameStore::canvasModel) {
+            on<ImageCanvasModel> { event }
+            on<ResetMeasure> { ImageCanvasModel() }
         }
     }
 
-    fun hasImage() = imageDisplayModel.images.isNotEmpty()
+    fun hasImage() = displayModel.images.isNotEmpty()
 
     fun playable() = allowPlay && size > 1
 
@@ -240,24 +223,19 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
     data class PlayAnimation(val images: List<Bitmap>)
     data class PlayIndexChange(val index: Int, val meta: DicomImageMetaInfo)
 
-    class PlayModeReset
     class StudyModeReset
     class Reset
     class ResetDisplay
+    class ResetMeasure
 
     class ImageClicked
     class MeasureLineTurned
     class MeasureAngleTurned
     class ReverseColor
     class PseudoColor
-    class Undo
-    class Redo
 
     data class ScaleChange(val scaleFactor: Float)
-    data class IndexChange(val index: Int, val fromUser: Boolean)
-    data class IndexScroll(val scroll: Float)
     data class LocationTranslate(val distanceX: Float, val distanceY: Float)
-    data class AddPath(val points: List<PointF>, val text: Pair<PointF, String>)
     data class DrawLines(val points: List<PointF>)
 
     enum class Measure {

@@ -1,12 +1,12 @@
 package com.github.charleslzq.pacsdemo.component.store.action
 
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Path
+import android.graphics.PointF
 import com.github.charleslzq.kotlin.react.DispatchAction
-import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
+import com.github.charleslzq.pacsdemo.component.store.*
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore.*
-import com.github.charleslzq.pacsdemo.component.store.ImageThumbModel
-import com.github.charleslzq.pacsdemo.component.store.PacsStore
-import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
 import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 import java.net.URI
 
@@ -15,6 +15,7 @@ import java.net.URI
  */
 object ImageActions : RxScheduleSupport {
     private val seriesModels: MutableList<PatientSeriesModel> = mutableListOf()
+    private val stacks = (0..8).map { UndoSupport<Bitmap>() }
     private var bitmapCache = BitmapCache()
 
     fun reloadModels(patientSeriesModelList: List<PatientSeriesModel>): DispatchAction<PacsStore> {
@@ -30,8 +31,10 @@ object ImageActions : RxScheduleSupport {
     }
 
     fun bindModel(modId: String, index: Int = 0): DispatchAction<ImageFrameStore> {
-        return { _, dispatch, _ ->
+        return { store, dispatch, _ ->
             runOnIo {
+                cleanMeasure(store, dispatch)
+
                 seriesModels.find { it.modId == modId }?.let {
                     dispatch(BindModel(modId, it.patientMetaInfo, it.studyMetaInfo, it.seriesMetaInfo, it.frames.size))
                     findImage(it, index)?.run {
@@ -46,8 +49,10 @@ object ImageActions : RxScheduleSupport {
         return { store, dispatch, _ ->
             if (store.playable()) {
                 runOnIo {
+                    cleanMeasure(store, dispatch)
+
                     val index = store.index
-                    if (store.imageDisplayModel.images.size > 1) {
+                    if (store.displayModel.images.size > 1) {
                         dispatchShowImage(store.bindModId, index, dispatch)
                     } else {
                         seriesModels.find { it.modId == store.bindModId }?.let {
@@ -62,6 +67,8 @@ object ImageActions : RxScheduleSupport {
     fun showImage(index: Int): DispatchAction<ImageFrameStore> {
         return { store, dispatch, _ ->
             runOnIo {
+                cleanMeasure(store, dispatch)
+
                 dispatchShowImage(store.bindModId, index, dispatch)
             }
         }
@@ -81,6 +88,8 @@ object ImageActions : RxScheduleSupport {
         return { store, dispatch, _ ->
             runOnIo {
                 if (store.size > 0) {
+                    cleanMeasure(store, dispatch)
+
                     val changeBase = Math.min(100f / store.size, 10f)
                     val offset = (scrollDistance / changeBase).toInt()
                     val newIndex = Math.min(Math.max(store.index - offset, 0), store.size - 1)
@@ -93,9 +102,68 @@ object ImageActions : RxScheduleSupport {
     fun resetDisplay(): DispatchAction<ImageFrameStore> {
         return { store, dispatch, _ ->
             runOnIo {
+                cleanMeasure(store, dispatch)
                 dispatch(ResetDisplay())
                 if (store.size > 1) {
                     dispatchShowImage(store.bindModId, 0, dispatch)
+                }
+            }
+        }
+    }
+
+    fun addPath(points: List<PointF>, text: Pair<PointF, String>): DispatchAction<ImageFrameStore> {
+        return { store, dispatch, _ ->
+            runOnIo {
+                val stack = stacks[store.layoutPosition]
+                if (!stack.initialized()) {
+                    seriesModels.find { it.modId == store.bindModId }?.let {
+                        findImage(it, store.index)?.let {
+                            Bitmap.createBitmap(it.width, it.height, it.config).let { stack.done(it) }
+                        }
+                    }
+                }
+                if (stack.initialized() && points.size > 1) {
+                    dispatch(ImageCanvasModel(
+                            stack.generate {
+                                Bitmap.createBitmap(it.width, it.height, it.config).apply {
+                                    Canvas(this).apply {
+                                        drawBitmap(it, 0f, 0f, store.linePaint)
+                                        drawPath(Path().apply {
+                                            moveTo(points.first().x, points.first().y)
+                                            repeat(points.size - 2) {
+                                                lineTo(points[it + 1].x, points[it + 1].y)
+                                            }
+                                        }, store.linePaint)
+                                        drawText(text.second, text.first.x, text.first.y, store.stringPaint)
+                                    }
+                                }
+                            },
+                            emptyList(),
+                            stack.canUndo(),
+                            stack.canRedo()
+                    ))
+                }
+            }
+        }
+    }
+
+    fun undoDrawing(): DispatchAction<ImageFrameStore> {
+        return { store, dispatch, _ ->
+            val stack = stacks[store.layoutPosition]
+            if (stack.canUndo()) {
+                runOnCompute {
+                    dispatch(stack.undo())
+                }
+            }
+        }
+    }
+
+    fun redoDrawing(): DispatchAction<ImageFrameStore> {
+        return { store, dispatch, _ ->
+            val stack = stacks[store.layoutPosition]
+            if (stack.canRedo()) {
+                runOnCompute {
+                    dispatch(stack.redo())
                 }
             }
         }
@@ -120,6 +188,13 @@ object ImageActions : RxScheduleSupport {
         return when {
             model.frames.isEmpty() || index !in (0..(model.frames.size - 1)) -> emptyList()
             else -> model.frames.subList(index, model.frames.size).mapNotNull { loadImage(it.frame) }
+        }
+    }
+
+    private fun cleanMeasure(store: ImageFrameStore, dispatch: (Any) -> Unit) {
+        if (store.measure != Measure.NONE) {
+            dispatch(ResetMeasure())
+            stacks[store.layoutPosition].reset()
         }
     }
 

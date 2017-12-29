@@ -34,7 +34,7 @@ class DicomImage(
         EventBus.onEvent<DragEventMessage.StartCopyCell> { onDragStart(it) }
         view.setOnTouchListener(operationMode)
 
-        render(property = ImageFrameStore::imageDisplayModel, guard = { store.hasImage() }) {
+        render(property = ImageFrameStore::displayModel, guard = { store.hasImage() }) {
             val background = imageView.background
             if (background != null && background is IndexAwareAnimationDrawable) {
                 background.stop()
@@ -80,7 +80,7 @@ class DicomImage(
         render(property = ImageFrameStore::measure, guard = { store.hasImage() }) {
             operationMode = when (store.measure != ImageFrameStore.Measure.NONE) {
                 true -> {
-                    drawOnImage()
+                    draw()
                     MeasureMode(view.context, MeasureModeGestureListener(store.measure, store.dispatch))
                 }
                 false -> {
@@ -94,12 +94,8 @@ class DicomImage(
             }
         }
 
-        render(property = ImageFrameStore::drawingMap, guard = { store.hasImage() && store.measure != ImageFrameStore.Measure.NONE }) {
-            drawOnImage()
-        }
-
-        render(property = ImageFrameStore::currentPoints, guard = { store.hasImage() }) {
-            drawOnImage()
+        render(property = ImageFrameStore::canvasModel, guard = { store.hasImage() && store.measure != ImageFrameStore.Measure.NONE }) {
+            draw()
         }
     }
 
@@ -130,8 +126,8 @@ class DicomImage(
     }
 
     private fun getCurrentImage(): Bitmap? {
-        return if (store.imageDisplayModel.images.isNotEmpty()) {
-            scaleIfNecessary(pseudoIfRequired(store.imageDisplayModel.images[0]))
+        return if (store.displayModel.images.isNotEmpty()) {
+            scaleIfNecessary(pseudoIfRequired(store.displayModel.images[0]))
         } else {
             null
         }
@@ -198,7 +194,7 @@ class DicomImage(
     private fun getAnimation(resources: Resources): IndexAwareAnimationDrawable {
         val animation = IndexAwareAnimationDrawable(store.dispatch, store.index)
         animation.isOneShot = true
-        store.imageDisplayModel.images
+        store.displayModel.images
                 .map { BitmapDrawable(resources, it).apply { colorFilter = ColorMatrixColorFilter(store.colorMatrix) } }
                 .forEach { animation.addFrame(it, store.duration) }
         animation.selectDrawable(0)
@@ -206,25 +202,21 @@ class DicomImage(
         return animation
     }
 
-    private fun createCanvas(): Canvas {
-        return Canvas(getCurrentImage()!!.also { imageView.setImageBitmap(it) })
-    }
-
-    private fun drawOnImage() {
+    private fun draw() {
         createCanvas().apply {
-            store.drawingMap?.let {
-                drawBitmap(it, 0f, 0f, store.linePaint)
-            }
-            toLines(*store.currentPoints).let {
-                if (it.size > 1) {
-                    drawCircle(it[it.size - 2], it[it.size - 1], 5f, store.pointPaint)
-                    if (it.size > 3) {
-                        drawLines(it, store.linePaint)
-                    }
+            store.canvasModel.drawing?.let { drawBitmap(it, 0f, 0f, store.linePaint) }
+            val coordinates = toLines(*store.canvasModel.points.toTypedArray())
+            if (coordinates.size > 1) {
+                if (coordinates.size > 3) {
+                    drawLines(coordinates, store.linePaint)
                 }
+                drawCircle(coordinates[coordinates.size - 2], coordinates[coordinates.size - 2], 5f, store.pointPaint)
             }
         }
-        view.invalidate()
+    }
+
+    private fun createCanvas(): Canvas {
+        return Canvas(getCurrentImage()!!.also { imageView.setImageBitmap(it) })
     }
 
     private fun toLines(vararg points: PointF): FloatArray {

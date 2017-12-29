@@ -70,11 +70,11 @@ class ImageControllPanel(
         }
 
         undo.setOnClickListener {
-            dispatch(Undo())
+            dispatch(ImageActions.undoDrawing())
         }
 
         redo.setOnClickListener {
-            dispatch(Redo())
+            dispatch(ImageActions.redoDrawing())
         }
 
         first.setOnClickListener {
@@ -155,7 +155,7 @@ class ImageControllPanel(
             imageSeekBar.progress = it
         }
 
-        render(store::imageDisplayModel) {
+        render(store::displayModel) {
             play.post {
                 play.text = if (it.images.size > 1) view.context.resources.getString(R.string.image_pause) else view.context.resources.getString(R.string.image_play)
             }
@@ -165,9 +165,9 @@ class ImageControllPanel(
             view.visibility = if (it) View.INVISIBLE else View.VISIBLE
         }
 
-        render(property = store::drawingMap, guard = { store.hasImage() && store.measure != ImageFrameStore.Measure.NONE }) {
-            undo.visibility = if (store.canUndo) View.VISIBLE else View.GONE
-            redo.visibility = if (store.canRedo) View.VISIBLE else View.GONE
+        render(property = store::canvasModel, guard = { store.hasImage() && store.measure != ImageFrameStore.Measure.NONE }) {
+            undo.visibility = if (it.canUndo) View.VISIBLE else View.GONE
+            redo.visibility = if (it.canRedo) View.VISIBLE else View.GONE
         }
     }
 }
