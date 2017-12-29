@@ -2,18 +2,17 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.content.ClipData
 import android.content.ClipDescription
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.ColorMatrixColorFilter
-import android.graphics.PointF
+import android.content.res.Resources
+import android.graphics.*
+import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.kotlin.react.Component
 import com.github.charleslzq.kotlin.react.EventBus
+import com.github.charleslzq.pacsdemo.R
 import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.gesture.*
-import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
-import com.github.charleslzq.pacsdemo.component.store.action.ImageAction
+import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
 import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 
@@ -21,9 +20,10 @@ import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
  * Created by charleslzq on 17-11-27.
  */
 class DicomImage(
-        imageView: ImageView,
-        imageFramesStore: ImageFramesStore
-) : Component<ImageView, ImageFramesStore>(imageView, imageFramesStore), RxScheduleSupport {
+        imageLayout: View,
+        imageFrameStore: ImageFrameStore
+) : Component<View, ImageFrameStore>(imageLayout, imageFrameStore), RxScheduleSupport {
+    private val imageView: ImageView = view.findViewById(R.id.image)
     private var operationMode: OperationMode = PlayMode(view.context, PlayModeGestureListener(store.dispatch))
         set(value) {
             field = value
@@ -31,66 +31,61 @@ class DicomImage(
         }
 
     init {
-        store.initialImageHeight = view.measuredHeight
-        store.initialImageWidth = view.measuredWidth
-
         EventBus.onEvent<DragEventMessage.StartCopyCell> { onDragStart(it) }
         view.setOnTouchListener(operationMode)
 
-        render(ImageFramesStore::imageFramesModel) {
-            view.setImageBitmap(store.getCurrentFrame())
-        }
-
-        render(ImageFramesStore::imageDisplayModel) {
-            it.image?.apply {
-                val background = view.background
-                if (background != null && background is IndexAwareAnimationDrawable) {
-                    background.stop()
-                    view.clearAnimation()
-                    view.background = null
+        render(property = ImageFrameStore::imageDisplayModel, guard = { store.hasImage() }) {
+            val background = imageView.background
+            if (background != null && background is IndexAwareAnimationDrawable) {
+                background.stop()
+                imageView.clearAnimation()
+                imageView.background = null
+            }
+            callOnCompute { autoAdjustScale(it.images[0]) }.let {
+                imageView.layoutParams.width = it.first
+                imageView.layoutParams.height = it.second
+            }
+            if (it.images.size > 1) {
+                imageView.setImageBitmap(null)
+                imageView.clearAnimation()
+                callOnCompute { getAnimation(view.resources) }.let {
+                    imageView.background = it
+                    imageView.post(it)
                 }
-                callOnCompute { autoAdjustScale(this) }.let {
-                    view.layoutParams.width = it.second
-                    view.layoutParams.height = it.third
-                    view.setImageBitmap(it.first)
-                }
-            } ?: it.animation?.let {
-                view.setImageBitmap(null)
-                view.clearAnimation()
-                view.background = it
-                view.post(it)
+            } else {
+                imageView.setImageBitmap(getCurrentImage())
             }
         }
 
-        render(ImageFramesStore::scaleFactor) {
-            if (store.scaleFactor > 1 && operationMode is PlayMode) {
+        render(ImageFrameStore::gestureScale) {
+            if (store.gestureScale > 1 && operationMode is PlayMode) {
                 operationMode = StudyMode(view.context, StudyModeGestureListener(store.dispatch))
-            } else if (store.scaleFactor == 1.0f && operationMode is StudyMode) {
+            } else if (store.gestureScale == 1.0f && operationMode is StudyMode) {
                 operationMode = PlayMode(view.context, PlayModeGestureListener(store.dispatch))
             }
         }
 
-        render(ImageFramesStore::matrix) {
-            view.imageMatrix = store.matrix
+        render(ImageFrameStore::matrix) {
+            imageView.imageMatrix = store.matrix
         }
 
-        render(ImageFramesStore::colorMatrix) {
-            view.colorFilter = ColorMatrixColorFilter(store.colorMatrix)
+        render(ImageFrameStore::colorMatrix) {
+            imageView.colorFilter = ColorMatrixColorFilter(store.colorMatrix)
         }
 
-        render(property = ImageFramesStore::pseudoColor, guard = { store.hasImage() }) {
-            view.setImageBitmap(store.getCurrentFrame())
+        render(property = ImageFrameStore::pseudoColor, guard = { store.hasImage() }) {
+            imageView.setImageBitmap(getCurrentImage())
         }
 
-        render(property = ImageFramesStore::measure, guard = { store.hasImage() }) {
-            operationMode = when (store.measure != ImageFramesStore.Measure.NONE) {
+        render(property = ImageFrameStore::measure, guard = { store.hasImage() }) {
+            operationMode = when (store.measure != ImageFrameStore.Measure.NONE) {
                 true -> {
                     drawOnImage()
                     MeasureMode(view.context, MeasureModeGestureListener(store.measure, store.dispatch))
                 }
                 false -> {
-                    view.setImageBitmap(store.getCurrentFrame())
-                    if (store.scaleFactor > 1.0f) {
+                    imageView.setImageBitmap(getCurrentImage())
+                    if (store.gestureScale > 1.0f) {
                         StudyMode(view.context, StudyModeGestureListener(store.dispatch))
                     } else {
                         PlayMode(view.context, PlayModeGestureListener(store.dispatch))
@@ -99,11 +94,11 @@ class DicomImage(
             }
         }
 
-        render(property = ImageFramesStore::drawingMap, guard = { store.hasImage() && store.measure != ImageFramesStore.Measure.NONE }) {
+        render(property = ImageFrameStore::drawingMap, guard = { store.hasImage() && store.measure != ImageFrameStore.Measure.NONE }) {
             drawOnImage()
         }
 
-        render(property = ImageFramesStore::currentPoints, guard = { store.hasImage() }) {
+        render(property = ImageFrameStore::currentPoints, guard = { store.hasImage() }) {
             drawOnImage()
         }
     }
@@ -118,28 +113,99 @@ class DicomImage(
         }
     }
 
-    private fun autoAdjustScale(image: Bitmap): Triple<Bitmap, Int, Int> {
+    private fun autoAdjustScale(image: Bitmap): Pair<Int, Int> {
         val viewHeight = view.measuredHeight
         val viewWidth = view.measuredWidth
         val imageWidth = image.width
         val imageHeight = image.height
         val ratio = imageWidth.toFloat() / imageHeight.toFloat()
         val desiredWidth = Math.ceil((viewHeight * ratio).toDouble()).toInt()
-        val newSize = if (desiredWidth <= viewWidth) {
+        return if (desiredWidth <= viewWidth) {
             desiredWidth to viewHeight
         } else {
             viewWidth to (viewHeight * ratio).toInt()
+        }.also {
+            store.autoScale = it.first.toFloat() / imageWidth
         }
-        store.rawScale = newSize.first.toFloat() / imageWidth
-        return Triple(if (store.rawScale > 1.0f) {
-            Bitmap.createScaledBitmap(image, view.layoutParams.width, view.layoutParams.height, false)
+    }
+
+    private fun getCurrentImage(): Bitmap? {
+        return if (store.imageDisplayModel.images.isNotEmpty()) {
+            scaleIfNecessary(pseudoIfRequired(store.imageDisplayModel.images[0]))
         } else {
-            image
-        }, newSize.first, newSize.second)
+            null
+        }
+    }
+
+    private fun scaleIfNecessary(rawBitmap: Bitmap): Bitmap {
+        return if (store.autoScale > 1.0f) {
+            val newWidth = (rawBitmap.width * store.autoScale).toInt()
+            val newHeight = (rawBitmap.height * store.autoScale).toInt()
+            Bitmap.createScaledBitmap(rawBitmap, newWidth, newHeight, false)
+        } else {
+            rawBitmap
+        }
+    }
+
+    private fun pseudoIfRequired(rawBitmap: Bitmap): Bitmap {
+        if (store.pseudoColor) {
+            val pixels = IntArray(rawBitmap.height * rawBitmap.width)
+            rawBitmap.getPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
+            (0..(pixels.size - 1)).forEach {
+                pixels[it] = calculateColor(pixels[it])
+            }
+            rawBitmap.setPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
+        }
+        return rawBitmap
+    }
+
+    private fun calculateColor(color: Int): Int {
+        return getPseudoColor((Color.red(color) + Color.green(color) + Color.blue(color) + Color.alpha(color)) / 4)
+    }
+
+    private fun getPseudoColor(greyValue: Int): Int {
+        return when (greyValue) {
+            in (0..31) -> Color.rgb(
+                    0,
+                    (255 * greyValue / 32.0).toInt(),
+                    (255 * greyValue / 32.0).toInt())
+            in (32..63) -> Color.rgb(
+                    0,
+                    255,
+                    255)
+            in (64..95) -> Color.rgb(
+                    0,
+                    (255 * (96 - greyValue) / 32.0).toInt(),
+                    (255 * (96 - greyValue) / 32.0).toInt())
+            in (96..127) -> Color.rgb((
+                    255 * (greyValue - 96) / 64.0).toInt(),
+                    (255 * (greyValue - 96) / 32.0).toInt(),
+                    (255 * (greyValue - 96) / 32.0).toInt())
+            in (128..191) -> Color.rgb(
+                    (255 * (greyValue - 128) / 128.0 + 128).toInt(),
+                    0,
+                    0)
+            in (192..255) -> Color.rgb(
+                    255,
+                    (255 * (greyValue - 192) / 63.0).toInt(),
+                    (255 * (greyValue - 192) / 63.0).toInt())
+            else -> throw IllegalArgumentException("$greyValue not in (0..255)")
+        }
+    }
+
+    private fun getAnimation(resources: Resources): IndexAwareAnimationDrawable {
+        val animation = IndexAwareAnimationDrawable(store.dispatch, store.index)
+        animation.isOneShot = true
+        store.imageDisplayModel.images
+                .map { BitmapDrawable(resources, it).apply { colorFilter = ColorMatrixColorFilter(store.colorMatrix) } }
+                .forEach { animation.addFrame(it, store.duration) }
+        animation.selectDrawable(0)
+        animation.callback = null
+        return animation
     }
 
     private fun createCanvas(): Canvas {
-        return Canvas(store.getCurrentFrame()!!.also { view.setImageBitmap(it) })
+        return Canvas(getCurrentImage()!!.also { imageView.setImageBitmap(it) })
     }
 
     private fun drawOnImage() {
@@ -181,6 +247,5 @@ class DicomImage(
 
     companion object {
         val tag = "imageCell"
-        val action = ImageAction()
     }
 }

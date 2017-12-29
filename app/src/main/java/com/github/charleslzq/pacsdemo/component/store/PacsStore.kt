@@ -9,17 +9,17 @@ import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
  * Created by charleslzq on 17-11-27.
  */
 class PacsStore : Store<PacsStore>(MiddleWare.debugLog, buildThunk<PacsStore>()), RxScheduleSupport {
-    var seriesList by ObservableStatus(mutableListOf<PatientSeriesModel>())
+    var thumbList by ObservableStatus(mutableListOf<ImageThumbModel>())
         private set
     var selected: Int by ObservableStatus(-1)
         private set
     var layoutOption: LayoutOption by ObservableStatus(LayoutOption.ONE_ONE)
         private set
-    val imageCells: List<PatientSeriesStore> = callOnIo { (0..8).map { PatientSeriesStore(ImageFramesStore(it)) } }
+    val imageCells: List<ImageFrameStore> = callOnIo { (0..8).map { ImageFrameStore(it) } }
 
     init {
-        reduce(PacsStore::seriesList) {
-            on<SeriesListUpdated> { event.seriesList }
+        reduce(PacsStore::thumbList) {
+            on<SeriesListUpdated> { event.thumbList.toMutableList() }
         }
 
         reduce(PacsStore::selected) {
@@ -42,7 +42,7 @@ class PacsStore : Store<PacsStore>(MiddleWare.debugLog, buildThunk<PacsStore>())
         THREE_THREE
     }
 
-    data class SeriesListUpdated(val seriesList: MutableList<PatientSeriesModel>)
+    data class SeriesListUpdated(val thumbList: List<ImageThumbModel>)
     data class ChangeLayout(val layoutOrdinal: Int)
     data class ThumbListItemClicked(val position: Int)
 }

@@ -8,10 +8,11 @@
     android:padding="3dp">
 
     <RelativeLayout
+        android:id="@+id/imageContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <ImageView
-            android:id="@+id/imagesContainer"
+            android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
@@ -98,8 +99,6 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@id/imagesContainer"
-            android:layout_alignEnd="@id/imagesContainer"
             android:orientation="vertical">
             <TextView
                 android:id="@+id/patientName"
@@ -166,8 +165,6 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/imagesContainer"
-            android:layout_alignStart="@id/imagesContainer"
             android:orientation="vertical">
             <TextView
                 android:id="@+id/xRayInfo"
@@ -206,9 +203,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_alignEnd="@id/imagesContainer"
-            android:layout_alignBottom="@id/imagesContainer">
+            android:orientation="vertical">
             <LinearLayout
                 android:id="@+id/displayController"
                 android:layout_width="match_parent"

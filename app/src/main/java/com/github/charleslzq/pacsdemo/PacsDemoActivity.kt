@@ -10,18 +10,18 @@ import android.os.StrictMode
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.charleslzq.dicom.data.DicomStudy
-import com.github.charleslzq.pacsdemo.component.DicomImage
 import com.github.charleslzq.pacsdemo.component.PacsMain
-import com.github.charleslzq.pacsdemo.component.store.ImageFramesModel
+import com.github.charleslzq.pacsdemo.component.store.ImageFrameModel
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
-import com.github.charleslzq.pacsdemo.component.store.PatientSeriesStore
+import com.github.charleslzq.pacsdemo.component.store.action.ImageActions
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackground
 import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_pacs_demo.*
+import java.util.*
 
 class PacsDemoActivity : AppCompatActivity(), RxScheduleSupport {
     private val serviceConnection = object : ServiceConnection {
@@ -68,10 +68,10 @@ class PacsDemoActivity : AppCompatActivity(), RxScheduleSupport {
     }
 
     fun load(patientId: String?, studyId: String?, seriesId: String?, imageNum: String?) {
-        Observable.create<MutableList<PatientSeriesModel>> {
+        Observable.fromCallable {
             val patient = patientId?.let { dicomDataService?.findPatient(it) }
-            it.onNext(when (patient == null) {
-                true -> mutableListOf()
+            when (patient == null) {
+                true -> emptyList()
                 false -> {
                     val filter: (DicomStudy) -> Boolean = if (studyId == null) {
                         { true }
@@ -81,33 +81,36 @@ class PacsDemoActivity : AppCompatActivity(), RxScheduleSupport {
                     patient!!.studies.filter(filter).flatMap { study ->
                         study.series.sortedBy { it.metaInfo.instanceUID }.map {
                             PatientSeriesModel(
+                                    UUID.randomUUID().toString(),
                                     patient.metaInfo,
                                     study.metaInfo,
                                     it.metaInfo,
-                                    ImageFramesModel(it.metaInfo.instanceUID!!, it.images.sortedBy { it.instanceNumber?.toInt() })
+                                    it.images.sortedBy { it.instanceNumber?.toInt() }
+                                            .filter { it.files[ImageFrameModel.DEFAULT] != null }
+                                            .map { ImageFrameModel(it) },
+                                    it.images.sortedBy { it.instanceNumber?.toInt() }
+                                            .map { it.files[ImageFrameModel.THUMB] }
+                                            .firstOrNull()
                             )
                         }
-                    }.toMutableList()
+                    }
                 }
-            })
+            }
         }.subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation())
                 .subscribe {
                     val base = pacs.store
                     val firstCell = base.imageCells.first()
-                    val firstImage = firstCell.imageFramesStore
-                    base.dispatch(PacsStore.SeriesListUpdated(it))
+                    base.dispatch(ImageActions.reloadModels(it))
                     if (seriesId != null) {
-                        it.indices.find { index -> it[index].dicomSeriesMetaInfo.instanceUID == seriesId }?.let { index ->
+                        it.indices.find { index -> it[index].seriesMetaInfo.instanceUID == seriesId }?.let { index ->
                             base.dispatch(PacsStore.ThumbListItemClicked(index))
-                            firstCell.dispatch(PatientSeriesStore.ModelDropped(it[index]))
-                            val imageIndex = (imageNum?.run { toInt() }?.takeIf { imageIndex -> imageIndex in (1..it[index].imageFramesModel.size) } ?: 1) - 1
-                            firstImage.dispatch(DicomImage.action.bindModel(it[index].imageFramesModel, imageIndex))
+                            val imageOrder = imageNum?.run { toInt() } ?: 1
+                            firstCell.dispatch(ImageActions.bindModel(it[index].modId, imageOrder))
                         }
                     } else if (it.isNotEmpty()) {
                         base.dispatch(PacsStore.ThumbListItemClicked(0))
-                        firstCell.dispatch(PatientSeriesStore.ModelDropped(it[0]))
-                        firstImage.dispatch(DicomImage.action.bindModel(it[0].imageFramesModel))
+                        firstCell.dispatch(ImageActions.bindModel(it[0].modId, 0))
                     }
                 }
     }

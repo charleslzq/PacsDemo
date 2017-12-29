@@ -7,9 +7,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
-import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
-import com.github.charleslzq.pacsdemo.component.store.PatientSeriesStore
 import com.github.charleslzq.pacsdemo.support.DicomSeriesThumbListAdpater
 
 /**
@@ -22,23 +20,23 @@ class ThumbList(
 
     init {
         view.layoutManager = LinearLayoutManager(recyclerView.context)
-        render(store::seriesList) {
+        render(store::thumbList) {
             val adapter = view.adapter
             if (adapter != null && adapter is DicomSeriesThumbListAdpater) {
-                adapter.seriesModels.clear()
-                adapter.seriesModels.addAll(store.seriesList)
+                adapter.thumbList.clear()
+                adapter.thumbList.addAll(store.thumbList)
             } else {
-                view.adapter = DicomSeriesThumbListAdpater(store.seriesList)
+                view.adapter = DicomSeriesThumbListAdpater(store.thumbList)
             }
             view.adapter.notifyDataSetChanged()
-            if (store.seriesList.isNotEmpty()) {
+            if (store.thumbList.isNotEmpty()) {
                 ItemClickSupport.addTo(view).setOnItemClickListener(object : ItemClickSupport.OnItemClickListener {
                     override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
-                        if (store.layoutOption == PacsStore.LayoutOption.ONE_ONE && position in (0..(store.seriesList.size - 1))) {
+                        if (store.layoutOption == PacsStore.LayoutOption.ONE_ONE && position in (0..(store.thumbList.size - 1))) {
                             store.dispatch(PacsStore.ThumbListItemClicked(position))
                             store.imageCells.first().apply {
-                                imageFramesStore.dispatch(ImageFramesStore.PlayModeReset())
-                                dispatch(PatientSeriesStore.ModelDropped(store.seriesList[position]))
+                                //                                imageFrameStore.dispatch(ImageFrameStore.PlayModeReset())
+//                                dispatch(PatientSeriesStore.ModelDropped(store.thumbList[position]))
                             }
                         }
                     }
@@ -64,10 +62,10 @@ class ThumbList(
     }
 
     private fun setSelected(selected: Int) {
-        repeat(store.seriesList.size) {
+        repeat(store.thumbList.size) {
             setSelected(it, false)
         }
-        if (selected in (0..(store.seriesList.size - 1))) {
+        if (selected in (0..(store.thumbList.size - 1))) {
             setSelected(selected, true)
         }
     }

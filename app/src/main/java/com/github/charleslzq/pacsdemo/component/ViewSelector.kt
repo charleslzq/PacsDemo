@@ -24,16 +24,16 @@ class ViewSelector(
         EventBus.onEvent<DragEventMessage.DropAtCellWithData> {
             val layoutPosition = it.layoutPosition
             val dataPosition = it.dataPosition
-            if (dataPosition >= 0 && dataPosition < store.seriesList.size) {
+            if (dataPosition >= 0 && dataPosition < store.thumbList.size) {
 //                dispatch(ImageDisplayEvent.PlayModeReset(layoutPosition))
-//                dispatch(BindingEvent.ModelDropped(layoutPosition, store.seriesList[dataPosition]))
+//                dispatch(BindingEvent.ModelDropped(layoutPosition, store.thumbList[dataPosition]))
             }
         }
         EventBus.onEvent<DragEventMessage.DropToCopyCell> {
             val sourcePosition = it.sourcePosition
             val destPosition = it.targetPosition
             if (sourcePosition >= 0 && sourcePosition < store.imageCells.size) {
-                val data = store.imageCells[sourcePosition].patientSeriesModel
+//                val data = store.imageCells[sourcePosition].patientSeriesModel
 //                dispatch(ImageDisplayEvent.PlayModeReset(destPosition))
 //                dispatch(BindingEvent.ModelDropped(destPosition, data))
 //                dispatch(ImageDisplayEvent.PlayModeReset(sourcePosition))

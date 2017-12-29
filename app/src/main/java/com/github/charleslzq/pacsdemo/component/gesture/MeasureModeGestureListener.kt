@@ -3,14 +3,14 @@ package com.github.charleslzq.pacsdemo.component.gesture
 import android.graphics.PointF
 import android.view.MotionEvent
 import android.view.View
-import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
+import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
 import java.util.*
 
 /**
  * Created by charleslzq on 17-11-30.
  */
 class MeasureModeGestureListener(
-        private val measure: ImageFramesStore.Measure,
+        private val measure: ImageFrameStore.Measure,
         dispatch: (Any) -> Unit
 ) : ScaleCompositeGestureListener(dispatch) {
     private val points = Stack<PointF>()
@@ -20,46 +20,46 @@ class MeasureModeGestureListener(
         when (motionEvent.action) {
             MotionEvent.ACTION_DOWN -> {
                 points.push(getPoint(motionEvent))
-                dispatch(ImageFramesStore.DrawLines(points))
+                dispatch(ImageFrameStore.DrawLines(points))
             }
             MotionEvent.ACTION_MOVE -> {
                 points.pop()
                 points.push(getPoint(motionEvent))
-                dispatch(ImageFramesStore.DrawLines(points))
+                dispatch(ImageFrameStore.DrawLines(points))
             }
             MotionEvent.ACTION_UP -> {
                 points.pop()
                 points.push(getPoint(motionEvent))
                 if (points.size > 1) {
                     when (measure) {
-                        ImageFramesStore.Measure.NONE -> throw IllegalStateException("Unexpected measure mode")
-                        ImageFramesStore.Measure.LINE -> {
+                        ImageFrameStore.Measure.NONE -> throw IllegalStateException("Unexpected measure mode")
+                        ImageFrameStore.Measure.LINE -> {
                             length(points.first(), points.last()).takeIf { it > lengthThreshold }?.let {
-                                dispatch(ImageFramesStore.AddPath(points, points.last() to it.toString()))
+                                dispatch(ImageFrameStore.AddPath(points, points.last() to it.toString()))
                             }
                             points.clear()
                         }
-                        ImageFramesStore.Measure.ANGEL -> {
+                        ImageFrameStore.Measure.ANGEL -> {
                             if (points.size == 3) {
                                 val length = length(points[1], points[2])
                                 if (length >= lengthThreshold) {
-                                    dispatch(ImageFramesStore.AddPath(points, points[1] to calculateAngle(points[0], points[1], points[2]).toString()))
+                                    dispatch(ImageFrameStore.AddPath(points, points[1] to calculateAngle(points[0], points[1], points[2]).toString()))
                                     points.clear()
                                 } else {
                                     points.pop()
-                                    dispatch(ImageFramesStore.DrawLines(points))
+                                    dispatch(ImageFrameStore.DrawLines(points))
                                 }
                             } else {
                                 val length = length(points.first(), points.last())
                                 if (length < lengthThreshold) {
                                     points.pop()
                                 }
-                                dispatch(ImageFramesStore.DrawLines(points))
+                                dispatch(ImageFrameStore.DrawLines(points))
                             }
                         }
                     }
                 } else {
-                    dispatch(ImageFramesStore.DrawLines(points))
+                    dispatch(ImageFrameStore.DrawLines(points))
                 }
             }
         }

@@ -4,15 +4,15 @@ import android.view.View
 import android.widget.TextView
 import com.github.charleslzq.kotlin.react.Component
 import com.github.charleslzq.pacsdemo.R
-import com.github.charleslzq.pacsdemo.component.store.PatientSeriesStore
+import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
 
 /**
  * Created by charleslzq on 17-12-6.
  */
 class ImageRightTopPanel(
         view: View,
-        patientSeriesStore: PatientSeriesStore
-) : Component<View, PatientSeriesStore>(view, patientSeriesStore) {
+        imageFrameStore: ImageFrameStore
+) : Component<View, ImageFrameStore>(view, imageFrameStore) {
     private val patientName: TextView = view.findViewById(R.id.patientName)
     private val patientId: TextView = view.findViewById(R.id.patientId)
     private val patientInfo: TextView = view.findViewById(R.id.patientInfo)
@@ -20,49 +20,48 @@ class ImageRightTopPanel(
     private val description: TextView = view.findViewById(R.id.description)
 
     init {
-        render(store::patientSeriesModel) {
+        render(store::patientMeta) {
             val visible = View.GONE
             patientName.visibility = visible
             patientId.visibility = visible
             patientInfo.visibility = visible
             institutionName.visibility = visible
-            description.visibility = visible
 
-            if (store.imageFramesStore.hasImage()) {
-                val meta = it.patientMetaInfo
-                meta.name?.let {
-                    patientName.post { patientName.text = it }
-                    patientName.visibility = View.VISIBLE
-                }
-                meta.id?.let {
-                    patientId.post { patientId.text = it }
-                    patientId.visibility = View.VISIBLE
-                }
+            it.name?.let {
+                patientName.post { patientName.text = it }
+                patientName.visibility = View.VISIBLE
+            }
+            it.id?.let {
+                patientId.post { patientId.text = it }
+                patientId.visibility = View.VISIBLE
+            }
 
-                if (meta.birthday != null && meta.sex != null) {
-                    patientInfo.post {
-                        patientInfo.text = buildString {
-                            append(meta.birthday!!)
-                            append(" ")
-                            append(meta.sex!!)
-                        }
+            if (it.birthday != null && it.sex != null) {
+                patientInfo.post {
+                    patientInfo.text = buildString {
+                        append(it.birthday!!)
+                        append(" ")
+                        append(it.sex!!)
                     }
-                    patientInfo.visibility = View.VISIBLE
                 }
+                patientInfo.visibility = View.VISIBLE
+            }
 
-                meta.institutionName?.let {
-                    institutionName.post { institutionName.text = it }
-                    institutionName.visibility = View.VISIBLE
-                }
-
-                it.dicomSeriesMetaInfo.description?.let {
-                    description.post { description.text = it }
-                    description.visibility = View.VISIBLE
-                }
+            it.institutionName?.let {
+                institutionName.post { institutionName.text = it }
+                institutionName.visibility = View.VISIBLE
             }
         }
 
-        render(property = store.imageFramesStore::hideMeta, guard = { store.imageFramesStore.hasImage() }) {
+        render(store::seriesMeta) {
+            description.visibility = View.GONE
+            it.description?.let {
+                description.post { description.text = it }
+                description.visibility = View.VISIBLE
+            }
+        }
+
+        render(store::hideMeta) {
             view.visibility = if (it) View.INVISIBLE else View.VISIBLE
         }
     }

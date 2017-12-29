@@ -2,7 +2,8 @@ package com.github.charleslzq.pacsdemo.component.gesture
 
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
-import com.github.charleslzq.pacsdemo.component.store.ImageFramesStore
+import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore.ImageClicked
+import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore.ScaleChange
 
 /**
  * Created by charleslzq on 17-11-29.
@@ -12,13 +13,12 @@ open class ScaleCompositeGestureListener(
 ) : NoOpCompositeGestureListener() {
 
     override fun onSingleTapConfirmed(motionEvent: MotionEvent): Boolean {
-        dispatch(ImageFramesStore.ImageClicked())
+        dispatch(ImageClicked())
         return true
     }
 
     override fun onScale(scaleGestureDetector: ScaleGestureDetector): Boolean {
-        val rawScaleFactor = scaleGestureDetector.scaleFactor
-        dispatch(ImageFramesStore.ScaleChange(rawScaleFactor))
+        dispatch(ScaleChange(scaleGestureDetector.scaleFactor))
         return true
     }
 }
