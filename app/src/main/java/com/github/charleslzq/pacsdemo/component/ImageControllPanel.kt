@@ -118,7 +118,7 @@ class ImageControllPanel(
                 imageSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                         if (fromUser) {
-                            dispatch(ImageFrameStore.IndexChange(progress, true))
+                            dispatch(ImageActions.showImage(progress))
                         }
                     }
 
