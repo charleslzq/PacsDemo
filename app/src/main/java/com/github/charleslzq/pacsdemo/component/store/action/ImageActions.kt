@@ -70,8 +70,32 @@ object ImageActions : RxScheduleSupport {
     fun playIndexChange(index: Int): DispatchAction<ImageFrameStore> {
         return { store, dispatch, _ ->
             seriesModels.find { it.modId == store.bindModId }?.let {
-                if (index in (0..(it.frames.size-1))) {
+                if (index in (0..(it.frames.size - 1))) {
                     dispatch(PlayIndexChange(index, it.frames[index].meta))
+                }
+            }
+        }
+    }
+
+    fun indexScroll(scrollDistance: Float): DispatchAction<ImageFrameStore> {
+        return { store, dispatch, _ ->
+            runOnIo {
+                if (store.size > 0) {
+                    val changeBase = Math.min(100f / store.size, 10f)
+                    val offset = (scrollDistance / changeBase).toInt()
+                    val newIndex = Math.min(Math.max(store.index - offset, 0), store.size - 1)
+                    dispatchShowImage(store.bindModId, newIndex, dispatch)
+                }
+            }
+        }
+    }
+
+    fun resetDisplay(): DispatchAction<ImageFrameStore> {
+        return { store, dispatch, _ ->
+            runOnIo {
+                dispatch(ResetDisplay())
+                if (store.size > 1) {
+                    dispatchShowImage(store.bindModId, 0, dispatch)
                 }
             }
         }

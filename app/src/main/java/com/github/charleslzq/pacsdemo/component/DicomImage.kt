@@ -151,10 +151,12 @@ class DicomImage(
         if (store.pseudoColor) {
             val pixels = IntArray(rawBitmap.height * rawBitmap.width)
             rawBitmap.getPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
-            (0..(pixels.size - 1)).forEach {
+            repeat(pixels.size) {
                 pixels[it] = calculateColor(pixels[it])
             }
-            rawBitmap.setPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
+            Bitmap.createBitmap(rawBitmap.width, rawBitmap.height, rawBitmap.config).apply {
+                setPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
+            }
         }
         return rawBitmap
     }

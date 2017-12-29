@@ -80,6 +80,8 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
 
         reduce(ImageFrameStore::hideMeta) {
             on<ImageClicked> { !state }
+            on<BindModel>(precondition = { it.size > 0 }) { false }
+            on<ResetDisplay> { false }
         }
 
         reduce(ImageFrameStore::bindModId) {
@@ -153,7 +155,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
             on<ReverseColor> {
                 !state
             }
-            on<PlayModeReset> {
+            on<ResetDisplay> {
                 false
             }
             on<StudyModeReset> {
@@ -167,7 +169,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
                     postConcat(reverseMatrix)
                 }
             }
-            on<PlayModeReset> {
+            on<ResetDisplay> {
                 ColorMatrix()
             }
             on<StudyModeReset> {
@@ -179,7 +181,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
             on<PseudoColor> {
                 !state
             }
-            on<PlayModeReset> {
+            on<ResetDisplay> {
                 false
             }
             on<StudyModeReset> {
@@ -238,6 +240,11 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
     data class PlayAnimation(val images: List<Bitmap>)
     data class PlayIndexChange(val index: Int, val meta: DicomImageMetaInfo)
 
+    class PlayModeReset
+    class StudyModeReset
+    class Reset
+    class ResetDisplay
+
     class ImageClicked
     class MeasureLineTurned
     class MeasureAngleTurned
@@ -245,10 +252,6 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
     class PseudoColor
     class Undo
     class Redo
-    class ChangePlayStatus
-    class PlayModeReset
-    class StudyModeReset
-    class Reset
 
     data class ScaleChange(val scaleFactor: Float)
     data class IndexChange(val index: Int, val fromUser: Boolean)
