@@ -160,6 +160,9 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
             on<StudyModeReset> {
                 Matrix()
             }
+            on<Reset> {
+                Matrix()
+            }
         }
 
         reduce(ImageFrameStore::reverseColor) {
@@ -170,6 +173,9 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
                 false
             }
             on<StudyModeReset> {
+                false
+            }
+            on<Reset> {
                 false
             }
         }
@@ -186,6 +192,9 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
             on<StudyModeReset> {
                 ColorMatrix()
             }
+            on<Reset> {
+                ColorMatrix()
+            }
         }
 
         reduce(ImageFrameStore::pseudoColor) {
@@ -196,6 +205,9 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
                 false
             }
             on<StudyModeReset> {
+                false
+            }
+            on<Reset> {
                 false
             }
         }
@@ -214,12 +226,14 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
                 }
             }
             on<ResetMeasure> { Measure.NONE }
+            on<Reset> { Measure.NONE }
         }
 
         reduce(ImageFrameStore::canvasModel) {
             on<ImageCanvasModel> { event }
             on<DrawLines> { state.copy(tmp = event.tmp) }
             on<ResetMeasure> { ImageCanvasModel() }
+            on<Reset> { ImageCanvasModel() }
         }
     }
 

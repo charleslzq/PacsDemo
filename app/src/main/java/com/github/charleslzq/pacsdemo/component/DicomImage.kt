@@ -8,7 +8,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.drawable.BitmapDrawable
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.kotlin.react.Component
@@ -45,7 +44,7 @@ class DicomImage(
                 imageView.clearAnimation()
                 imageView.background = null
             }
-            if (store.hasImage) {
+            if (it.images.isNotEmpty()) {
                 callOnCompute { autoAdjustScale(it.images[0]) }
             }
             if (it.images.size > 1) {
@@ -83,11 +82,9 @@ class DicomImage(
         render(property = ImageFrameStore::measure, guard = { store.hasImage }) {
             operationMode = when (store.measure != ImageFrameStore.Measure.NONE) {
                 true -> {
-                    draw()
                     MeasureMode(imageView.context, MeasureModeGestureListener(store.measure, store.dispatch))
                 }
                 false -> {
-                    imageView.setImageBitmap(getCurrentImage())
                     if (store.gestureScale > 1.0f) {
                         StudyMode(imageView.context, StudyModeGestureListener(store.dispatch))
                     } else {
@@ -105,11 +102,9 @@ class DicomImage(
     private fun onDragStart(dragCopyCellMessage: DragEventMessage.StartCopyCell) {
         if (dragCopyCellMessage.layoutPosition == store.layoutPosition) {
             val dragBuilder = View.DragShadowBuilder(imageView)
-            val clipDataItem = ClipData.Item(tag, store.bindModId)
-            val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), clipDataItem)
+            val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_HTML), ClipData.Item(tag))
             @Suppress("DEPRECATION")
-            imageView.startDrag(clipData, dragBuilder, null, 0)
-            store.dispatch(ImageFrameStore.Reset())
+            imageView.startDrag(clipData, dragBuilder, store, 0)
         }
     }
 

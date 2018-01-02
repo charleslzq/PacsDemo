@@ -60,6 +60,10 @@ object ImageActions : RxScheduleSupport {
                     dispatch(BindModel(modId, it.patientMetaInfo, it.studyMetaInfo, it.seriesMetaInfo, it.frames.size))
                     findImage(it, index)?.run {
                         dispatch(ShowImage(this, index, it.frames[index].meta))
+                        stacks[store.layoutPosition].let {
+                            it.reset()
+                            it.done(this)
+                        }
                     }
                     if (store.playable) {
                         bitmapCache = BitmapCache(Math.max(100, it.frames.size))
@@ -72,6 +76,30 @@ object ImageActions : RxScheduleSupport {
         }
     }
 
+    fun copyStates(imageFrameStore: ImageFrameStore): DispatchAction<ImageFrameStore> {
+        return { store, dispatch, _ ->
+            dispatch(Reset())
+            store.dispatch(ImageActions.bindModel(imageFrameStore.bindModId, imageFrameStore.index))
+            if (imageFrameStore.reverseColor) {
+                dispatch(ReverseColor())
+            }
+            if (imageFrameStore.pseudoColor) {
+                dispatch(PseudoColor())
+            }
+            when (imageFrameStore.measure) {
+                ImageFrameStore.Measure.NONE -> {
+                }
+                ImageFrameStore.Measure.LINE -> dispatch(MeasureLineTurned())
+                ImageFrameStore.Measure.ANGEL -> dispatch(MeasureAngleTurned())
+            }
+            stacks[store.layoutPosition].copyFrom(stacks[imageFrameStore.layoutPosition])
+            stacks[imageFrameStore.layoutPosition].reset()
+            dispatch(imageFrameStore.canvasModel)
+
+            imageFrameStore.dispatch(ImageFrameStore.Reset())
+        }
+    }
+
     fun playOrPause(): DispatchAction<ImageFrameStore> {
         return { store, dispatch, _ ->
             if (store.playable) {
@@ -80,7 +108,7 @@ object ImageActions : RxScheduleSupport {
 
                     val index = store.index
                     if (store.displayModel.images.size > 1) {
-                        dispatchShowImage(store.bindModId, index, dispatch)
+                        dispatchShowImage(store.layoutPosition, store.bindModId, index, dispatch)
                     } else {
                         seriesModels.find { it.modId == store.bindModId }?.let {
                             dispatch(PlayAnimation(findFrames(it, index)))
@@ -96,7 +124,7 @@ object ImageActions : RxScheduleSupport {
             runOnIo {
                 cleanMeasure(store, dispatch)
 
-                dispatchShowImage(store.bindModId, index, dispatch)
+                dispatchShowImage(store.layoutPosition, store.bindModId, index, dispatch)
             }
         }
     }
@@ -120,7 +148,7 @@ object ImageActions : RxScheduleSupport {
                     val changeBase = Math.min(100f / store.size, 10f)
                     val offset = (scrollDistance / changeBase).toInt()
                     val newIndex = Math.min(Math.max(store.index - offset, 0), store.size - 1)
-                    dispatchShowImage(store.bindModId, newIndex, dispatch)
+                    dispatchShowImage(store.layoutPosition, store.bindModId, newIndex, dispatch)
                 }
             }
         }
@@ -132,7 +160,7 @@ object ImageActions : RxScheduleSupport {
                 cleanMeasure(store, dispatch)
                 dispatch(ResetDisplay())
                 if (store.size > 1) {
-                    dispatchShowImage(store.bindModId, 0, dispatch)
+                    dispatchShowImage(store.layoutPosition, store.bindModId, 0, dispatch)
                 }
             }
         }
@@ -161,13 +189,6 @@ object ImageActions : RxScheduleSupport {
         return { store, dispatch, _ ->
             runOnIo {
                 val stack = stacks[store.layoutPosition]
-                if (!stack.initialized()) {
-                    seriesModels.find { it.modId == store.bindModId }?.let {
-                        findImage(it, store.index)?.let {
-                            Bitmap.createBitmap(it.width, it.height, it.config).let { stack.done(it) }
-                        }
-                    }
-                }
                 if (stack.initialized() && points.size > 1) {
                     dispatch(ImageCanvasModel(
                             stack.generate {
@@ -218,9 +239,13 @@ object ImageActions : RxScheduleSupport {
     private fun urisInRange(patientSeriesModel: PatientSeriesModel, start: Int, end: Int)
             = patientSeriesModel.frames.subList(Math.max(0, start), Math.min(end + 1, patientSeriesModel.frames.size)).map { it.frame }
 
-    private fun dispatchShowImage(modId: String, index: Int, dispatch: (Any) -> Unit) {
+    private fun dispatchShowImage(layoutPosition: Int, modId: String, index: Int, dispatch: (Any) -> Unit) {
         seriesModels.find { it.modId == modId }?.let {
             findImage(it, index)?.run {
+                stacks[layoutPosition].let {
+                    it.reset()
+                    it.done(this)
+                }
                 dispatch(ShowImage(this, index, it.frames[index].meta))
                 bitmapCache.preload(*urisInRange(it, index - preloadRange, index + preloadRange).toTypedArray())
             }

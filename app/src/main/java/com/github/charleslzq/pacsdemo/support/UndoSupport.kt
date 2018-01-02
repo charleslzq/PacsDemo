@@ -9,6 +9,12 @@ class UndoSupport<T> {
     private val doneStack = Stack<T>()
     private val canceledStack = Stack<T>()
 
+    fun copyFrom(another: UndoSupport<T>) {
+        reset()
+        another.doneStack.forEach { doneStack.push(it) }
+        another.canceledStack.forEach { canceledStack.push(it) }
+    }
+
     fun reset() {
         doneStack.clear()
         canceledStack.clear()

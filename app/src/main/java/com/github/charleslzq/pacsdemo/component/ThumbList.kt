@@ -42,11 +42,12 @@ class ThumbList(
                 ItemClickSupport.addTo(view).setOnItemLongClickListener(object : ItemClickSupport.OnItemLongClickListener {
                     @Suppress("DEPRECATION")
                     override fun onItemLongClicked(recyclerView: RecyclerView, position: Int, v: View): Boolean {
-                        getThumbView(position)?.let {
-                            val dragBuilder = View.DragShadowBuilder(it)
-                            val clipDataItem = ClipData.Item(tag, getModId(position))
-                            val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), clipDataItem)
-                            it.startDrag(clipData, dragBuilder, null, 0)
+                        if (store.layoutOption != PacsStore.LayoutOption.ONE_ONE) {
+                            getThumbView(position)?.let {
+                                val dragBuilder = View.DragShadowBuilder(it)
+                                val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), ClipData.Item(tag))
+                                it.startDrag(clipData, dragBuilder, getModId(position), 0)
+                            }
                         }
                         return true
                     }

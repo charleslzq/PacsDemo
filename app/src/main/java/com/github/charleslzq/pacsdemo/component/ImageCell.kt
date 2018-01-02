@@ -25,9 +25,14 @@ class ImageCell(
             when (dragEvent.action) {
                 DragEvent.ACTION_DROP -> {
                     val tag = dragEvent.clipData.getItemAt(0).text.toString()
-                    if (tag == ThumbList.tag || tag == DicomImage.tag) {
-                        val modId = dragEvent.clipData.getItemAt(0).htmlText.toString()
-                        store.dispatch(ImageActions.bindModel(modId))
+                    if (tag == DicomImage.tag) {
+                        (dragEvent.localState as? ImageFrameStore)?.let {
+                            store.dispatch(ImageActions.copyStates(it))
+                        }
+                    } else if (tag == ThumbList.tag) {
+                        (dragEvent.localState as? String)?.let {
+                            store.dispatch(ImageActions.bindModel(it))
+                        }
                     }
                 }
             }
