@@ -8,7 +8,7 @@ import com.github.charleslzq.kotlin.react.Component
 import com.github.charleslzq.pacsdemo.R
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore.*
-import com.github.charleslzq.pacsdemo.component.store.action.ImageActions
+import com.github.charleslzq.pacsdemo.component.store.ImageActions
 import com.github.charleslzq.pacsdemo.support.TypefaceUtil
 
 /**

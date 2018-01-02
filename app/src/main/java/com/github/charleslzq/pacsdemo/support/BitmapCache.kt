@@ -1,8 +1,7 @@
-package com.github.charleslzq.pacsdemo.component.store.action
+package com.github.charleslzq.pacsdemo.support
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import com.github.charleslzq.pacsdemo.support.MemCache
 import java.io.File
 import java.net.URI
 
