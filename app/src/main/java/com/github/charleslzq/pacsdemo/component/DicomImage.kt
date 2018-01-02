@@ -131,7 +131,9 @@ class DicomImage(
 
     private fun getCurrentImage(): Bitmap? {
         return if (store.displayModel.images.isNotEmpty()) {
-            scaleIfNecessary(pseudoIfRequired(store.displayModel.images[0]))
+            callOnCompute {
+                scaleIfNecessary(pseudoIfRequired(store.displayModel.images[0])).let { it.copy(it.config, true) }
+            }
         } else {
             null
         }

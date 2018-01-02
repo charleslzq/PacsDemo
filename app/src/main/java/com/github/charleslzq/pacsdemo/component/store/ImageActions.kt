@@ -57,7 +57,7 @@ object ImageActions : RxScheduleSupport {
                 seriesModels.find { it.modId == modId }?.let {
                     dispatch(BindModel(modId, it.patientMetaInfo, it.studyMetaInfo, it.seriesMetaInfo, it.frames.size))
                     findImage(it, index)?.run {
-                        dispatch(ShowImage(copy(config, false), index, it.frames[index].meta))
+                        dispatch(ShowImage(this, index, it.frames[index].meta))
                     }
                     if (store.playable) {
                         bitmapCache = BitmapCache(Math.max(100, it.frames.size))
@@ -236,7 +236,7 @@ object ImageActions : RxScheduleSupport {
     private fun dispatchShowImage(modId: String, index: Int, dispatch: (Any) -> Unit) {
         seriesModels.find { it.modId == modId }?.let {
             findImage(it, index)?.run {
-                dispatch(ShowImage(copy(config, true), index, it.frames[index].meta))
+                dispatch(ShowImage(this, index, it.frames[index].meta))
                 bitmapCache.preload(*urisInRange(it, index - preloadRange, index + preloadRange).toTypedArray())
             }
         }
