@@ -66,7 +66,7 @@ class ImageControllPanel(
         }
 
         pseudo.setOnClickListener {
-            dispatch(PseudoColor())
+            dispatch(ImageActions.pseudoColor())
         }
 
         undo.setOnClickListener {

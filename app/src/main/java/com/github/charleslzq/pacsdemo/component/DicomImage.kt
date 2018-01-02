@@ -144,7 +144,7 @@ class DicomImage(
     }
 
     private fun pseudoIfRequired(rawBitmap: Bitmap): Bitmap {
-        if (store.pseudoColor) {
+        return if (store.pseudoColor) {
             val pixels = IntArray(rawBitmap.height * rawBitmap.width)
             rawBitmap.getPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
             repeat(pixels.size) {
@@ -153,8 +153,9 @@ class DicomImage(
             Bitmap.createBitmap(rawBitmap.width, rawBitmap.height, rawBitmap.config).apply {
                 setPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
             }
+        } else {
+            rawBitmap
         }
-        return rawBitmap
     }
 
     private fun calculateColor(color: Int): Int {

@@ -107,6 +107,15 @@ object ImageActions : RxScheduleSupport {
         }
     }
 
+    fun pseudoColor() : DispatchAction<ImageFrameStore> {
+        return { store, dispatch, _ ->
+            runOnIo {
+                dispatch(PseudoColor())
+                dispatchShowImage(store.bindModId, store.index, dispatch)
+            }
+        }
+    }
+
     fun resetDisplay(): DispatchAction<ImageFrameStore> {
         return { store, dispatch, _ ->
             runOnIo {
