@@ -35,7 +35,7 @@ class ThumbList(
                     override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
                         if (store.layoutOption == PacsStore.LayoutOption.ONE_ONE && position in (0..(store.thumbList.size - 1))) {
                             store.dispatch(PacsStore.ThumbListItemClicked(position))
-                            store.imageCells.first().dispatch(ImageActions.bindModel(store.thumbList[position].modId))
+                            store.imageCells.first().dispatch(ImageActions.bindModel(getModId(position)))
                         }
                     }
                 })
@@ -44,7 +44,7 @@ class ThumbList(
                     override fun onItemLongClicked(recyclerView: RecyclerView, position: Int, v: View): Boolean {
                         getThumbView(position)?.let {
                             val dragBuilder = View.DragShadowBuilder(it)
-                            val clipDataItem = ClipData.Item(tag, position.toString())
+                            val clipDataItem = ClipData.Item(tag, getModId(position))
                             val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), clipDataItem)
                             it.startDrag(clipData, dragBuilder, null, 0)
                         }
@@ -58,6 +58,8 @@ class ThumbList(
             setSelected(it)
         }
     }
+
+    private fun getModId(position: Int) = store.thumbList[position].modId
 
     private fun setSelected(selected: Int) {
         repeat(store.thumbList.size) {

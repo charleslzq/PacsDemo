@@ -8,6 +8,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.drawable.BitmapDrawable
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import com.github.charleslzq.kotlin.react.Component
@@ -27,7 +28,7 @@ class DicomImage(
         imageFrameStore: ImageFrameStore
 ) : Component<View, ImageFrameStore>(imageLayout, imageFrameStore), RxScheduleSupport {
     private val imageView: ImageView = view.findViewById(R.id.image)
-    private var operationMode: OperationMode = PlayMode(view.context, PlayModeGestureListener(store.dispatch))
+    private var operationMode: OperationMode = PlayMode(view.context, PlayModeGestureListener(store.dispatch, store.layoutPosition))
         set(value) {
             field = value
             view.setOnTouchListener(operationMode)
@@ -37,16 +38,18 @@ class DicomImage(
         EventBus.onEvent<DragEventMessage.StartCopyCell> { onDragStart(it) }
         view.setOnTouchListener(operationMode)
 
-        render(property = ImageFrameStore::displayModel, guard = { store.hasImage }) {
+        render(ImageFrameStore::displayModel) {
             val background = imageView.background
             if (background != null && background is IndexAwareAnimationDrawable) {
                 background.stop()
                 imageView.clearAnimation()
                 imageView.background = null
             }
-            callOnCompute { autoAdjustScale(it.images[0]) }.let {
-                imageView.layoutParams.width = it.first
-                imageView.layoutParams.height = it.second
+            if (store.hasImage) {
+                callOnCompute { autoAdjustScale(it.images[0]) }.let {
+                    imageView.layoutParams.width = it.first
+                    imageView.layoutParams.height = it.second
+                }
             }
             if (it.images.size > 1) {
                 imageView.setImageBitmap(null)
@@ -64,7 +67,7 @@ class DicomImage(
             if (store.gestureScale > 1 && operationMode is PlayMode) {
                 operationMode = StudyMode(view.context, StudyModeGestureListener(store.dispatch))
             } else if (store.gestureScale == 1.0f && operationMode is StudyMode) {
-                operationMode = PlayMode(view.context, PlayModeGestureListener(store.dispatch))
+                operationMode = PlayMode(view.context, PlayModeGestureListener(store.dispatch, store.layoutPosition))
             }
         }
 
@@ -91,7 +94,7 @@ class DicomImage(
                     if (store.gestureScale > 1.0f) {
                         StudyMode(view.context, StudyModeGestureListener(store.dispatch))
                     } else {
-                        PlayMode(view.context, PlayModeGestureListener(store.dispatch))
+                        PlayMode(view.context, PlayModeGestureListener(store.dispatch, store.layoutPosition))
                     }
                 }
             }
@@ -105,10 +108,11 @@ class DicomImage(
     private fun onDragStart(dragCopyCellMessage: DragEventMessage.StartCopyCell) {
         if (dragCopyCellMessage.layoutPosition == store.layoutPosition) {
             val dragBuilder = View.DragShadowBuilder(view)
-            val clipDataItem = ClipData.Item(tag, store.layoutPosition.toString())
+            val clipDataItem = ClipData.Item(tag, store.bindModId)
             val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), clipDataItem)
             @Suppress("DEPRECATION")
             view.startDrag(clipData, dragBuilder, null, 0)
+            store.dispatch(ImageFrameStore.Reset())
         }
     }
 

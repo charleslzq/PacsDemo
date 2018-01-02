@@ -136,6 +136,9 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
             on<PlayAnimation> {
                 ImageDisplayModel(event.images)
             }
+            on<Reset> {
+                ImageDisplayModel()
+            }
         }
 
         reduce(ImageFrameStore::gestureScale) {
