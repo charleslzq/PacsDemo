@@ -11,7 +11,7 @@ import com.github.charleslzq.pacsdemo.support.MiddleWare
 
 
 data class ImageDisplayModel(val images: List<Bitmap> = emptyList())
-data class ImageCanvasModel(val drawing: Bitmap? = null, val points: List<PointF> = emptyList(), val canUndo: Boolean = false, val canRedo: Boolean = false)
+data class ImageCanvasModel(val drawing: Bitmap? = null, val tmp: Bitmap? = null, val canUndo: Boolean = false, val canRedo: Boolean = false)
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -203,6 +203,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
 
         reduce(ImageFrameStore::canvasModel) {
             on<ImageCanvasModel> { event }
+            on<DrawLines> { state.copy(tmp = event.tmp) }
             on<ResetMeasure> { ImageCanvasModel() }
         }
     }
@@ -236,7 +237,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
 
     data class ScaleChange(val scaleFactor: Float)
     data class LocationTranslate(val distanceX: Float, val distanceY: Float)
-    data class DrawLines(val points: List<PointF>)
+    data class DrawLines(val tmp: Bitmap)
 
     enum class Measure {
         NONE,

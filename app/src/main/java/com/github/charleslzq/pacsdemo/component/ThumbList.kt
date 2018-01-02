@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
+import com.github.charleslzq.pacsdemo.component.store.ImageActions
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.support.DicomSeriesThumbListAdpater
 
@@ -34,10 +35,7 @@ class ThumbList(
                     override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
                         if (store.layoutOption == PacsStore.LayoutOption.ONE_ONE && position in (0..(store.thumbList.size - 1))) {
                             store.dispatch(PacsStore.ThumbListItemClicked(position))
-                            store.imageCells.first().apply {
-                                //                                imageFrameStore.dispatch(ImageFrameStore.PlayModeReset())
-//                                dispatch(PatientSeriesStore.ModelDropped(store.thumbList[position]))
-                            }
+                            store.imageCells.first().dispatch(ImageActions.bindModel(store.thumbList[position].modId))
                         }
                     }
                 })

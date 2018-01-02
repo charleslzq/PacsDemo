@@ -161,13 +161,13 @@ class ImageControllPanel(
             }
         }
 
-        render(property = store::hideMeta, guard = { store.hasImage() }) {
-            view.visibility = if (it) View.INVISIBLE else View.VISIBLE
-        }
-
         render(property = store::canvasModel, guard = { store.hasImage() && store.measure != ImageFrameStore.Measure.NONE }) {
             undo.visibility = if (it.canUndo) View.VISIBLE else View.GONE
             redo.visibility = if (it.canRedo) View.VISIBLE else View.GONE
+        }
+
+        render(store::hideMeta) {
+            view.visibility = if (it) View.INVISIBLE else View.VISIBLE
         }
     }
 }

@@ -3,7 +3,10 @@ package com.github.charleslzq.pacsdemo.component
 import android.content.ClipData
 import android.content.ClipDescription
 import android.content.res.Resources
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.ColorMatrixColorFilter
 import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import android.widget.ImageView
@@ -204,40 +207,11 @@ class DicomImage(
     }
 
     private fun draw() {
-        createCanvas().apply {
+        Canvas(getCurrentImage()!!.also { imageView.setImageBitmap(it) }).apply {
             store.canvasModel.drawing?.let { drawBitmap(it, 0f, 0f, store.linePaint) }
-            val coordinates = toLines(*store.canvasModel.points.toTypedArray())
-            if (coordinates.size > 1) {
-                if (coordinates.size > 3) {
-                    drawLines(coordinates, store.linePaint)
-                }
-                drawCircle(coordinates[coordinates.size - 2], coordinates[coordinates.size - 2], 5f, store.pointPaint)
-            }
+            store.canvasModel.tmp?.let { drawBitmap(it, 0f, 0f, store.linePaint) }
         }
-    }
-
-    private fun createCanvas(): Canvas {
-        return Canvas(getCurrentImage()!!.also { imageView.setImageBitmap(it) })
-    }
-
-    private fun toLines(vararg points: PointF): FloatArray {
-        return when (points.size) {
-            0 -> FloatArray(0)
-            1 -> FloatArray(2).apply {
-                val point = points.first()
-                this[0] = point.x
-                this[1] = point.y
-            }
-            else -> FloatArray((points.size - 1) * 4).apply {
-                repeat(points.size - 1) {
-                    val start = it * 4
-                    this[start] = points[it].x
-                    this[start + 1] = points[it].y
-                    this[start + 2] = points[it + 1].x
-                    this[start + 3] = points[it + 1].y
-                }
-            }
-        }
+        imageView.invalidate()
     }
 
     companion object {

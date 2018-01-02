@@ -107,7 +107,7 @@ object ImageActions : RxScheduleSupport {
         }
     }
 
-    fun pseudoColor() : DispatchAction<ImageFrameStore> {
+    fun pseudoColor(): DispatchAction<ImageFrameStore> {
         return { store, dispatch, _ ->
             runOnIo {
                 dispatch(PseudoColor())
@@ -123,6 +123,25 @@ object ImageActions : RxScheduleSupport {
                 dispatch(ResetDisplay())
                 if (store.size > 1) {
                     dispatchShowImage(store.bindModId, 0, dispatch)
+                }
+            }
+        }
+    }
+
+    fun drawLines(vararg points: PointF): DispatchAction<ImageFrameStore> {
+        return { store, dispatch, _ ->
+            runOnIo {
+                val coordinates = toLines(*points)
+                if (coordinates.size > 1 && store.hasImage()) {
+                    val currentImage = store.displayModel.images[0]
+                    dispatch(DrawLines(Bitmap.createBitmap(currentImage.width, currentImage.height, currentImage.config).apply {
+                        Canvas(this).apply {
+                            drawCircle(coordinates[coordinates.size-2], coordinates.last(), 5f, store.pointPaint)
+                            if (coordinates.size > 3) {
+                                drawLines(coordinates, store.linePaint)
+                            }
+                        }
+                    }))
                 }
             }
         }
@@ -155,7 +174,7 @@ object ImageActions : RxScheduleSupport {
                                     }
                                 }
                             },
-                            emptyList(),
+                            null,
                             stack.canUndo(),
                             stack.canRedo()
                     ))
@@ -169,7 +188,7 @@ object ImageActions : RxScheduleSupport {
             val stack = stacks[store.layoutPosition]
             if (stack.canUndo()) {
                 runOnCompute {
-                    dispatch(stack.undo())
+                    dispatch(ImageCanvasModel(stack.undo(), null, stack.canUndo(), stack.canRedo()))
                 }
             }
         }
@@ -180,7 +199,7 @@ object ImageActions : RxScheduleSupport {
             val stack = stacks[store.layoutPosition]
             if (stack.canRedo()) {
                 runOnCompute {
-                    dispatch(stack.redo())
+                    dispatch(ImageCanvasModel(stack.redo(), null, stack.canUndo(), stack.canRedo()))
                 }
             }
         }
@@ -221,5 +240,25 @@ object ImageActions : RxScheduleSupport {
 
     private fun loadImage(uri: URI): Bitmap? {
         return bitmapCache.load(uri)
+    }
+
+    private fun toLines(vararg points: PointF): FloatArray {
+        return when (points.size) {
+            0 -> FloatArray(0)
+            1 -> FloatArray(2).apply {
+                val point = points.first()
+                this[0] = point.x
+                this[1] = point.y
+            }
+            else -> FloatArray((points.size - 1) * 4).apply {
+                repeat(points.size - 1) {
+                    val start = it * 4
+                    this[start] = points[it].x
+                    this[start + 1] = points[it].y
+                    this[start + 2] = points[it + 1].x
+                    this[start + 3] = points[it + 1].y
+                }
+            }
+        }
     }
 }

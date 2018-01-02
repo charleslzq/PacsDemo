@@ -21,12 +21,12 @@ class MeasureModeGestureListener(
         when (motionEvent.action) {
             MotionEvent.ACTION_DOWN -> {
                 points.push(getPoint(motionEvent))
-                dispatch(ImageFrameStore.DrawLines(points))
+                dispatch(ImageActions.drawLines(*points.toTypedArray()))
             }
             MotionEvent.ACTION_MOVE -> {
                 points.pop()
                 points.push(getPoint(motionEvent))
-                dispatch(ImageFrameStore.DrawLines(points))
+                dispatch(ImageActions.drawLines(*points.toTypedArray()))
             }
             MotionEvent.ACTION_UP -> {
                 points.pop()
@@ -36,7 +36,7 @@ class MeasureModeGestureListener(
                         ImageFrameStore.Measure.NONE -> throw IllegalStateException("Unexpected measure mode")
                         ImageFrameStore.Measure.LINE -> {
                             length(points.first(), points.last()).takeIf { it > lengthThreshold }?.let {
-                                dispatch(ImageActions.addPath(points, points.last() to it.toString()))
+                                dispatch(ImageActions.addPath(points.toList(), points.last() to it.toString()))
                             }
                             points.clear()
                         }
@@ -44,23 +44,23 @@ class MeasureModeGestureListener(
                             if (points.size == 3) {
                                 val length = length(points[1], points[2])
                                 if (length >= lengthThreshold) {
-                                    dispatch(ImageActions.addPath(points, points[1] to calculateAngle(points[0], points[1], points[2]).toString()))
+                                    dispatch(ImageActions.addPath(points.toList(), points[1] to calculateAngle(points[0], points[1], points[2]).toString()))
                                     points.clear()
                                 } else {
                                     points.pop()
-                                    dispatch(ImageFrameStore.DrawLines(points))
+                                    dispatch(ImageActions.drawLines(*points.toTypedArray()))
                                 }
                             } else {
                                 val length = length(points.first(), points.last())
                                 if (length < lengthThreshold) {
                                     points.pop()
                                 }
-                                dispatch(ImageFrameStore.DrawLines(points))
+                                dispatch(ImageActions.drawLines(*points.toTypedArray()))
                             }
                         }
                     }
                 } else {
-                    dispatch(ImageFrameStore.DrawLines(points))
+                    dispatch(ImageActions.drawLines(*points.toTypedArray()))
                 }
             }
         }
