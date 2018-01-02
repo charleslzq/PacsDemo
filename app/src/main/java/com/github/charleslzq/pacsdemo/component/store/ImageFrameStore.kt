@@ -234,6 +234,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
             on<DrawLines> { state.copy(tmp = event.tmp) }
             on<ResetMeasure> { ImageCanvasModel() }
             on<Reset> { ImageCanvasModel() }
+            on<ClearMeasure> { ImageCanvasModel() }
         }
     }
 
@@ -266,6 +267,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
     data class ScaleChange(val scaleFactor: Float)
     data class LocationTranslate(val distanceX: Float, val distanceY: Float)
     data class DrawLines(val tmp: Bitmap)
+    class ClearMeasure
 
     enum class Measure {
         NONE,

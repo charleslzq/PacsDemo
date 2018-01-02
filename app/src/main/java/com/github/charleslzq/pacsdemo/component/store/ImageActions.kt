@@ -54,8 +54,6 @@ object ImageActions : RxScheduleSupport {
     fun bindModel(modId: String, index: Int = 0): DispatchAction<ImageFrameStore> {
         return { store, dispatch, _ ->
             runOnIo {
-                cleanMeasure(store, dispatch)
-
                 seriesModels.find { it.modId == modId }?.let {
                     dispatch(BindModel(modId, it.patientMetaInfo, it.studyMetaInfo, it.seriesMetaInfo, it.frames.size))
                     findImage(it, index)?.run {
@@ -82,12 +80,6 @@ object ImageActions : RxScheduleSupport {
             if (imageFrameStore.pseudoColor) {
                 dispatch(PseudoColor())
             }
-            when (imageFrameStore.measure) {
-                ImageFrameStore.Measure.NONE -> {
-                }
-                ImageFrameStore.Measure.LINE -> dispatch(MeasureLineTurned())
-                ImageFrameStore.Measure.ANGEL -> dispatch(MeasureAngleTurned())
-            }
             stacks[store.layoutPosition].copyFrom(stacks[imageFrameStore.layoutPosition])
             stacks[imageFrameStore.layoutPosition].reset()
             dispatch(imageFrameStore.canvasModel)
@@ -100,8 +92,6 @@ object ImageActions : RxScheduleSupport {
         return { store, dispatch, _ ->
             if (store.playable) {
                 runOnIo {
-                    cleanMeasure(store, dispatch)
-
                     val index = store.index
                     if (store.displayModel.images.size > 1) {
                         dispatchShowImage(store.bindModId, index, dispatch)
@@ -118,8 +108,6 @@ object ImageActions : RxScheduleSupport {
     fun showImage(index: Int): DispatchAction<ImageFrameStore> {
         return { store, dispatch, _ ->
             runOnIo {
-                cleanMeasure(store, dispatch)
-
                 dispatchShowImage(store.bindModId, index, dispatch)
             }
         }
@@ -139,8 +127,6 @@ object ImageActions : RxScheduleSupport {
         return { store, dispatch, _ ->
             runOnIo {
                 if (store.size > 0) {
-                    cleanMeasure(store, dispatch)
-
                     val changeBase = Math.min(100f / store.size, 10f)
                     val offset = (scrollDistance / changeBase).toInt()
                     val newIndex = Math.min(Math.max(store.index - offset, 0), store.size - 1)
@@ -167,8 +153,8 @@ object ImageActions : RxScheduleSupport {
             runOnIo {
                 val coordinates = toLines(*points)
                 if (coordinates.size > 1 && store.hasImage) {
-                    store.displayModel.images[0].let {
-                        dispatch(DrawLines(Bitmap.createBitmap((it.width * store.autoScale).toInt(), (it.height * store.autoScale).toInt(), it.config).apply {
+                    createDrawingBase(store)?.let {
+                        dispatch(DrawLines(it.apply {
                             Canvas(this).apply {
                                 drawCircle(coordinates[coordinates.size - 2], coordinates.last(), 5f, store.pointPaint)
                                 if (coordinates.size > 3) {
@@ -187,26 +173,27 @@ object ImageActions : RxScheduleSupport {
             runOnIo {
                 val stack = stacks[store.layoutPosition]
                 if (points.size > 1 && store.displayModel.images.isNotEmpty()) {
-                    dispatch(ImageCanvasModel(
-                            stack.generate(store.displayModel.images[0]
-                                    .let { Bitmap.createBitmap((it.width * store.autoScale).toInt(), (it.height * store.autoScale).toInt(), it.config)}) {
-                                Bitmap.createBitmap(it.width, it.height, it.config).apply {
-                                    Canvas(this).apply {
-                                        drawBitmap(it, 0f, 0f, store.linePaint)
-                                        drawPath(Path().apply {
-                                            moveTo(points[0].x, points[0].y)
-                                            repeat(points.size - 1) {
-                                                lineTo(points[it + 1].x, points[it + 1].y)
-                                            }
-                                        }, store.linePaint)
-                                        drawText(text.second, text.first.x, text.first.y, store.stringPaint)
+                    createDrawingBase(store)?.run {
+                        dispatch(ImageCanvasModel(
+                                stack.generate(this) {
+                                    Bitmap.createBitmap(it.width, it.height, it.config).apply {
+                                        Canvas(this).apply {
+                                            drawBitmap(it, 0f, 0f, store.linePaint)
+                                            drawPath(Path().apply {
+                                                moveTo(points[0].x, points[0].y)
+                                                repeat(points.size - 1) {
+                                                    lineTo(points[it + 1].x, points[it + 1].y)
+                                                }
+                                            }, store.linePaint)
+                                            drawText(text.second, text.first.x, text.first.y, store.stringPaint)
+                                        }
                                     }
-                                }
-                            },
-                            null,
-                            stack.canUndo(),
-                            stack.canRedo()
-                    ))
+                                },
+                                null,
+                                stack.canUndo(),
+                                stack.canRedo()
+                        ))
+                    }
                 }
             }
         }
@@ -234,6 +221,15 @@ object ImageActions : RxScheduleSupport {
         }
     }
 
+    fun clearDrawing(): DispatchAction<ImageFrameStore> {
+        return { store, dispatch, _ ->
+            runOnCompute {
+                stacks[store.layoutPosition].reset()
+                dispatch(ClearMeasure())
+            }
+        }
+    }
+
     private fun urisInRange(patientSeriesModel: PatientSeriesModel, start: Int, end: Int)
             = patientSeriesModel.frames.subList(Math.max(0, start), Math.min(end + 1, patientSeriesModel.frames.size)).map { it.frame }
 
@@ -257,6 +253,17 @@ object ImageActions : RxScheduleSupport {
         return when {
             model.frames.isEmpty() || index !in (0..(model.frames.size - 1)) -> emptyList()
             else -> model.frames.subList(index, model.frames.size).mapNotNull { loadImage(it.frame) }
+        }
+    }
+
+    private fun createDrawingBase(store: ImageFrameStore): Bitmap? {
+        return if (store.displayModel.images.isNotEmpty()) {
+            store.displayModel.images[0].let {
+                val scale = Math.max(store.autoScale, 1.0f)
+                Bitmap.createBitmap((it.width * scale).toInt(), (it.height * scale).toInt(), it.config)
+            }
+        } else {
+            null
         }
     }
 

@@ -267,6 +267,16 @@
                     android:background="@drawable/circle_button_selector"
                     android:textColor="@color/common_text_color"
                     android:text="@string/forward_icon"/>
+                <Button
+                    android:id="@+id/clearButton"
+                    android:visibility="gone"
+                    android:layout_width="@dimen/imageButtonSize"
+                    android:layout_height="@dimen/imageButtonSize"
+                    android:layout_margin="@dimen/imageButtonMargin"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:background="@drawable/circle_button_selector"
+                    android:textColor="@color/common_text_color"
+                    android:text="@string/refresh_icon"/>
             </LinearLayout>
             <LinearLayout android:id="@+id/indexController"
                 android:layout_width="match_parent"
