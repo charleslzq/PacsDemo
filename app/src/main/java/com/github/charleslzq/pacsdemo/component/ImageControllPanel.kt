@@ -30,6 +30,7 @@ class ImageControllPanel(
     private val reverse: Button = view.findViewById(R.id.reverseButton)
     private val undo: Button = view.findViewById(R.id.undoButton)
     private val redo: Button = view.findViewById(R.id.redoButton)
+    private val clear: Button = view.findViewById(R.id.clearButton)
 
     private val imageSeekBar: SeekBar = view.findViewById(R.id.imageSeekBar)
 
@@ -47,6 +48,7 @@ class ImageControllPanel(
         reverse.typeface = fontAwesomeTypeface
         undo.typeface = fontAwesomeTypeface
         redo.typeface = fontAwesomeTypeface
+        clear.typeface = fontAwesomeTypeface
         play.typeface = fontAwesomeTypeface
         previous.typeface = fontAwesomeTypeface
         next.typeface = fontAwesomeTypeface
@@ -75,6 +77,10 @@ class ImageControllPanel(
 
         redo.setOnClickListener {
             dispatch(ImageActions.redoDrawing())
+        }
+
+        clear.setOnClickListener {
+            dispatch(ImageActions.clearDrawing())
         }
 
         first.setOnClickListener {
@@ -164,6 +170,7 @@ class ImageControllPanel(
         render(property = store::canvasModel, guard = { store.hasImage && store.measure != ImageFrameStore.Measure.NONE }) {
             undo.visibility = if (it.canUndo) View.VISIBLE else View.GONE
             redo.visibility = if (it.canRedo) View.VISIBLE else View.GONE
+            clear.visibility = if (it.canUndo) View.VISIBLE else View.GONE
         }
 
         render(store::hideMeta) {
