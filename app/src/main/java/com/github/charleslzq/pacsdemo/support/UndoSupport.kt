@@ -20,8 +20,6 @@ class UndoSupport<T> {
         canceledStack.clear()
     }
 
-    fun initialized() = doneStack.isNotEmpty()
-
     fun canUndo() = doneStack.size > 1
 
     fun canRedo() = canceledStack.isNotEmpty()
@@ -47,11 +45,10 @@ class UndoSupport<T> {
         }
     }
 
-    fun generate(generator: (T) -> T): T {
+    fun generate(initialValue: T, generator: (T) -> T): T {
         if (doneStack.isEmpty()) {
-            throw IllegalStateException("no data to work on")
+            done(initialValue)
         }
         return generator(doneStack.peek()).also { done(it) }
     }
-
 }

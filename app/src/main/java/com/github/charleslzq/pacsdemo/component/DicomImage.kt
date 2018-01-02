@@ -95,7 +95,11 @@ class DicomImage(
         }
 
         render(property = ImageFrameStore::canvasModel, guard = { store.hasImage && store.measure != ImageFrameStore.Measure.NONE }) {
-            draw()
+            Canvas(getCurrentImage()!!.also { imageView.setImageBitmap(it) }).apply {
+                store.canvasModel.drawing?.let { drawBitmap(it, 0f, 0f, store.linePaint) }
+                store.canvasModel.tmp?.let { drawBitmap(it, 0f, 0f, store.linePaint) }
+            }
+            imageView.invalidate()
         }
     }
 
@@ -201,14 +205,6 @@ class DicomImage(
         animation.selectDrawable(0)
         animation.callback = null
         return animation
-    }
-
-    private fun draw() {
-        Canvas(getCurrentImage()!!.also { imageView.setImageBitmap(it) }).apply {
-            store.canvasModel.drawing?.let { drawBitmap(it, 0f, 0f, store.linePaint) }
-            store.canvasModel.tmp?.let { drawBitmap(it, 0f, 0f, store.linePaint) }
-        }
-        imageView.invalidate()
     }
 
     companion object {

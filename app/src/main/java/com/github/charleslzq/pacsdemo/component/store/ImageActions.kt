@@ -60,10 +60,6 @@ object ImageActions : RxScheduleSupport {
                     dispatch(BindModel(modId, it.patientMetaInfo, it.studyMetaInfo, it.seriesMetaInfo, it.frames.size))
                     findImage(it, index)?.run {
                         dispatch(ShowImage(this, index, it.frames[index].meta))
-                        stacks[store.layoutPosition].let {
-                            it.reset()
-                            it.done(this)
-                        }
                     }
                     if (store.playable) {
                         bitmapCache = BitmapCache(Math.max(100, it.frames.size))
@@ -108,7 +104,7 @@ object ImageActions : RxScheduleSupport {
 
                     val index = store.index
                     if (store.displayModel.images.size > 1) {
-                        dispatchShowImage(store.layoutPosition, store.bindModId, index, dispatch)
+                        dispatchShowImage(store.bindModId, index, dispatch)
                     } else {
                         seriesModels.find { it.modId == store.bindModId }?.let {
                             dispatch(PlayAnimation(findFrames(it, index)))
@@ -124,7 +120,7 @@ object ImageActions : RxScheduleSupport {
             runOnIo {
                 cleanMeasure(store, dispatch)
 
-                dispatchShowImage(store.layoutPosition, store.bindModId, index, dispatch)
+                dispatchShowImage(store.bindModId, index, dispatch)
             }
         }
     }
@@ -148,7 +144,7 @@ object ImageActions : RxScheduleSupport {
                     val changeBase = Math.min(100f / store.size, 10f)
                     val offset = (scrollDistance / changeBase).toInt()
                     val newIndex = Math.min(Math.max(store.index - offset, 0), store.size - 1)
-                    dispatchShowImage(store.layoutPosition, store.bindModId, newIndex, dispatch)
+                    dispatchShowImage(store.bindModId, newIndex, dispatch)
                 }
             }
         }
@@ -160,7 +156,7 @@ object ImageActions : RxScheduleSupport {
                 cleanMeasure(store, dispatch)
                 dispatch(ResetDisplay())
                 if (store.size > 1) {
-                    dispatchShowImage(store.layoutPosition, store.bindModId, 0, dispatch)
+                    dispatchShowImage(store.bindModId, 0, dispatch)
                 }
             }
         }
@@ -171,15 +167,16 @@ object ImageActions : RxScheduleSupport {
             runOnIo {
                 val coordinates = toLines(*points)
                 if (coordinates.size > 1 && store.hasImage) {
-                    val currentImage = store.displayModel.images[0]
-                    dispatch(DrawLines(Bitmap.createBitmap(currentImage.width, currentImage.height, currentImage.config).apply {
-                        Canvas(this).apply {
-                            drawCircle(coordinates[coordinates.size - 2], coordinates.last(), 5f, store.pointPaint)
-                            if (coordinates.size > 3) {
-                                drawLines(coordinates, store.linePaint)
+                    store.displayModel.images[0].let {
+                        dispatch(DrawLines(Bitmap.createBitmap((it.width * store.autoScale).toInt(), (it.height * store.autoScale).toInt(), it.config).apply {
+                            Canvas(this).apply {
+                                drawCircle(coordinates[coordinates.size - 2], coordinates.last(), 5f, store.pointPaint)
+                                if (coordinates.size > 3) {
+                                    drawLines(coordinates, store.linePaint)
+                                }
                             }
-                        }
-                    }))
+                        }))
+                    }
                 }
             }
         }
@@ -189,15 +186,16 @@ object ImageActions : RxScheduleSupport {
         return { store, dispatch, _ ->
             runOnIo {
                 val stack = stacks[store.layoutPosition]
-                if (stack.initialized() && points.size > 1) {
+                if (points.size > 1 && store.displayModel.images.isNotEmpty()) {
                     dispatch(ImageCanvasModel(
-                            stack.generate {
+                            stack.generate(store.displayModel.images[0]
+                                    .let { Bitmap.createBitmap((it.width * store.autoScale).toInt(), (it.height * store.autoScale).toInt(), it.config)}) {
                                 Bitmap.createBitmap(it.width, it.height, it.config).apply {
                                     Canvas(this).apply {
                                         drawBitmap(it, 0f, 0f, store.linePaint)
                                         drawPath(Path().apply {
-                                            moveTo(points.first().x, points.first().y)
-                                            repeat(points.size - 2) {
+                                            moveTo(points[0].x, points[0].y)
+                                            repeat(points.size - 1) {
                                                 lineTo(points[it + 1].x, points[it + 1].y)
                                             }
                                         }, store.linePaint)
@@ -239,13 +237,9 @@ object ImageActions : RxScheduleSupport {
     private fun urisInRange(patientSeriesModel: PatientSeriesModel, start: Int, end: Int)
             = patientSeriesModel.frames.subList(Math.max(0, start), Math.min(end + 1, patientSeriesModel.frames.size)).map { it.frame }
 
-    private fun dispatchShowImage(layoutPosition: Int, modId: String, index: Int, dispatch: (Any) -> Unit) {
+    private fun dispatchShowImage(modId: String, index: Int, dispatch: (Any) -> Unit) {
         seriesModels.find { it.modId == modId }?.let {
             findImage(it, index)?.run {
-                stacks[layoutPosition].let {
-                    it.reset()
-                    it.done(this)
-                }
                 dispatch(ShowImage(this, index, it.frames[index].meta))
                 bitmapCache.preload(*urisInRange(it, index - preloadRange, index + preloadRange).toTypedArray())
             }
