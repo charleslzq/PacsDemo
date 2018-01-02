@@ -28,15 +28,15 @@ class DicomImage(
         imageFrameStore: ImageFrameStore
 ) : Component<View, ImageFrameStore>(imageLayout, imageFrameStore), RxScheduleSupport {
     private val imageView: ImageView = view.findViewById(R.id.image)
-    private var operationMode: OperationMode = PlayMode(view.context, PlayModeGestureListener(store.dispatch, store.layoutPosition))
+    private var operationMode: OperationMode = PlayMode(imageView.context, PlayModeGestureListener(store.dispatch, store.layoutPosition))
         set(value) {
             field = value
-            view.setOnTouchListener(operationMode)
+            imageView.setOnTouchListener(operationMode)
         }
 
     init {
         EventBus.onEvent<DragEventMessage.StartCopyCell> { onDragStart(it) }
-        view.setOnTouchListener(operationMode)
+        imageView.setOnTouchListener(operationMode)
 
         render(ImageFrameStore::displayModel) {
             val background = imageView.background
@@ -46,10 +46,7 @@ class DicomImage(
                 imageView.background = null
             }
             if (store.hasImage) {
-                callOnCompute { autoAdjustScale(it.images[0]) }.let {
-                    imageView.layoutParams.width = it.first
-                    imageView.layoutParams.height = it.second
-                }
+                callOnCompute { autoAdjustScale(it.images[0]) }
             }
             if (it.images.size > 1) {
                 imageView.setImageBitmap(null)
@@ -65,9 +62,9 @@ class DicomImage(
 
         render(ImageFrameStore::gestureScale) {
             if (store.gestureScale > 1 && operationMode is PlayMode) {
-                operationMode = StudyMode(view.context, StudyModeGestureListener(store.dispatch))
+                operationMode = StudyMode(imageView.context, StudyModeGestureListener(store.dispatch))
             } else if (store.gestureScale == 1.0f && operationMode is StudyMode) {
-                operationMode = PlayMode(view.context, PlayModeGestureListener(store.dispatch, store.layoutPosition))
+                operationMode = PlayMode(imageView.context, PlayModeGestureListener(store.dispatch, store.layoutPosition))
             }
         }
 
@@ -87,14 +84,14 @@ class DicomImage(
             operationMode = when (store.measure != ImageFrameStore.Measure.NONE) {
                 true -> {
                     draw()
-                    MeasureMode(view.context, MeasureModeGestureListener(store.measure, store.dispatch))
+                    MeasureMode(imageView.context, MeasureModeGestureListener(store.measure, store.dispatch))
                 }
                 false -> {
                     imageView.setImageBitmap(getCurrentImage())
                     if (store.gestureScale > 1.0f) {
-                        StudyMode(view.context, StudyModeGestureListener(store.dispatch))
+                        StudyMode(imageView.context, StudyModeGestureListener(store.dispatch))
                     } else {
-                        PlayMode(view.context, PlayModeGestureListener(store.dispatch, store.layoutPosition))
+                        PlayMode(imageView.context, PlayModeGestureListener(store.dispatch, store.layoutPosition))
                     }
                 }
             }
@@ -107,28 +104,29 @@ class DicomImage(
 
     private fun onDragStart(dragCopyCellMessage: DragEventMessage.StartCopyCell) {
         if (dragCopyCellMessage.layoutPosition == store.layoutPosition) {
-            val dragBuilder = View.DragShadowBuilder(view)
+            val dragBuilder = View.DragShadowBuilder(imageView)
             val clipDataItem = ClipData.Item(tag, store.bindModId)
             val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), clipDataItem)
             @Suppress("DEPRECATION")
-            view.startDrag(clipData, dragBuilder, null, 0)
+            imageView.startDrag(clipData, dragBuilder, null, 0)
             store.dispatch(ImageFrameStore.Reset())
         }
     }
 
-    private fun autoAdjustScale(image: Bitmap): Pair<Int, Int> {
+    private fun autoAdjustScale(image: Bitmap) {
         val viewHeight = view.measuredHeight
         val viewWidth = view.measuredWidth
         val imageWidth = image.width
         val imageHeight = image.height
         val ratio = imageWidth.toFloat() / imageHeight.toFloat()
         val desiredWidth = Math.ceil((viewHeight * ratio).toDouble()).toInt()
-        return if (desiredWidth <= viewWidth) {
-            desiredWidth to viewHeight
+        store.autoScale = if (desiredWidth <= viewWidth) {
+            imageView.layoutParams.width = desiredWidth
+            desiredWidth.toFloat() / imageWidth
         } else {
-            viewWidth to (viewHeight * ratio).toInt()
-        }.also {
-            store.autoScale = it.first.toFloat() / imageWidth
+            val desiredHeight = Math.ceil((viewWidth / ratio).toDouble()).toInt()
+            imageView.layoutParams.height = desiredHeight
+            desiredHeight.toFloat() / imageHeight
         }
     }
 
