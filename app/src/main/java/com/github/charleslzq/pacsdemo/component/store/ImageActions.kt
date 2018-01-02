@@ -7,8 +7,8 @@ import android.graphics.PointF
 import com.github.charleslzq.kotlin.react.DispatchAction
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore.*
 import com.github.charleslzq.pacsdemo.support.BitmapCache
-import com.github.charleslzq.pacsdemo.support.UndoSupport
 import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
+import com.github.charleslzq.pacsdemo.support.UndoSupport
 import java.net.URI
 
 /**
@@ -18,6 +18,7 @@ object ImageActions : RxScheduleSupport {
     private val seriesModels: MutableList<PatientSeriesModel> = mutableListOf()
     private val stacks = (0..8).map { UndoSupport<Bitmap>() }
     private var bitmapCache = BitmapCache()
+    private val preloadRange = 5
 
     fun reloadModels(patientSeriesModelList: List<PatientSeriesModel>): DispatchAction<PacsStore> {
         seriesModels.clear()
@@ -40,6 +41,12 @@ object ImageActions : RxScheduleSupport {
                     dispatch(BindModel(modId, it.patientMetaInfo, it.studyMetaInfo, it.seriesMetaInfo, it.frames.size))
                     findImage(it, index)?.run {
                         dispatch(ShowImage(this, index, it.frames[index].meta))
+                    }
+                    if (store.allowPlay) {
+                        bitmapCache = BitmapCache(Math.max(100, it.frames.size))
+                        bitmapCache.preload(*it.frames.map { it.frame }.toTypedArray())
+                    } else {
+                        bitmapCache.preload(*urisInRange(it, 0, 2 * preloadRange).toTypedArray())
                     }
                 }
             }
@@ -170,10 +177,14 @@ object ImageActions : RxScheduleSupport {
         }
     }
 
+    private fun urisInRange(patientSeriesModel: PatientSeriesModel, start: Int, end: Int)
+            = patientSeriesModel.frames.subList(Math.max(0, start), Math.min(end + 1, patientSeriesModel.frames.size)).map { it.frame }
+
     private fun dispatchShowImage(modId: String, index: Int, dispatch: (Any) -> Unit) {
         seriesModels.find { it.modId == modId }?.let {
             findImage(it, index)?.run {
                 dispatch(ShowImage(this, index, it.frames[index].meta))
+                bitmapCache.preload(*urisInRange(it, index - preloadRange, index + preloadRange).toTypedArray())
             }
         }
     }
@@ -200,6 +211,6 @@ object ImageActions : RxScheduleSupport {
     }
 
     private fun loadImage(uri: URI): Bitmap? {
-        return BitmapCache.decode(uri)
+        return bitmapCache.load(uri)
     }
 }

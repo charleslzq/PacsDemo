@@ -8,24 +8,12 @@ import java.net.URI
 /**
  * Created by charleslzq on 17-12-20.
  */
-class BitmapCache(size: Int = 10, private val useBigImageCache: Boolean = true) {
-    private val cache = MemCache(Bitmap::class.java, size, { !useBigImageCache || it.byteCount <= ONE_MB })
-
-    init {
-        if (!useBigImageCache) {
-            bigImageCache.clear()
-        }
-    }
+class BitmapCache(size: Int = 100) {
+    private val cache = MemCache(Bitmap::class.java, size)
 
     fun load(uri: URI): Bitmap? {
         return cache.load(uri.toString()) {
-            if (useBigImageCache) {
-                bigImageCache.load(uri.toString()) {
-                    decode(uri)
-                }
-            } else {
-                decode(uri)
-            }
+            decode(uri)
         }
     }
 
@@ -34,9 +22,6 @@ class BitmapCache(size: Int = 10, private val useBigImageCache: Boolean = true) 
     }
 
     companion object {
-        private val ONE_MB = 1024 * 1024 * 8
-        private val bigImageCache = MemCache(Bitmap::class.java, 10, { it.byteCount > ONE_MB })
-
         fun decode(uri: URI): Bitmap? {
             return try {
                 BitmapFactory.decodeFile(File(uri).absolutePath, BitmapFactory.Options().apply {

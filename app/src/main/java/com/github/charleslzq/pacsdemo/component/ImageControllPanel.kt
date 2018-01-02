@@ -6,9 +6,9 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import com.github.charleslzq.kotlin.react.Component
 import com.github.charleslzq.pacsdemo.R
+import com.github.charleslzq.pacsdemo.component.store.ImageActions
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore.*
-import com.github.charleslzq.pacsdemo.component.store.ImageActions
 import com.github.charleslzq.pacsdemo.support.TypefaceUtil
 
 /**

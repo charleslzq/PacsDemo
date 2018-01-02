@@ -3,8 +3,8 @@ package com.github.charleslzq.pacsdemo.component.gesture
 import android.graphics.PointF
 import android.view.MotionEvent
 import android.view.View
-import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
 import com.github.charleslzq.pacsdemo.component.store.ImageActions
+import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
 import java.util.*
 
 /**
