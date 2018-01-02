@@ -35,13 +35,21 @@ class ImageLeftTopPanel(
         }
 
         renderByAll(store::autoScale, store::gestureScale) {
-            scaleInfo.visibility = View.VISIBLE
-            scaleInfo.post { scaleInfo.text = "缩放: ${store.gestureScale * store.autoScale}倍" }
+            if (store.hasImage) {
+                scaleInfo.visibility = View.VISIBLE
+                scaleInfo.post { scaleInfo.text = "缩放: ${store.gestureScale * store.autoScale}倍" }
+            } else {
+                scaleInfo.visibility = View.GONE
+            }
         }
 
         renderByAll(store::size, store::index) {
-            imageProgress.visibility = View.VISIBLE
-            imageProgress.post { imageProgress.text = "IMAGE: ${store.index + 1}/${store.size}" }
+            if (store.hasImage) {
+                imageProgress.visibility = View.VISIBLE
+                imageProgress.post { imageProgress.text = "IMAGE: ${store.index + 1}/${store.size}" }
+            } else {
+                imageProgress.visibility = View.GONE
+            }
         }
 
         render(store::hideMeta) {

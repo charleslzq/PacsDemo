@@ -16,6 +16,8 @@ class PacsStore : Store<PacsStore>(MiddleWare.debugLog, buildThunk<PacsStore>())
     var layoutOption: LayoutOption by ObservableStatus(LayoutOption.ONE_ONE)
         private set
     val imageCells: List<ImageFrameStore> = callOnIo { (0..8).map { ImageFrameStore(it) } }
+    val firstCell
+        get() = imageCells.first()
 
     init {
         reduce(PacsStore::thumbList) {

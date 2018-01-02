@@ -144,7 +144,7 @@ class ImageControllPanel(
                 displayController.visibility = View.VISIBLE
             }
 
-            if (!store.playable()) {
+            if (!store.playable) {
                 play.visibility = View.GONE
             } else {
                 play.visibility = View.VISIBLE
@@ -161,7 +161,7 @@ class ImageControllPanel(
             }
         }
 
-        render(property = store::canvasModel, guard = { store.hasImage() && store.measure != ImageFrameStore.Measure.NONE }) {
+        render(property = store::canvasModel, guard = { store.hasImage && store.measure != ImageFrameStore.Measure.NONE }) {
             undo.visibility = if (it.canUndo) View.VISIBLE else View.GONE
             redo.visibility = if (it.canRedo) View.VISIBLE else View.GONE
         }

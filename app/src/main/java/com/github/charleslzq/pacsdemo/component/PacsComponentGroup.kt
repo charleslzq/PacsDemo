@@ -2,7 +2,6 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.view.View
 import com.github.charleslzq.kotlin.react.ComponentGroup
-import com.github.charleslzq.kotlin.react.EventBus
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 
 /**
@@ -11,7 +10,6 @@ import com.github.charleslzq.pacsdemo.component.store.PacsStore
 abstract class PacsComponentGroup<V>(
         view: V,
         pacsStore: PacsStore,
-        config: List<Sub<V, PacsStore, *, *, *>>,
-        protected val dispatch: (Any) -> Unit = { EventBus.post(it) }
+        config: List<Sub<V, PacsStore, *, *, *>>
 ) : ComponentGroup<V, PacsStore>(view, pacsStore, config)
         where V : View

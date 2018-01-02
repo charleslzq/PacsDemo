@@ -37,7 +37,7 @@ class DicomImage(
         EventBus.onEvent<DragEventMessage.StartCopyCell> { onDragStart(it) }
         view.setOnTouchListener(operationMode)
 
-        render(property = ImageFrameStore::displayModel, guard = { store.hasImage() }) {
+        render(property = ImageFrameStore::displayModel, guard = { store.hasImage }) {
             val background = imageView.background
             if (background != null && background is IndexAwareAnimationDrawable) {
                 background.stop()
@@ -76,11 +76,11 @@ class DicomImage(
             imageView.colorFilter = ColorMatrixColorFilter(store.colorMatrix)
         }
 
-        render(property = ImageFrameStore::pseudoColor, guard = { store.hasImage() }) {
+        render(property = ImageFrameStore::pseudoColor, guard = { store.hasImage }) {
             imageView.setImageBitmap(getCurrentImage())
         }
 
-        render(property = ImageFrameStore::measure, guard = { store.hasImage() }) {
+        render(property = ImageFrameStore::measure, guard = { store.hasImage }) {
             operationMode = when (store.measure != ImageFrameStore.Measure.NONE) {
                 true -> {
                     draw()
@@ -97,7 +97,7 @@ class DicomImage(
             }
         }
 
-        render(property = ImageFrameStore::canvasModel, guard = { store.hasImage() && store.measure != ImageFrameStore.Measure.NONE }) {
+        render(property = ImageFrameStore::canvasModel, guard = { store.hasImage && store.measure != ImageFrameStore.Measure.NONE }) {
             draw()
         }
     }

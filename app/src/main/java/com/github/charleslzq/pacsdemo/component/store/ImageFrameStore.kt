@@ -61,6 +61,11 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
         private set
     var canvasModel by ObservableStatus(ImageCanvasModel())
 
+    val playable
+        get() = allowPlay && size > 1
+    val hasImage
+        get() = size > 0
+
     init {
         linePaint.color = Color.RED
         linePaint.strokeWidth = 3f
@@ -74,10 +79,17 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
         pointPaint.strokeWidth = 3f
         pointPaint.style = Paint.Style.FILL_AND_STROKE
 
+        reduce(ImageFrameStore::allowPlay) {
+            on<AllowPlay> { true }
+            on<ForbidPlay> { false }
+            on<Reset> { true }
+        }
+
         reduce(ImageFrameStore::hideMeta) {
             on<ImageClicked> { !state }
             on<BindModel>(precondition = { it.size > 0 }) { false }
             on<ResetDisplay> { false }
+            on<Reset> { true }
         }
 
         reduce(ImageFrameStore::bindModId) {
@@ -208,11 +220,10 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
         }
     }
 
-    fun hasImage() = displayModel.images.isNotEmpty()
-
-    fun playable() = allowPlay && size > 1
-
     private fun getNewScaleFactor(rawScaleFactor: Float): Float = Math.max(1.0f, Math.min(rawScaleFactor * gestureScale, 5.0f))
+
+    class AllowPlay
+    class ForbidPlay
 
     data class BindModel(val modeId: String,
                          val patient: DicomPatientMetaInfo,
@@ -252,6 +263,5 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
                 0f, 0f, -1f, 0f, 255f,
                 0f, 0f, 0f, 1f, 0f
         ))
-        private val preloadRange = 5
     }
 }

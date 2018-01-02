@@ -32,6 +32,25 @@ object ImageActions : RxScheduleSupport {
         }
     }
 
+    fun changeLayout(layoutOption: PacsStore.LayoutOption): DispatchAction<PacsStore> {
+        return { store, dispatch, _ ->
+            if (store.layoutOption != layoutOption) {
+                dispatch(PacsStore.ChangeLayout(layoutOption.ordinal))
+                store.imageCells.forEach {
+                    it.dispatch(Reset())
+                    it.dispatch(
+                            if (layoutOption == PacsStore.LayoutOption.ONE_ONE) {
+                                AllowPlay()
+                            } else {
+                                ForbidPlay()
+                            }
+                    )
+                }
+                bitmapCache = BitmapCache(100)
+            }
+        }
+    }
+
     fun bindModel(modId: String, index: Int = 0): DispatchAction<ImageFrameStore> {
         return { store, dispatch, _ ->
             runOnIo {
@@ -42,7 +61,7 @@ object ImageActions : RxScheduleSupport {
                     findImage(it, index)?.run {
                         dispatch(ShowImage(this, index, it.frames[index].meta))
                     }
-                    if (store.allowPlay) {
+                    if (store.playable) {
                         bitmapCache = BitmapCache(Math.max(100, it.frames.size))
                         bitmapCache.preload(*it.frames.map { it.frame }.toTypedArray())
                     } else {
@@ -55,7 +74,7 @@ object ImageActions : RxScheduleSupport {
 
     fun playOrPause(): DispatchAction<ImageFrameStore> {
         return { store, dispatch, _ ->
-            if (store.playable()) {
+            if (store.playable) {
                 runOnIo {
                     cleanMeasure(store, dispatch)
 
@@ -132,11 +151,11 @@ object ImageActions : RxScheduleSupport {
         return { store, dispatch, _ ->
             runOnIo {
                 val coordinates = toLines(*points)
-                if (coordinates.size > 1 && store.hasImage()) {
+                if (coordinates.size > 1 && store.hasImage) {
                     val currentImage = store.displayModel.images[0]
                     dispatch(DrawLines(Bitmap.createBitmap(currentImage.width, currentImage.height, currentImage.config).apply {
                         Canvas(this).apply {
-                            drawCircle(coordinates[coordinates.size-2], coordinates.last(), 5f, store.pointPaint)
+                            drawCircle(coordinates[coordinates.size - 2], coordinates.last(), 5f, store.pointPaint)
                             if (coordinates.size > 3) {
                                 drawLines(coordinates, store.linePaint)
                             }
