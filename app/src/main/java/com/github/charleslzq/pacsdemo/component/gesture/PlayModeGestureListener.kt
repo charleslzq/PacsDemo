@@ -1,8 +1,6 @@
 package com.github.charleslzq.pacsdemo.component.gesture
 
 import android.view.MotionEvent
-import com.github.charleslzq.kotlin.react.EventBus
-import com.github.charleslzq.pacsdemo.component.event.DragEventMessage
 import com.github.charleslzq.pacsdemo.component.store.ImageActions
 
 /**
@@ -10,7 +8,7 @@ import com.github.charleslzq.pacsdemo.component.store.ImageActions
  */
 class PlayModeGestureListener(
         dispatch: (Any) -> Unit,
-        val layoutPosition: Int
+        private val onDragStart: () -> Unit
 ) : ScaleCompositeGestureListener(dispatch) {
 
     override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
@@ -21,7 +19,7 @@ class PlayModeGestureListener(
     }
 
     override fun onLongPress(e: MotionEvent) {
-        EventBus.post(DragEventMessage.StartCopyCell(layoutPosition))
+        onDragStart()
     }
 
     override fun onDoubleTap(motionEvent: MotionEvent?): Boolean {

@@ -32,6 +32,12 @@ object ImageActions : RxScheduleSupport {
         }
     }
 
+    fun changeLayout(layoutOrdinal: Int): DispatchAction<PacsStore> {
+        return { store, _, _ ->
+            store.dispatch(changeLayout(PacsStore.LayoutOption.values()[layoutOrdinal % PacsStore.LayoutOption.values().size]))
+        }
+    }
+
     fun changeLayout(layoutOption: PacsStore.LayoutOption): DispatchAction<PacsStore> {
         return { store, dispatch, _ ->
             if (store.layoutOption != layoutOption) {
