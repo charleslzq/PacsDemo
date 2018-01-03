@@ -31,7 +31,8 @@ object ImageActions : RxScheduleSupport {
 
     fun changeLayout(layoutOrdinal: Int): DispatchAction<PacsStore> {
         return { store, _, _ ->
-            store.dispatch(changeLayout(PacsStore.LayoutOption.values()[layoutOrdinal % PacsStore.LayoutOption.values().size]))
+            val ordinal = layoutOrdinal.rem(PacsStore.LayoutOption.values().size).let { if (it < 0) it + PacsStore.LayoutOption.values().size else it }
+            store.dispatch(changeLayout(PacsStore.LayoutOption.values()[ordinal]))
         }
     }
 
