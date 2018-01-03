@@ -20,6 +20,12 @@ class ButtonPanel(
     private val splitButton: Button = view.findViewById(R.id.spliteButton)
     private val backButton: Button = view.findViewById(R.id.backButton)
     private val layoutSelector: PopupMenu = PopupMenu(buttonPanel.context, splitButton)
+    private val layoutMap = mapOf(
+            R.id.one_one to PacsStore.LayoutOption.ONE_ONE,
+            R.id.one_two to PacsStore.LayoutOption.ONE_TWO,
+            R.id.two_two to PacsStore.LayoutOption.TWO_TWO,
+            R.id.three_three to PacsStore.LayoutOption.THREE_THREE
+    )
 
     init {
         layoutSelector.menu.add(Menu.NONE, R.id.one_one, Menu.NONE, "1 X 1")
@@ -37,19 +43,8 @@ class ButtonPanel(
     }
 
     private fun onLayoutSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.one_one -> {
-                store.dispatch(ImageActions.changeLayout(PacsStore.LayoutOption.ONE_ONE))
-            }
-            R.id.one_two -> {
-                store.dispatch(ImageActions.changeLayout(PacsStore.LayoutOption.ONE_TWO))
-            }
-            R.id.two_two -> {
-                store.dispatch(ImageActions.changeLayout(PacsStore.LayoutOption.TWO_TWO))
-            }
-            R.id.three_three -> {
-                store.dispatch(ImageActions.changeLayout(PacsStore.LayoutOption.THREE_THREE))
-            }
+        layoutMap[item.itemId]?.let {
+            store.dispatch(ImageActions.changeLayout(it))
         }
         return true
     }
