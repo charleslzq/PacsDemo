@@ -33,7 +33,7 @@ class ThumbList(
             if (store.thumbList.isNotEmpty()) {
                 ItemClickSupport.addTo(view).setOnItemClickListener(object : ItemClickSupport.OnItemClickListener {
                     override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
-                        if (store.layoutOption == PacsStore.LayoutOption.ONE_ONE && position in (0..(store.thumbList.size - 1))) {
+                        if (store.layoutOption == PacsStore.LayoutOption.ONE_ONE && position in 0 until store.thumbList.size) {
                             store.dispatch(PacsStore.ThumbListItemClicked(position))
                             store.imageCells.first().dispatch(ImageActions.bindModel(getModId(position)))
                         }
@@ -66,7 +66,7 @@ class ThumbList(
         repeat(store.thumbList.size) {
             setSelected(it, false)
         }
-        if (selected in (0..(store.thumbList.size - 1))) {
+        if (selected in 0 until store.thumbList.size) {
             setSelected(selected, true)
         }
     }

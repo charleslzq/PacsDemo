@@ -121,7 +121,7 @@ object ImageActions : RxScheduleSupport {
     fun playIndexChange(index: Int): DispatchAction<ImageFrameStore> {
         return { store, dispatch, _ ->
             seriesModels.find { it.modId == store.bindModId }?.let {
-                if (index in (0..(it.frames.size - 1))) {
+                if (index in 0 until  it.frames.size) {
                     dispatch(PlayIndexChange(index, it.frames[index].meta))
                 }
             }
