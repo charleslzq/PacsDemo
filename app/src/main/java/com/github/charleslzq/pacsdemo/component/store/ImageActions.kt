@@ -92,12 +92,11 @@ object ImageActions : RxScheduleSupport {
         return { store, dispatch, _ ->
             if (store.playable) {
                 runOnIo {
-                    val index = store.index
-                    if (store.displayModel.images.size > 1) {
-                        dispatchShowImage(store.bindModId, index, dispatch)
+                    if (store.displayModel.images.size > 1 && store.autoJumpIndex != 0) {
+                        dispatchShowImage(store.bindModId, store.index, dispatch)
                     } else {
                         seriesModels.find { it.modId == store.bindModId }?.let {
-                            dispatch(PlayAnimation(findFrames(it, index)))
+                            dispatch(PlayAnimation(findFrames(it, store.autoJumpIndex)))
                         }
                     }
                 }

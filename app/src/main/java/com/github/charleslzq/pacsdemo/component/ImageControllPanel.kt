@@ -116,10 +116,10 @@ class ImageControllPanel(
             reverse.isSelected = it
         }
 
-        render(store::size) {
-            val visible = if (it > 1) {
-                imageSeekBar.max = it - 1
-                imageSeekBar.progress = 0
+        renderByAll(store::size, store::index) {
+            val visible = if (store.size > 1) {
+                imageSeekBar.max = store.size - 1
+                imageSeekBar.progress = store.index
                 imageSeekBar.visibility = View.VISIBLE
                 imageSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -157,13 +157,13 @@ class ImageControllPanel(
             }
         }
 
-        render(store::index) {
-            imageSeekBar.progress = it
-        }
-
-        render(store::displayModel) {
+        renderByAll(store::displayModel, store::index) {
             play.post {
-                play.text = if (it.images.size > 1) view.context.resources.getString(R.string.image_pause) else view.context.resources.getString(R.string.image_play)
+                play.text = if (store.displayModel.images.size > 1 && store.index != store.size - 1) {
+                    view.context.resources.getString(R.string.image_pause)
+                } else {
+                    view.context.resources.getString(R.string.image_play)
+                }
             }
         }
 

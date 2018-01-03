@@ -199,7 +199,7 @@ class DicomImage(
     }
 
     private fun getAnimation(resources: Resources): IndexAwareAnimationDrawable {
-        val animation = IndexAwareAnimationDrawable(store.dispatch, store.index)
+        val animation = IndexAwareAnimationDrawable(store.dispatch, store.autoJumpIndex)
         animation.isOneShot = true
         store.displayModel.images
                 .map { BitmapDrawable(resources, it).apply { colorFilter = ColorMatrixColorFilter(store.colorMatrix) } }

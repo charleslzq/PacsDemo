@@ -65,6 +65,8 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
         get() = allowPlay && size > 1
     val hasImage
         get() = size > 0
+    val autoJumpIndex
+        get() = if (index == size - 1) 0 else index
 
     init {
         linePaint.color = Color.RED
