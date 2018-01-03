@@ -41,8 +41,8 @@ class ImageLeftBottomPanel(
             }
         }
 
-        render(store::hideMeta) {
-            view.visibility = if (it) View.INVISIBLE else View.VISIBLE
+        renderByAll(store::hideMeta, store::measure) {
+            view.visibility = if (store.hideMeta || store.measure != ImageFrameStore.Measure.NONE) View.INVISIBLE else View.VISIBLE
         }
     }
 }
