@@ -1,9 +1,6 @@
 package com.github.charleslzq.pacsdemo.component.store
 
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Path
-import android.graphics.PointF
+import android.graphics.*
 import com.github.charleslzq.kotlin.react.DispatchAction
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore.*
 import com.github.charleslzq.pacsdemo.support.BitmapCache
@@ -190,7 +187,39 @@ object ImageActions : RxScheduleSupport {
                                                     lineTo(points[it + 1].x, points[it + 1].y)
                                                 }
                                             }, store.linePaint)
-                                            drawText(text.second, text.first.x, text.first.y, store.stringPaint)
+                                            val textLocation = Rect().let {
+                                                store.stringPaint.getTextBounds(text.second, 0, text.second.length, it)
+                                                when (points.size) {
+                                                    2 -> {
+                                                        if ((points.first().x - points.last().x) * (points.first().y - points.last().y) >= 0) {
+                                                            if (text.first.x + it.width() > width || text.first.y - it.height() < 0) {
+                                                                PointF(text.first.x - it.width(), text.first.y + it.height())
+                                                            } else {
+                                                                PointF(text.first.x, text.first.y - it.height())
+                                                            }
+                                                        } else {
+                                                            if (text.first.x + it.width() > width || text.first.y + it.height() > height) {
+                                                                PointF(text.first.x - it.width(), text.first.y - it.height())
+                                                            } else {
+                                                                PointF(text.first.x , text.first.y + it.height())
+                                                            }
+                                                        }
+                                                    }
+                                                    3 -> {
+                                                        if (text.first.x + it.width() <= width && text.first.y + it.height() <= height) {
+                                                            PointF(text.first.x, text.first.y + it.height())
+                                                        } else if (text.first.x - it.width() >= 0 && text.first.y + it.height() <= height) {
+                                                            PointF(text.first.x - it.width(), text.first.y + it.height())
+                                                        } else  if (text.first.x - it.width() >= 0 && text.first.y + it.height() >= 0) {
+                                                            PointF(text.first.x - it.width(), text.first.y - it.height())
+                                                        } else {
+                                                            PointF(text.first.x , text.first.y - it.height())
+                                                        }
+                                                    }
+                                                    else -> throw IllegalArgumentException("Unexpected number of points: ${points.size}")
+                                                }
+                                            }
+                                            drawText(text.second, textLocation.x, textLocation.y, store.stringPaint)
                                         }
                                     }
                                 },

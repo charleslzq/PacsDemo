@@ -36,7 +36,7 @@ class MeasureModeGestureListener(
                         ImageFrameStore.Measure.NONE -> throw IllegalStateException("Unexpected measure mode")
                         ImageFrameStore.Measure.LINE -> {
                             length(points.first(), points.last()).takeIf { it > lengthThreshold }?.let {
-                                dispatch(ImageActions.addPath(points.toList(), points.last() to it.toString()))
+                                dispatch(ImageActions.addPath(points.toList(), textLocation(points.first(), points.last()) to it.toString()))
                             }
                             points.clear()
                         }
@@ -73,6 +73,10 @@ class MeasureModeGestureListener(
 
     private fun length(point1: PointF, point2: PointF): Float {
         return Math.sqrt(((point1.x - point2.x) * (point1.x - point2.x) + (point1.y - point2.y) * (point1.y - point2.y)).toDouble()).toFloat()
+    }
+
+    private fun textLocation(startPoint: PointF, endPoint: PointF): PointF {
+        return PointF((startPoint.x + endPoint.x) / 2, (startPoint.y + endPoint.y) / 2)
     }
 
     private fun calculateAngle(startPoint: PointF, anglePoint: PointF, endPoint: PointF): Float {

@@ -75,8 +75,9 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
         linePaint.strokeJoin = Paint.Join.ROUND
         linePaint.style = Paint.Style.STROKE
         stringPaint.strokeWidth = 1f
-        stringPaint.color = Color.RED
+        stringPaint.color = Color.YELLOW
         stringPaint.isLinearText = true
+        stringPaint.textSize = 20f
         pointPaint.color = Color.RED
         pointPaint.strokeWidth = 3f
         pointPaint.style = Paint.Style.FILL_AND_STROKE
