@@ -99,17 +99,16 @@ class PacsDemoActivity : AppCompatActivity(), RxScheduleSupport {
         }.subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation())
                 .subscribe {
-                    val base = pacs.store
-                    base.dispatch(ImageActions.reloadModels(it))
+                    pacs.store.dispatch(ImageActions.reloadModels(it))
                     if (seriesId != null) {
                         it.indices.find { index -> it[index].seriesMetaInfo.instanceUID == seriesId }?.let { index ->
-                            base.dispatch(PacsStore.ThumbListItemClicked(index))
+                            pacs.store.dispatch(PacsStore.ThumbListItemClicked(index))
                             val imageOrder = imageNum?.run { toInt() } ?: 1
-                            base.firstCell.dispatch(ImageActions.bindModel(it[index].modId, imageOrder))
+                            pacs.store.firstCell.dispatch(ImageActions.bindModel(it[index].modId, imageOrder))
                         }
                     } else if (it.isNotEmpty()) {
-                        base.dispatch(PacsStore.ThumbListItemClicked(0))
-                        base.firstCell.dispatch(ImageActions.bindModel(it[0].modId, 0))
+                        pacs.store.dispatch(PacsStore.ThumbListItemClicked(0))
+                        pacs.store.firstCell.dispatch(ImageActions.bindModel(it[0].modId, 0))
                     }
                 }
     }
