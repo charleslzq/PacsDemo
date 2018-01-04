@@ -20,7 +20,7 @@ class UndoSupport<T> {
         canceledStack.clear()
     }
 
-    fun canUndo() = doneStack.size > 1
+    fun canUndo() = doneStack.isNotEmpty()
 
     fun canRedo() = canceledStack.isNotEmpty()
 
@@ -28,27 +28,28 @@ class UndoSupport<T> {
         doneStack.push(data)
     }
 
-    fun undo(): T {
-        if (canUndo()) {
+    fun undo(): T? {
+        return if (canUndo()) {
             canceledStack.push(doneStack.pop())
-            return doneStack.peek()
+            doneStack.peek()
         } else {
-            throw IllegalStateException("Can not undo any more!")
+            null
         }
     }
 
-    fun redo(): T {
-        if (canRedo()) {
-            return canceledStack.pop().also { done(it) }
+    fun redo(): T? {
+        return if (canRedo()) {
+            canceledStack.pop().also { done(it) }
         } else {
-            throw IllegalStateException("Can not redo any more!")
+            null
         }
     }
 
-    fun generate(initialValue: T, generator: (T) -> T): T {
-        if (doneStack.isEmpty()) {
-            done(initialValue)
-        }
-        return generator(doneStack.peek()).also { done(it) }
+    fun generate(initialValue: () -> T, generator: (T) -> T): T {
+        return generator(if (doneStack.isEmpty()) {
+            initialValue() }
+        else {
+            doneStack.peek()
+        }).also { done(it) }
     }
 }

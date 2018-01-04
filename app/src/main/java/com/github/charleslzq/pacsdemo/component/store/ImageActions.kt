@@ -176,58 +176,59 @@ object ImageActions : RxScheduleSupport {
             runOnIo {
                 val stack = stacks[store.layoutPosition]
                 if (points.size > 1 && store.displayModel.images.isNotEmpty()) {
-                    createDrawingBase(store)?.run {
-                        dispatch(ImageCanvasModel(
-                                stack.generate(this) {
-                                    Bitmap.createBitmap(it.width, it.height, it.config).apply {
-                                        Canvas(this).apply {
-                                            drawBitmap(it, 0f, 0f, store.linePaint)
-                                            drawPath(Path().apply {
-                                                moveTo(points[0].x, points[0].y)
-                                                repeat(points.size - 1) {
-                                                    lineTo(points[it + 1].x, points[it + 1].y)
-                                                }
-                                            }, store.linePaint)
-                                            val textLocation = Rect().let {
-                                                store.stringPaint.getTextBounds(text.second, 0, text.second.length, it)
-                                                when (points.size) {
-                                                    2 -> {
-                                                        if ((points.first().x - points.last().x) * (points.first().y - points.last().y) >= 0) {
-                                                            if (text.first.x + it.width() > width || text.first.y - it.height() < 0) {
-                                                                PointF(text.first.x - it.width(), text.first.y + it.height())
-                                                            } else {
-                                                                PointF(text.first.x, text.first.y - it.height())
-                                                            }
-                                                        } else {
-                                                            if (text.first.x + it.width() > width || text.first.y + it.height() > height) {
-                                                                PointF(text.first.x - it.width(), text.first.y - it.height())
-                                                            } else {
-                                                                PointF(text.first.x , text.first.y + it.height())
-                                                            }
-                                                        }
-                                                    }
-                                                    3 -> {
-                                                        if (text.first.x + it.width() <= width && text.first.y + it.height() <= height) {
-                                                            PointF(text.first.x, text.first.y + it.height())
-                                                        } else if (text.first.x - it.width() >= 0 && text.first.y + it.height() <= height) {
+                    dispatch(ImageCanvasModel(
+                            stack.generate({ createDrawingBase(store)!! }) {
+                                Bitmap.createBitmap(it.width, it.height, it.config).apply {
+                                    Canvas(this).apply {
+                                        drawBitmap(it, 0f, 0f, store.linePaint)
+                                        drawPath(Path().apply {
+                                            moveTo(points[0].x, points[0].y)
+                                            repeat(points.size - 1) {
+                                                lineTo(points[it + 1].x, points[it + 1].y)
+                                            }
+                                        }, store.linePaint)
+                                        val textLocation = Rect().let {
+                                            store.stringPaint.getTextBounds(text.second, 0, text.second.length, it)
+                                            when (points.size) {
+                                                2 -> {
+                                                    if ((points.first().x - points.last().x) * (points.first().y - points.last().y) >= 0) {
+                                                        if (text.first.x + it.width() > width || text.first.y - it.height() < 0) {
                                                             PointF(text.first.x - it.width(), text.first.y + it.height())
-                                                        } else  if (text.first.x - it.width() >= 0 && text.first.y + it.height() >= 0) {
+                                                        } else {
+                                                            PointF(text.first.x, text.first.y - it.height())
+                                                        }
+                                                    } else {
+                                                        if (text.first.x + it.width() > width || text.first.y + it.height() > height) {
                                                             PointF(text.first.x - it.width(), text.first.y - it.height())
                                                         } else {
-                                                            PointF(text.first.x , text.first.y - it.height())
+                                                            PointF(text.first.x , text.first.y + it.height())
                                                         }
                                                     }
-                                                    else -> throw IllegalArgumentException("Unexpected number of points: ${points.size}")
                                                 }
+                                                3 -> {
+                                                    if (text.first.x + it.width() <= width && text.first.y + it.height() <= height) {
+                                                        PointF(text.first.x, text.first.y + it.height())
+                                                    } else if (text.first.x - it.width() >= 0 && text.first.y + it.height() <= height) {
+                                                        PointF(text.first.x - it.width(), text.first.y + it.height())
+                                                    } else  if (text.first.x - it.width() >= 0 && text.first.y + it.height() >= 0) {
+                                                        PointF(text.first.x - it.width(), text.first.y - it.height())
+                                                    } else {
+                                                        PointF(text.first.x , text.first.y - it.height())
+                                                    }
+                                                }
+                                                else -> throw IllegalArgumentException("Unexpected number of points: ${points.size}")
                                             }
-                                            drawText(text.second, textLocation.x, textLocation.y, store.stringPaint)
                                         }
+                                        drawText(text.second, textLocation.x, textLocation.y, store.stringPaint)
                                     }
-                                },
-                                null,
-                                stack.canUndo(),
-                                stack.canRedo()
-                        ))
+                                }
+                            },
+                            null,
+                            stack.canUndo(),
+                            stack.canRedo()
+                    ))
+                    createDrawingBase(store)?.run {
+
                     }
                 }
             }
