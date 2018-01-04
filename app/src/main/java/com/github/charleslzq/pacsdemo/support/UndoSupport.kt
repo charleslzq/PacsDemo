@@ -31,7 +31,11 @@ class UndoSupport<T> {
     fun undo(): T? {
         return if (canUndo()) {
             canceledStack.push(doneStack.pop())
-            doneStack.peek()
+            if (doneStack.isNotEmpty()) {
+                doneStack.peek()
+            } else {
+                null
+            }
         } else {
             null
         }
