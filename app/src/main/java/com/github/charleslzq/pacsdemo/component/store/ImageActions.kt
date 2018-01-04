@@ -119,7 +119,7 @@ object ImageActions : RxScheduleSupport {
     fun playIndexChange(index: Int): DispatchAction<ImageFrameStore> {
         return { store, dispatch, _ ->
             seriesModels.find { it.modId == store.bindModId }?.let {
-                if (index in 0 until  it.frames.size) {
+                if (index in 0 until it.frames.size) {
                     dispatch(PlayIndexChange(index, it.frames[index].meta))
                 }
             }
@@ -151,7 +151,7 @@ object ImageActions : RxScheduleSupport {
         }
     }
 
-    fun drawLines(vararg points: PointF): DispatchAction<ImageFrameStore> {
+    fun drawLines(vararg points: PointF, showMagnify: Boolean = false): DispatchAction<ImageFrameStore> {
         return { store, dispatch, _ ->
             runOnIo {
                 val coordinates = toLines(*points)
@@ -159,9 +159,38 @@ object ImageActions : RxScheduleSupport {
                     createDrawingBase(store)?.let {
                         dispatch(DrawLines(it.apply {
                             Canvas(this).apply {
-                                drawCircle(coordinates[coordinates.size - 2], coordinates.last(), 5f, store.pointPaint)
                                 if (coordinates.size > 3) {
                                     drawLines(coordinates, store.linePaint)
+                                }
+                                val lastX = points.last().x.toInt()
+                                val lastY = points.last().y.toInt()
+                                if (showMagnify) {
+                                    getCurrentImage(store)?.run {
+                                        val range = arrayOf(store.range, width - lastX, lastX, height - lastY, lastY).min()!!
+                                        val srcRect = Rect(lastX - range, lastY - range, lastX + range, lastY + range)
+                                        val startX = if (lastX > 4 * range) {
+                                            lastX - 4 * range
+                                        } else {
+                                            lastX
+                                        }
+                                        val startY = if (lastY > 4 * range) {
+                                            lastY - 4 * range
+                                        } else {
+                                            lastY
+                                        }
+                                        val dstRect = Rect(startX, startY, startX + 4 * range, startY + 4 * range)
+                                        drawBitmap(this, srcRect, dstRect, store.linePaint)
+                                        drawLine(startX + 2.0f * range,
+                                                startY + 1.5f * range,
+                                                startX + 2.0f * range,
+                                                startY + 2.5f * range, store.linePaint)
+                                        drawLine(startX + 1.5f * range,
+                                                startY + 2.0f * range,
+                                                startX + 2.5f * range,
+                                                startY + 2.0f * range, store.linePaint)
+                                    }
+                                } else {
+                                    drawCircle(lastX.toFloat(), lastY.toFloat(), 5f, store.pointPaint)
                                 }
                             }
                         }))
@@ -201,7 +230,7 @@ object ImageActions : RxScheduleSupport {
                                                         if (text.first.x + it.width() > width || text.first.y + it.height() > height) {
                                                             PointF(text.first.x - it.width(), text.first.y - it.height())
                                                         } else {
-                                                            PointF(text.first.x , text.first.y + it.height())
+                                                            PointF(text.first.x, text.first.y + it.height())
                                                         }
                                                     }
                                                 }
@@ -210,10 +239,10 @@ object ImageActions : RxScheduleSupport {
                                                         PointF(text.first.x, text.first.y + it.height())
                                                     } else if (text.first.x - it.width() >= 0 && text.first.y + it.height() <= height) {
                                                         PointF(text.first.x - it.width(), text.first.y + it.height())
-                                                    } else  if (text.first.x - it.width() >= 0 && text.first.y + it.height() >= 0) {
+                                                    } else if (text.first.x - it.width() >= 0 && text.first.y + it.height() >= 0) {
                                                         PointF(text.first.x - it.width(), text.first.y - it.height())
                                                     } else {
-                                                        PointF(text.first.x , text.first.y - it.height())
+                                                        PointF(text.first.x, text.first.y - it.height())
                                                     }
                                                 }
                                                 else -> throw IllegalArgumentException("Unexpected number of points: ${points.size}")
@@ -293,10 +322,18 @@ object ImageActions : RxScheduleSupport {
     }
 
     private fun createDrawingBase(store: ImageFrameStore): Bitmap? {
+        return getCurrentImage(store)?.let { Bitmap.createBitmap(it.width, it.height, it.config) }
+    }
+
+    private fun getCurrentImage(store: ImageFrameStore): Bitmap? {
         return if (store.displayModel.images.isNotEmpty()) {
-            store.displayModel.images[0].let {
-                val scale = Math.max(store.autoScale, 1.0f)
-                Bitmap.createBitmap((it.width * scale).toInt(), (it.height * scale).toInt(), it.config)
+            val rawBitmap = store.displayModel.images[0]
+            return if (store.autoScale > 1.0f) {
+                val newWidth = (rawBitmap.width * store.autoScale).toInt()
+                val newHeight = (rawBitmap.height * store.autoScale).toInt()
+                Bitmap.createScaledBitmap(rawBitmap, newWidth, newHeight, false)
+            } else {
+                rawBitmap
             }
         } else {
             null

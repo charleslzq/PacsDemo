@@ -20,6 +20,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
     var linePaint = Paint()
     var stringPaint = Paint()
     var pointPaint = Paint()
+    var range = 50
 
     var allowPlay = true
         private set
@@ -75,7 +76,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
         linePaint.strokeJoin = Paint.Join.ROUND
         linePaint.style = Paint.Style.STROKE
         stringPaint.strokeWidth = 1f
-        stringPaint.color = Color.YELLOW
+        stringPaint.color = Color.RED
         stringPaint.isLinearText = true
         stringPaint.textSize = 20f
         pointPaint.color = Color.RED

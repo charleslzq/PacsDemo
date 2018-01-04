@@ -30,12 +30,12 @@ class MeasureModeGestureListener(
         when (motionEvent.action) {
             MotionEvent.ACTION_DOWN -> {
                 points.push(getPoint(motionEvent))
-                dispatch(ImageActions.drawLines(*points.toTypedArray()))
+                dispatch(ImageActions.drawLines(points = *points.toTypedArray(), showMagnify = true))
             }
             MotionEvent.ACTION_MOVE -> {
                 points.pop()
                 points.push(getPoint(motionEvent))
-                dispatch(ImageActions.drawLines(*points.toTypedArray()))
+                dispatch(ImageActions.drawLines(points = *points.toTypedArray(), showMagnify = true))
             }
             MotionEvent.ACTION_UP -> {
                 points.pop()
@@ -92,7 +92,7 @@ class MeasureModeGestureListener(
     }
 
     private fun calculateAngle(startPoint: PointF, anglePoint: PointF, endPoint: PointF): Float {
-        val offsetStart = PointF(startPoint.x - anglePoint.x, startPoint.y - endPoint.y)
+        val offsetStart = PointF(startPoint.x - anglePoint.x, startPoint.y - anglePoint.y)
         val offsetEnd = PointF(endPoint.x - anglePoint.x, endPoint.y - anglePoint.y)
         val distanceStart = Math.sqrt((offsetStart.x * offsetStart.x + offsetStart.y * offsetStart.y).toDouble())
         val distanceEnd = Math.sqrt((offsetEnd.x * offsetEnd.x + offsetEnd.y * offsetEnd.y).toDouble())
