@@ -130,7 +130,7 @@ object ImageActions : RxScheduleSupport {
         return { store, dispatch, _ ->
             runOnIo {
                 if (store.size > 0) {
-                    val changeBase = Math.min(100f / store.size, 10f)
+                    val changeBase = Math.min(300f / store.size, 10f)
                     val offset = (scrollDistance / changeBase).toInt()
                     val newIndex = Math.min(Math.max(store.index - offset, 0), store.size - 1)
                     dispatchShowImage(store.bindModId, newIndex, dispatch)
