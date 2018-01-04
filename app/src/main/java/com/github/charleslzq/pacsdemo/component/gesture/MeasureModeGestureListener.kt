@@ -10,12 +10,21 @@ import java.util.*
 /**
  * Created by charleslzq on 17-11-30.
  */
+fun Float.format(precision: Int, prefix: String = "", suffix: String = ""): String {
+    return buildString {
+        append(prefix)
+        append(String.format("%.${precision}f", this@format))
+        append(suffix)
+    }
+}
+
 class MeasureModeGestureListener(
         private val measure: ImageFrameStore.Measure,
         dispatch: (Any) -> Unit
 ) : ScaleCompositeGestureListener(dispatch) {
     private val points = Stack<PointF>()
     private val lengthThreshold = 5f
+    private val precision = 2
 
     override fun onOtherGesture(view: View, motionEvent: MotionEvent): Boolean {
         when (motionEvent.action) {
@@ -36,7 +45,7 @@ class MeasureModeGestureListener(
                         ImageFrameStore.Measure.NONE -> throw IllegalStateException("Unexpected measure mode")
                         ImageFrameStore.Measure.LINE -> {
                             length(points.first(), points.last()).takeIf { it > lengthThreshold }?.let {
-                                dispatch(ImageActions.addPath(points.toList(), textLocation(points.first(), points.last()) to it.toString()))
+                                dispatch(ImageActions.addPath(points.toList(), textLocation(points.first(), points.last()) to it.format(precision)))
                             }
                             points.clear()
                         }
@@ -44,7 +53,10 @@ class MeasureModeGestureListener(
                             if (points.size == 3) {
                                 val length = length(points[1], points[2])
                                 if (length >= lengthThreshold) {
-                                    dispatch(ImageActions.addPath(points.toList(), points[1] to calculateAngle(points[0], points[1], points[2]).toString()))
+                                    dispatch(ImageActions.addPath(
+                                            points.toList(),
+                                            points[1] to calculateAngle(points[0], points[1], points[2]).format(precision, "∠", "°")
+                                    ))
                                     points.clear()
                                 } else {
                                     points.pop()
