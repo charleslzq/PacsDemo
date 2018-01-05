@@ -27,7 +27,9 @@ class ImageCell(
                     val tag = dragEvent.clipData.getItemAt(0).text.toString()
                     if (tag == DicomImage.tag) {
                         (dragEvent.localState as? ImageFrameStore)?.let {
-                            store.dispatch(ImageActions.copyStates(it))
+                            if (it.layoutPosition != imageFrameStore.layoutPosition) {
+                                store.dispatch(ImageActions.copyStates(it))
+                            }
                         }
                     } else if (tag == ThumbList.tag) {
                         (dragEvent.localState as? String)?.let {
