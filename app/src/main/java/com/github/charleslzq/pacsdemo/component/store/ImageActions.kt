@@ -74,7 +74,7 @@ object ImageActions : RxScheduleSupport {
         }
     }
 
-    fun copyStates(imageFrameStore: ImageFrameStore): DispatchAction<ImageFrameStore> {
+    fun moveFrame(imageFrameStore: ImageFrameStore): DispatchAction<ImageFrameStore> {
         return { store, dispatch, _ ->
             dispatch(Reset())
             store.dispatch(ImageActions.bindModel(imageFrameStore.bindModId, imageFrameStore.index))
