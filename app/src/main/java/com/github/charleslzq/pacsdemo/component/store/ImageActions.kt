@@ -58,6 +58,7 @@ object ImageActions : RxScheduleSupport {
     fun bindModel(modId: String, index: Int = 0): DispatchAction<ImageFrameStore> {
         return { store, dispatch, _ ->
             runOnIo {
+                cleanMeasure(store, dispatch)
                 seriesModels.find { it.modId == modId }?.let {
                     dispatch(BindModel(modId, it.patientMetaInfo, it.studyMetaInfo, it.seriesMetaInfo, it.frames.size))
                     findImage(it, index)?.run {
@@ -67,7 +68,7 @@ object ImageActions : RxScheduleSupport {
                         bitmapCache = BitmapCache(Math.max(100, it.frames.size))
                         bitmapCache.preload(*it.frames.map { it.frame }.toTypedArray())
                     } else {
-                        bitmapCache.preload(*urisInRange(it, 0, 2 * preloadRange).toTypedArray())
+                        bitmapCache.preload(*urisInRange(it, index - preloadRange, index + preloadRange).toTypedArray())
                     }
                 }
             }
