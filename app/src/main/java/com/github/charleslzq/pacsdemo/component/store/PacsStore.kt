@@ -27,7 +27,7 @@ class PacsStore : Store<PacsStore>(MiddleWare.debugLog, buildThunk<PacsStore>())
         reduce(PacsStore::selected) {
             on<ChangeLayout> { -1 }
             on<SeriesListUpdated> { -1 }
-            on<ThumbListItemClicked>(precondition = { layoutOption == LayoutOption.ONE_ONE }) {
+            on<ThumbListItemClicked>(require = { layoutOption == LayoutOption.ONE_ONE }) {
                 event.position
             }
         }

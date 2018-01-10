@@ -18,9 +18,7 @@ import com.github.charleslzq.pacsdemo.support.ViewUtils
 class ViewSelector(
         viewFlipper: ViewFlipper,
         pacsStore: PacsStore
-) : PacsComponentGroup<ViewFlipper>(viewFlipper, pacsStore, listOf(
-        Sub(ImageCell::class, this::getImageCellsFromPanel, { parentState, index -> parentState.imageCells[index] })
-)) {
+) : PacsComponent<ViewFlipper>(viewFlipper, pacsStore) {
     private val gestureDetector = GestureDetector(view.context, object : GestureDetector.SimpleOnGestureListener() {
         override fun onDown(e: MotionEvent?): Boolean {
             return true
@@ -39,9 +37,15 @@ class ViewSelector(
     })
 
     init {
+        bind {
+            children(ViewSelector.Companion::getImageCellsFromPanel) {
+                ImageCell(view, store.imageCells[index])
+            }
+        }
+
         render(store::layoutOption) {
             view.displayedChild = store.layoutOption.ordinal
-            reRenderChildren()
+            rebind()
         }
 
         view.setOnTouchListener { _, event -> gestureDetector.onTouchEvent(event) }

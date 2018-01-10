@@ -10,8 +10,12 @@ import com.github.charleslzq.pacsdemo.component.store.PacsStore
 class PacsMain(
         mainView: View,
         pacsStore: PacsStore
-) : PacsComponentGroup<View>(mainView, pacsStore, listOf(
-        Sub(ThumbList::class, byId(R.id.thumbList), sameAsParent()),
-        Sub(ViewSelector::class, byId(R.id.viewSelector), sameAsParent()),
-        Sub(ButtonPanel::class, byId(R.id.buttonPanel), sameAsParent())
-))
+) : PacsComponent<View>(mainView, pacsStore) {
+    init {
+        bind {
+            child { ThumbList(byId(R.id.thumbList), store) }
+            child { ViewSelector(byId(R.id.viewSelector), store) }
+            child { ButtonPanel(byId(R.id.buttonPanel), store) }
+        }
+    }
+}

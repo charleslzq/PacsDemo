@@ -2,7 +2,7 @@ package com.github.charleslzq.pacsdemo.component
 
 import android.view.DragEvent
 import android.view.View
-import com.github.charleslzq.kotlin.react.ComponentGroup
+import com.github.charleslzq.kotlin.react.Component
 import com.github.charleslzq.pacsdemo.R
 import com.github.charleslzq.pacsdemo.component.store.ImageActions
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
@@ -13,14 +13,16 @@ import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
 class ImageCell(
         baseView: View,
         imageFrameStore: ImageFrameStore
-) : ComponentGroup<View, ImageFrameStore>(baseView, imageFrameStore, listOf(
-        Sub(ImageLeftTopPanel::class, byId(R.id.leftTopPanel), sameAsParent()),
-        Sub(ImageRightTopPanel::class, byId(R.id.rightTopPanel), sameAsParent()),
-        Sub(ImageLeftBottomPanel::class, byId(R.id.leftBottomPanel), sameAsParent()),
-        Sub(ImageControllPanel::class, byId(R.id.imageController), sameAsParent()),
-        Sub(DicomImage::class, byId(R.id.imageContainer), sameAsParent())
-)) {
+) : Component<View, ImageFrameStore>(baseView, imageFrameStore) {
     init {
+        bind {
+            child { ImageLeftTopPanel(byId(R.id.leftTopPanel), store) }
+            child { ImageRightTopPanel(byId(R.id.rightTopPanel), store) }
+            child { ImageLeftBottomPanel(byId(R.id.leftBottomPanel), store) }
+            child { ImageControllPanel(byId(R.id.imageController), store) }
+            child { DicomImage(byId(R.id.imageContainer), store) }
+        }
+
         view.setOnDragListener { _, dragEvent ->
             when (dragEvent.action) {
                 DragEvent.ACTION_DROP -> {

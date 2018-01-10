@@ -167,7 +167,7 @@ class ImageControllPanel(
             }
         }
 
-        render(property = store::canvasModel, guard = { store.hasImage && store.measure != ImageFrameStore.Measure.NONE }) {
+        render(property = store::canvasModel, require = { store.hasImage && store.measure != ImageFrameStore.Measure.NONE }) {
             undo.visibility = if (it.canUndo) View.VISIBLE else View.GONE
             redo.visibility = if (it.canRedo) View.VISIBLE else View.GONE
             clear.visibility = if (it.canUndo || it.canRedo) View.VISIBLE else View.GONE

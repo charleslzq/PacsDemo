@@ -72,11 +72,11 @@ class DicomImage(
             imageView.colorFilter = ColorMatrixColorFilter(store.colorMatrix)
         }
 
-        render(property = ImageFrameStore::pseudoColor, guard = { store.hasImage }) {
+        render(property = ImageFrameStore::pseudoColor, require = { store.hasImage }) {
             imageView.setImageBitmap(getCurrentImage())
         }
 
-        render(property = ImageFrameStore::measure, guard = { store.hasImage }) {
+        render(property = ImageFrameStore::measure, require = { store.hasImage }) {
             operationMode = when (store.measure != ImageFrameStore.Measure.NONE) {
                 true -> {
                     MeasureMode(imageView.context, MeasureModeGestureListener(store.measure, store.dispatch))
@@ -91,7 +91,7 @@ class DicomImage(
             }
         }
 
-        render(property = ImageFrameStore::canvasModel, guard = { store.hasImage && store.measure != ImageFrameStore.Measure.NONE }) {
+        render(property = ImageFrameStore::canvasModel, require = { store.hasImage && store.measure != ImageFrameStore.Measure.NONE }) {
             Canvas(getCurrentImage()!!.also { imageView.setImageBitmap(it) }).apply {
                 store.canvasModel.drawing?.let { drawBitmap(it, 0f, 0f, store.linePaint) }
                 store.canvasModel.tmp?.let { drawBitmap(it, 0f, 0f, store.linePaint) }

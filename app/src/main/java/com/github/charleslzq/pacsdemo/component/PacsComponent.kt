@@ -7,7 +7,7 @@ import com.github.charleslzq.pacsdemo.component.store.PacsStore
 /**
  * Created by charleslzq on 17-11-30.
  */
-abstract class PacsComponent<out V>(
+abstract class PacsComponent<V>(
         view: V,
         pacsStore: PacsStore
 ) : Component<V, PacsStore>(view, pacsStore)

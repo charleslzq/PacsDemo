@@ -91,7 +91,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
 
         reduce(ImageFrameStore::hideMeta) {
             on<ImageClicked> { !state }
-            on<BindModel>(precondition = { it.size > 0 }) { false }
+            on<BindModel>(require = { it.size > 0 }) { false }
             on<ResetDisplay> { false }
             on<Reset> { true }
         }
