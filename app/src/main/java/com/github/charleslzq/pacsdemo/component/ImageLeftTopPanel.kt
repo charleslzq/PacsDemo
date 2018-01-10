@@ -37,7 +37,7 @@ class ImageLeftTopPanel(
         renderByAll(store::autoScale, store::gestureScale) {
             if (store.hasImage) {
                 scaleInfo.visibility = View.VISIBLE
-                scaleInfo.post { scaleInfo.text = "缩放: ${store.gestureScale * store.autoScale}倍" }
+                scaleInfo.post { scaleInfo.text = "缩放: ${store.scale}倍" }
             } else {
                 scaleInfo.visibility = View.GONE
             }

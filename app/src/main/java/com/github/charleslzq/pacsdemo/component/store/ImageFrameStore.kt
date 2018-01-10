@@ -46,6 +46,8 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWa
     var displayModel by ObservableStatus(ImageDisplayModel())
         private set
 
+    val scale
+        get() = autoScale * gestureScale
     var autoScale by ObservableStatus(1.0f)
     var gestureScale by ObservableStatus(1.0f)
         private set
