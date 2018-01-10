@@ -168,27 +168,33 @@ object ImageActions : RxScheduleSupport {
                                 if (showMagnify) {
                                     getCurrentImage(store)?.run {
                                         val range = arrayOf(store.range, width - lastX, lastX, height - lastY, lastY).min()!!
-                                        val srcRect = Rect(lastX - range, lastY - range, lastX + range, lastY + range)
-                                        val startX = if (lastX > 4 * range) {
-                                            lastX - 4 * range
-                                        } else {
-                                            lastX
+                                        val magnifyRange = arrayOf(width - lastX, lastX, height - lastY, lastY).max()!!
+                                        val magnify = Math.min(if (range > 20) 3 else (60f / range).toInt(), (magnifyRange.toFloat() / (2 * range)).toInt())
+                                        if (magnify > 1) {
+                                            val srcRect = Rect(lastX - range, lastY - range, lastX + range, lastY + range)
+                                            val startX = if (lastX > 2 * magnify * range) {
+                                                lastX - 2 * magnify * range
+                                            } else {
+                                                lastX
+                                            }
+                                            val startY = if (lastY > 2 * magnify * range) {
+                                                lastY - 2 * magnify * range
+                                            } else {
+                                                lastY
+                                            }
+                                            val dstRect = Rect(startX, startY, startX + 2 * magnify * range, startY + 2 * magnify * range)
+                                            val magnifyDistance = magnify.toFloat() * range
+                                            val halfLineLength = Math.min(magnifyDistance, Math.max(10f, .5f * range))
+                                            drawBitmap(this, srcRect, dstRect, store.linePaint)
+                                            drawLine(startX + magnifyDistance,
+                                                    startY + magnifyDistance - halfLineLength,
+                                                    startX + magnifyDistance,
+                                                    startY + magnifyDistance + halfLineLength, store.linePaint)
+                                            drawLine(startX + magnifyDistance - halfLineLength,
+                                                    startY + magnifyDistance,
+                                                    startX + magnifyDistance + halfLineLength,
+                                                    startY + magnifyDistance, store.linePaint)
                                         }
-                                        val startY = if (lastY > 4 * range) {
-                                            lastY - 4 * range
-                                        } else {
-                                            lastY
-                                        }
-                                        val dstRect = Rect(startX, startY, startX + 4 * range, startY + 4 * range)
-                                        drawBitmap(this, srcRect, dstRect, store.linePaint)
-                                        drawLine(startX + 2.0f * range,
-                                                startY + 1.5f * range,
-                                                startX + 2.0f * range,
-                                                startY + 2.5f * range, store.linePaint)
-                                        drawLine(startX + 1.5f * range,
-                                                startY + 2.0f * range,
-                                                startX + 2.5f * range,
-                                                startY + 2.0f * range, store.linePaint)
                                     }
                                 } else {
                                     drawCircle(lastX.toFloat(), lastY.toFloat(), 5f, store.pointPaint)
@@ -236,15 +242,33 @@ object ImageActions : RxScheduleSupport {
                                                     }
                                                 }
                                                 3 -> {
-                                                    if (text.first.x + it.width() <= width && text.first.y + it.height() <= height) {
-                                                        PointF(text.first.x, text.first.y + it.height())
-                                                    } else if (text.first.x - it.width() >= 0 && text.first.y + it.height() <= height) {
-                                                        PointF(text.first.x - it.width(), text.first.y + it.height())
-                                                    } else if (text.first.x - it.width() >= 0 && text.first.y + it.height() >= 0) {
-                                                        PointF(text.first.x - it.width(), text.first.y - it.height())
-                                                    } else {
-                                                        PointF(text.first.x, text.first.y - it.height())
+                                                    val startPoint = arrayOf(
+                                                            PointF(text.first.x, text.first.y + it.height()),
+                                                            PointF(text.first.x - it.width(), text.first.y + it.height()),
+                                                            PointF(text.first.x - it.width(), text.first.y),
+                                                            PointF(text.first.x, text.first.y)
+                                                    )
+                                                    val outOfRange = arrayOf(
+                                                            text.first.x + it.width() > width || text.first.y + it.height() > height,
+                                                            text.first.x - it.width() < 0 || text.first.y + it.height() > height,
+                                                            text.first.x - it.width() < 0 || text.first.y - it.height() < 0,
+                                                            text.first.x + it.width() > width || text.first.y - it.height() < 0
+                                                    )
+                                                    val lineOccupy = arrayOf(false, false, false, false)
+                                                    arrayOf(points[0], points[2]).forEach {
+                                                        val offset = PointF(it.x - points[1].x, it.y - points[1].y)
+                                                        when {
+                                                            offset.x > 0 && offset.y > 0 -> lineOccupy[0] = true
+                                                            offset.x < 0 && offset.y > 0 -> lineOccupy[1] = true
+                                                            offset.x < 0 && offset.y < 0 -> lineOccupy[2] = true
+                                                            offset.x > 0 && offset.y < 0 -> lineOccupy[3] = true
+                                                        }
                                                     }
+                                                    if (outOfRange.indices.filter { !outOfRange[it] }.all { lineOccupy[it] }) {
+                                                        outOfRange.indices.find { !outOfRange[it] }!!
+                                                    } else {
+                                                        outOfRange.indices.find { !outOfRange[it] && !lineOccupy[it] }!!
+                                                    }.let { startPoint[it] }
                                                 }
                                                 else -> throw IllegalArgumentException("Unexpected number of points: ${points.size}")
                                             }
@@ -257,9 +281,6 @@ object ImageActions : RxScheduleSupport {
                             stack.canUndo(),
                             stack.canRedo()
                     ))
-                    createDrawingBase(store)?.run {
-
-                    }
                 }
             }
         }
@@ -329,7 +350,7 @@ object ImageActions : RxScheduleSupport {
     private fun getCurrentImage(store: ImageFrameStore): Bitmap? {
         return if (store.displayModel.images.isNotEmpty()) {
             val rawBitmap = store.displayModel.images[0]
-            return if (store.autoScale > 1.0f) {
+            return if (store.autoScale != 1.0f) {
                 val newWidth = (rawBitmap.width * store.autoScale).toInt()
                 val newHeight = (rawBitmap.height * store.autoScale).toInt()
                 Bitmap.createScaledBitmap(rawBitmap, newWidth, newHeight, false)

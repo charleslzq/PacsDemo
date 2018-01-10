@@ -135,7 +135,7 @@ class DicomImage(
     }
 
     private fun scaleIfNecessary(rawBitmap: Bitmap): Bitmap {
-        return if (store.autoScale > 1.0f) {
+        return if (store.autoScale != 1.0f) {
             val newWidth = (rawBitmap.width * store.autoScale).toInt()
             val newHeight = (rawBitmap.height * store.autoScale).toInt()
             Bitmap.createScaledBitmap(rawBitmap, newWidth, newHeight, false)
