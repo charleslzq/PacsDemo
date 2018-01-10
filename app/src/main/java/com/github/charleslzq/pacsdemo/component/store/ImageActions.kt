@@ -310,14 +310,14 @@ object ImageActions : RxScheduleSupport {
 
     private fun findImage(model: PatientSeriesModel, index: Int = 0): Bitmap? {
         return when {
-            model.frames.isEmpty() || index !in (0..(model.frames.size - 1)) -> null
+            model.frames.isEmpty() || index !in (0 until model.frames.size) -> null
             else -> loadImage(model.frames[index].frame)
         }
     }
 
     private fun findFrames(model: PatientSeriesModel, index: Int = 0): List<Bitmap> {
         return when {
-            model.frames.isEmpty() || index !in (0..(model.frames.size - 1)) -> emptyList()
+            model.frames.isEmpty() || index !in (0 until model.frames.size) -> emptyList()
             else -> model.frames.subList(index, model.frames.size).mapNotNull { loadImage(it.frame) }
         }
     }
