@@ -10,12 +10,8 @@ import java.util.*
 /**
  * Created by charleslzq on 17-11-30.
  */
-fun Float.format(precision: Int, prefix: String = "", suffix: String = ""): String {
-    return buildString {
-        append(prefix)
-        append(String.format("%.${precision}f", this@format))
-        append(suffix)
-    }
+infix fun Float.format(precision: Int): String {
+    return String.format("%.${precision}f", this)
 }
 
 class MeasureModeGestureListener(
@@ -45,7 +41,7 @@ class MeasureModeGestureListener(
                         ImageFrameStore.Measure.NONE -> throw IllegalStateException("Unexpected measure mode")
                         ImageFrameStore.Measure.LINE -> {
                             length(points.first(), points.last()).takeIf { it > lengthThreshold }?.let {
-                                dispatch(ImageActions.addPath(points.toList(), textLocation(points.first(), points.last()) to it.format(precision)))
+                                dispatch(ImageActions.addPath(points.toList(), textLocation(points.first(), points.last()) to (it format precision)))
                             }
                             points.clear()
                         }
@@ -55,7 +51,13 @@ class MeasureModeGestureListener(
                                 if (length >= lengthThreshold) {
                                     dispatch(ImageActions.addPath(
                                             points.toList(),
-                                            points[1] to calculateAngle(points[0], points[1], points[2]).format(precision, "∠", "°")
+                                            points[1] to calculateAngle(points[0], points[1], points[2]).run {
+                                                buildString {
+                                                    append("∠")
+                                                    append(this@run format precision)
+                                                    append("°")
+                                                }
+                                            }
                                     ))
                                     points.clear()
                                 } else {
