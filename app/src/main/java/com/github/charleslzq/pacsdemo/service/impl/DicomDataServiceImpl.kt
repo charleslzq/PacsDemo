@@ -22,12 +22,12 @@ class DicomDataServiceImpl(
 
     override fun findPatient(patientId: String) = cache.load(patientId) {
         callOnIo {
-            val patientInStore = dataStore.getPatient(patientId)
-            if (patientInStore == null) {
-                requirePatients(patientId)
+            listOfNotNull(dataStore.getPatient(patientId)).apply {
+                if (isEmpty()) {
+                    requirePatients(patientId)
+                }
             }
-            patientInStore
-        }
+        }.firstOrNull()
     }
 
     override fun requirePatients(vararg patientId: String) = runOnIo {
