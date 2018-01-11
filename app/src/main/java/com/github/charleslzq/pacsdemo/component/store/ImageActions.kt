@@ -2,6 +2,7 @@ package com.github.charleslzq.pacsdemo.component.store
 
 import android.graphics.*
 import com.github.charleslzq.kotlin.react.DispatchAction
+import com.github.charleslzq.pacsdemo.component.gesture.minus
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore.*
 import com.github.charleslzq.pacsdemo.support.BitmapCache
 import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
@@ -256,7 +257,7 @@ object ImageActions : RxScheduleSupport {
                                                     )
                                                     val lineOccupy = arrayOf(false, false, false, false)
                                                     arrayOf(points[0], points[2]).forEach {
-                                                        val offset = PointF(it.x - points[1].x, it.y - points[1].y)
+                                                        val offset = it - points[1]
                                                         when {
                                                             offset.x > 0 && offset.y > 0 -> lineOccupy[0] = true
                                                             offset.x < 0 && offset.y > 0 -> lineOccupy[1] = true
@@ -264,11 +265,9 @@ object ImageActions : RxScheduleSupport {
                                                             offset.x > 0 && offset.y < 0 -> lineOccupy[3] = true
                                                         }
                                                     }
-                                                    if (outOfRange.indices.filter { !outOfRange[it] }.all { lineOccupy[it] }) {
-                                                        outOfRange.indices.find { !outOfRange[it] }!!
-                                                    } else {
-                                                        outOfRange.indices.find { !outOfRange[it] && !lineOccupy[it] }!!
-                                                    }.let { startPoint[it] }
+                                                    outOfRange.indices.filter { !outOfRange[it] }.run {
+                                                        startPoint[find { !lineOccupy[it] } ?: first()]
+                                                    }
                                                 }
                                                 else -> throw IllegalArgumentException("Unexpected number of points: ${points.size}")
                                             }

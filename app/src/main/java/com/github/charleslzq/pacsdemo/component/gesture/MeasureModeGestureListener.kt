@@ -10,9 +10,17 @@ import java.util.*
 /**
  * Created by charleslzq on 17-11-30.
  */
-infix fun Float.format(precision: Int): String {
-    return String.format("%.${precision}f", this)
-}
+infix fun Float.format(precision: Int) = String.format("%.${precision}f", this)
+
+operator fun PointF.plus(pointF: PointF) = PointF(x + pointF.x, y + pointF.y)
+
+operator fun PointF.minus(pointF: PointF) = PointF(x - pointF.x, y - pointF.y)
+
+operator fun PointF.times(pointF: PointF) = x * pointF.x + y * pointF.y
+
+operator fun PointF.div(float: Float) = if (float != 0f) PointF(x / float, y / float) else throw IllegalArgumentException("divider is zero")
+
+fun PointF.distance(pointF: PointF = PointF(0f, 0f)) = Math.sqrt((this - pointF).let { it * it }.toDouble())
 
 class MeasureModeGestureListener(
         private val measure: ImageFrameStore.Measure,
@@ -41,7 +49,7 @@ class MeasureModeGestureListener(
                         ImageFrameStore.Measure.NONE -> throw IllegalStateException("Unexpected measure mode")
                         ImageFrameStore.Measure.LINE -> {
                             length(points.first(), points.last()).takeIf { it > lengthThreshold }?.let {
-                                dispatch(ImageActions.addPath(points.toList(), textLocation(points.first(), points.last()) to (it format precision)))
+                                dispatch(ImageActions.addPath(points.toList(), textLocation(points.first(), points.last()) to (it.toFloat() format precision)))
                             }
                             points.clear()
                         }
@@ -81,24 +89,15 @@ class MeasureModeGestureListener(
         return true
     }
 
-    private fun getPoint(motionEvent: MotionEvent): PointF {
-        return PointF(motionEvent.x, motionEvent.y)
-    }
+    private fun getPoint(motionEvent: MotionEvent) = PointF(motionEvent.x, motionEvent.y)
 
-    private fun length(point1: PointF, point2: PointF): Float {
-        return Math.sqrt(((point1.x - point2.x) * (point1.x - point2.x) + (point1.y - point2.y) * (point1.y - point2.y)).toDouble()).toFloat()
-    }
+    private fun length(point1: PointF, point2: PointF) = point1.distance(point2)
 
-    private fun textLocation(startPoint: PointF, endPoint: PointF): PointF {
-        return PointF((startPoint.x + endPoint.x) / 2, (startPoint.y + endPoint.y) / 2)
-    }
+    private fun textLocation(startPoint: PointF, endPoint: PointF) = (startPoint + endPoint) / 2f
 
-    private fun calculateAngle(startPoint: PointF, anglePoint: PointF, endPoint: PointF): Float {
-        val offsetStart = PointF(startPoint.x - anglePoint.x, startPoint.y - anglePoint.y)
-        val offsetEnd = PointF(endPoint.x - anglePoint.x, endPoint.y - anglePoint.y)
-        val distanceStart = Math.sqrt((offsetStart.x * offsetStart.x + offsetStart.y * offsetStart.y).toDouble())
-        val distanceEnd = Math.sqrt((offsetEnd.x * offsetEnd.x + offsetEnd.y * offsetEnd.y).toDouble())
-        val cos = (offsetStart.x * offsetEnd.x + offsetEnd.y * offsetStart.y) / (distanceStart * distanceEnd)
-        return (Math.acos(cos).toFloat() * 180 / Math.PI).toFloat()
+    private fun calculateAngle(startPoint: PointF, anglePoint: PointF, endPoint: PointF) = ((startPoint - anglePoint) to (endPoint - anglePoint)).let {
+        ((it.first * it.second) / (it.first.distance() * it.second.distance())).let {
+            (Math.acos(it) * 180 / Math.PI).toFloat()
+        }
     }
 }
