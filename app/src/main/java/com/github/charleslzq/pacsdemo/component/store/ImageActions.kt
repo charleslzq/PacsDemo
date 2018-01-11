@@ -1,6 +1,9 @@
 package com.github.charleslzq.pacsdemo.component.store
 
 import android.graphics.*
+import com.github.charleslzq.dicom.data.DicomPatientMetaInfo
+import com.github.charleslzq.dicom.data.DicomSeriesMetaInfo
+import com.github.charleslzq.dicom.data.DicomStudyMetaInfo
 import com.github.charleslzq.kotlin.react.DispatchAction
 import com.github.charleslzq.pacsdemo.component.gesture.minus
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore.*
@@ -12,6 +15,15 @@ import java.net.URI
 /**
  * Created by charleslzq on 17-12-28.
  */
+data class PatientSeriesModel(
+        val modId: String = "",
+        val patientMetaInfo: DicomPatientMetaInfo = DicomPatientMetaInfo(),
+        val studyMetaInfo: DicomStudyMetaInfo = DicomStudyMetaInfo(),
+        val seriesMetaInfo: DicomSeriesMetaInfo = DicomSeriesMetaInfo(),
+        val frames: List<ImageFrameModel> = emptyList(),
+        val thumb: URI? = null
+)
+
 object ImageActions : RxScheduleSupport {
     private val seriesModels: MutableList<PatientSeriesModel> = mutableListOf()
     private val stacks = (0..8).map { UndoSupport<Bitmap>() }
@@ -30,335 +42,297 @@ object ImageActions : RxScheduleSupport {
         }
     }
 
-    fun changeLayout(layoutOrdinal: Int): DispatchAction<PacsStore> {
-        return { store, _, _ ->
-            val ordinal = layoutOrdinal.rem(PacsStore.LayoutOption.values().size).let { if (it < 0) it + PacsStore.LayoutOption.values().size else it }
-            store.dispatch(changeLayout(PacsStore.LayoutOption.values()[ordinal]))
-        }
+    fun changeLayout(layoutOrdinal: Int): DispatchAction<PacsStore> = { store, _, _ ->
+        val ordinal = layoutOrdinal.rem(PacsStore.LayoutOption.values().size).let { if (it < 0) it + PacsStore.LayoutOption.values().size else it }
+        store.dispatch(changeLayout(PacsStore.LayoutOption.values()[ordinal]))
     }
 
-    fun changeLayout(layoutOption: PacsStore.LayoutOption): DispatchAction<PacsStore> {
-        return { store, dispatch, _ ->
-            if (store.layoutOption != layoutOption) {
-                dispatch(PacsStore.ChangeLayout(layoutOption.ordinal))
-                store.imageCells.forEach {
-                    it.dispatch(Reset())
-                    it.dispatch(
-                            if (layoutOption == PacsStore.LayoutOption.ONE_ONE) {
-                                AllowPlay()
-                            } else {
-                                ForbidPlay()
-                            }
-                    )
-                }
-                bitmapCache = BitmapCache(100)
-            }
-        }
-    }
-
-    fun bindModel(modId: String, index: Int = 0): DispatchAction<ImageFrameStore> {
-        return { store, dispatch, _ ->
-            runOnIo {
-                cleanMeasure(store, dispatch)
-                seriesModels.find { it.modId == modId }?.let {
-                    dispatch(BindModel(modId, it.patientMetaInfo, it.studyMetaInfo, it.seriesMetaInfo, it.frames.size))
-                    findImage(it, index)?.run {
-                        dispatch(ShowImage(this, index, it.frames[index].meta))
-                    }
-                    if (store.playable) {
-                        bitmapCache = BitmapCache(Math.max(100, it.frames.size))
-                        bitmapCache.preload(*it.frames.map { it.frame }.toTypedArray())
-                    } else {
-                        bitmapCache.preload(*urisInRange(it, index - preloadRange, index + preloadRange).toTypedArray())
-                    }
-                }
-            }
-        }
-    }
-
-    fun moveFrame(imageFrameStore: ImageFrameStore): DispatchAction<ImageFrameStore> {
-        return { store, dispatch, _ ->
-            dispatch(Reset())
-            store.dispatch(ImageActions.bindModel(imageFrameStore.bindModId, imageFrameStore.index))
-            if (imageFrameStore.reverseColor) {
-                dispatch(ReverseColor())
-            }
-            if (imageFrameStore.pseudoColor) {
-                dispatch(PseudoColor())
-            }
-            stacks[store.layoutPosition].copyFrom(stacks[imageFrameStore.layoutPosition])
-            stacks[imageFrameStore.layoutPosition].reset()
-            dispatch(imageFrameStore.canvasModel)
-
-            imageFrameStore.dispatch(ImageFrameStore.Reset())
-        }
-    }
-
-    fun playOrPause(): DispatchAction<ImageFrameStore> {
-        return { store, dispatch, _ ->
-            if (store.playable) {
-                runOnIo {
-                    if (store.displayModel.images.size > 1 && store.autoJumpIndex != 0) {
-                        dispatchShowImage(store.bindModId, store.index, dispatch)
-                    } else {
-                        seriesModels.find { it.modId == store.bindModId }?.let {
-                            dispatch(PlayAnimation(findFrames(it, store.autoJumpIndex)))
+    fun changeLayout(layoutOption: PacsStore.LayoutOption): DispatchAction<PacsStore> = { store, dispatch, _ ->
+        if (store.layoutOption != layoutOption) {
+            dispatch(PacsStore.ChangeLayout(layoutOption.ordinal))
+            store.imageCells.forEach {
+                it.dispatch(Reset())
+                it.dispatch(
+                        if (layoutOption == PacsStore.LayoutOption.ONE_ONE) {
+                            AllowPlay()
+                        } else {
+                            ForbidPlay()
                         }
+                )
+            }
+            bitmapCache = BitmapCache(100)
+        }
+    }
+
+    fun bindModel(modId: String, index: Int = 0): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
+        runOnIo {
+            cleanMeasure(store, dispatch)
+            seriesModels.find { it.modId == modId }?.let {
+                dispatch(BindModel(modId, it.patientMetaInfo, it.studyMetaInfo, it.seriesMetaInfo, it.frames.size))
+                findImage(it, index)?.run {
+                    dispatch(ShowImage(this, index, it.frames[index].meta))
+                }
+                if (store.playable) {
+                    bitmapCache = BitmapCache(Math.max(100, it.frames.size))
+                    bitmapCache.preload(*it.frames.map { it.frame }.toTypedArray())
+                } else {
+                    bitmapCache.preload(*urisInRange(it, index - preloadRange, index + preloadRange).toTypedArray())
+                }
+            }
+        }
+    }
+
+    fun moveFrame(imageFrameStore: ImageFrameStore): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
+        dispatch(Reset())
+        store.dispatch(ImageActions.bindModel(imageFrameStore.bindModId, imageFrameStore.index))
+        if (imageFrameStore.reverseColor) {
+            dispatch(ReverseColor())
+        }
+        if (imageFrameStore.pseudoColor) {
+            dispatch(PseudoColor())
+        }
+        stacks[store.layoutPosition].copyFrom(stacks[imageFrameStore.layoutPosition])
+        stacks[imageFrameStore.layoutPosition].reset()
+        dispatch(imageFrameStore.canvasModel)
+
+        imageFrameStore.dispatch(ImageFrameStore.Reset())
+    }
+
+    fun playOrPause(): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
+        if (store.playable) {
+            runOnIo {
+                if (store.displayModel.images.size > 1 && store.autoJumpIndex != 0) {
+                    dispatchShowImage(store.bindModId, store.index, dispatch)
+                } else {
+                    seriesModels.find { it.modId == store.bindModId }?.let {
+                        dispatch(PlayAnimation(findFrames(it, store.autoJumpIndex)))
                     }
                 }
             }
         }
     }
 
-    fun showImage(index: Int): DispatchAction<ImageFrameStore> {
-        return { store, dispatch, _ ->
-            runOnIo {
-                dispatchShowImage(store.bindModId, index, dispatch)
+    fun showImage(index: Int): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
+        runOnIo {
+            dispatchShowImage(store.bindModId, index, dispatch)
+        }
+    }
+
+    fun playIndexChange(index: Int): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
+        seriesModels.find { it.modId == store.bindModId }?.let {
+            if (index in 0 until it.frames.size) {
+                dispatch(PlayIndexChange(index, it.frames[index].meta))
             }
         }
     }
 
-    fun playIndexChange(index: Int): DispatchAction<ImageFrameStore> {
-        return { store, dispatch, _ ->
-            seriesModels.find { it.modId == store.bindModId }?.let {
-                if (index in 0 until it.frames.size) {
-                    dispatch(PlayIndexChange(index, it.frames[index].meta))
-                }
+    fun indexScroll(scrollDistance: Float): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
+        runOnIo {
+            if (store.size > 0) {
+                val changeBase = Math.min(300f / store.size, 10f)
+                val offset = (scrollDistance / changeBase).toInt()
+                val newIndex = Math.min(Math.max(store.index - offset, 0), store.size - 1)
+                dispatchShowImage(store.bindModId, newIndex, dispatch)
             }
         }
     }
 
-    fun indexScroll(scrollDistance: Float): DispatchAction<ImageFrameStore> {
-        return { store, dispatch, _ ->
-            runOnIo {
-                if (store.size > 0) {
-                    val changeBase = Math.min(300f / store.size, 10f)
-                    val offset = (scrollDistance / changeBase).toInt()
-                    val newIndex = Math.min(Math.max(store.index - offset, 0), store.size - 1)
-                    dispatchShowImage(store.bindModId, newIndex, dispatch)
-                }
+    fun resetDisplay(): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
+        runOnIo {
+            cleanMeasure(store, dispatch)
+            dispatch(ResetDisplay())
+            if (store.size > 1) {
+                dispatchShowImage(store.bindModId, 0, dispatch)
             }
         }
     }
 
-    fun resetDisplay(): DispatchAction<ImageFrameStore> {
-        return { store, dispatch, _ ->
-            runOnIo {
-                cleanMeasure(store, dispatch)
-                dispatch(ResetDisplay())
-                if (store.size > 1) {
-                    dispatchShowImage(store.bindModId, 0, dispatch)
-                }
-            }
-        }
-    }
-
-    fun drawLines(vararg points: PointF, showMagnify: Boolean = false): DispatchAction<ImageFrameStore> {
-        return { store, dispatch, _ ->
-            runOnIo {
-                val coordinates = toLines(*points)
-                if (coordinates.size > 1 && store.hasImage) {
-                    createDrawingBase(store)?.let {
-                        dispatch(DrawLines(it.apply {
-                            Canvas(this).apply {
-                                if (coordinates.size > 3) {
-                                    drawLines(coordinates, store.linePaint)
+    fun drawLines(vararg points: PointF, showMagnify: Boolean = false): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
+        runOnIo {
+            val coordinates = toLines(*points)
+            if (coordinates.size > 1 && store.hasImage) {
+                createDrawingBase(store)?.let {
+                    dispatch(DrawLines(it.apply {
+                        Canvas(this).apply {
+                            if (coordinates.size > 3) {
+                                drawLines(coordinates, store.linePaint)
+                            }
+                            val lastX = points.last().x.toInt()
+                            val lastY = points.last().y.toInt()
+                            if (showMagnify) {
+                                getCurrentImage(store)?.run {
+                                    val range = arrayOf(store.range, width - lastX, lastX, height - lastY, lastY).min()!!
+                                    val magnifyRange = arrayOf(width - lastX, lastX, height - lastY, lastY).max()!!
+                                    val magnify = Math.min(if (range > 20) 3 else (60f / range).toInt(), (magnifyRange.toFloat() / (2 * range)).toInt())
+                                    if (magnify > 1) {
+                                        val srcRect = Rect(lastX - range, lastY - range, lastX + range, lastY + range)
+                                        val startX = if (lastX > 2 * magnify * range) {
+                                            lastX - 2 * magnify * range
+                                        } else {
+                                            lastX
+                                        }
+                                        val startY = if (lastY > 2 * magnify * range) {
+                                            lastY - 2 * magnify * range
+                                        } else {
+                                            lastY
+                                        }
+                                        val dstRect = Rect(startX, startY, startX + 2 * magnify * range, startY + 2 * magnify * range)
+                                        val magnifyDistance = magnify.toFloat() * range
+                                        val halfLineLength = Math.min(magnifyDistance, Math.max(10f, .5f * range))
+                                        drawBitmap(this, srcRect, dstRect, store.linePaint)
+                                        drawLine(startX + magnifyDistance,
+                                                startY + magnifyDistance - halfLineLength,
+                                                startX + magnifyDistance,
+                                                startY + magnifyDistance + halfLineLength, store.linePaint)
+                                        drawLine(startX + magnifyDistance - halfLineLength,
+                                                startY + magnifyDistance,
+                                                startX + magnifyDistance + halfLineLength,
+                                                startY + magnifyDistance, store.linePaint)
+                                    }
                                 }
-                                val lastX = points.last().x.toInt()
-                                val lastY = points.last().y.toInt()
-                                if (showMagnify) {
-                                    getCurrentImage(store)?.run {
-                                        val range = arrayOf(store.range, width - lastX, lastX, height - lastY, lastY).min()!!
-                                        val magnifyRange = arrayOf(width - lastX, lastX, height - lastY, lastY).max()!!
-                                        val magnify = Math.min(if (range > 20) 3 else (60f / range).toInt(), (magnifyRange.toFloat() / (2 * range)).toInt())
-                                        if (magnify > 1) {
-                                            val srcRect = Rect(lastX - range, lastY - range, lastX + range, lastY + range)
-                                            val startX = if (lastX > 2 * magnify * range) {
-                                                lastX - 2 * magnify * range
-                                            } else {
-                                                lastX
+                            } else {
+                                drawCircle(lastX.toFloat(), lastY.toFloat(), 5f, store.pointPaint)
+                            }
+                        }
+                    }))
+                }
+            }
+        }
+    }
+
+    fun addPath(points: List<PointF>, text: Pair<PointF, String>): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
+        runOnIo {
+            val stack = stacks[store.layoutPosition]
+            if (points.size > 1 && store.displayModel.images.isNotEmpty()) {
+                dispatch(ImageCanvasModel(
+                        stack.generate({ createDrawingBase(store)!! }) {
+                            Bitmap.createBitmap(it.width, it.height, it.config).apply {
+                                Canvas(this).apply {
+                                    drawBitmap(it, 0f, 0f, store.linePaint)
+                                    drawPath(Path().apply {
+                                        moveTo(points[0].x, points[0].y)
+                                        repeat(points.size - 1) {
+                                            lineTo(points[it + 1].x, points[it + 1].y)
+                                        }
+                                    }, store.linePaint)
+                                    val textLocation = Rect().let {
+                                        store.stringPaint.getTextBounds(text.second, 0, text.second.length, it)
+                                        when (points.size) {
+                                            2 -> {
+                                                if ((points.first().x - points.last().x) * (points.first().y - points.last().y) >= 0) {
+                                                    if (text.first.x + it.width() > width || text.first.y - it.height() < 0) {
+                                                        PointF(text.first.x - it.width(), text.first.y + it.height())
+                                                    } else {
+                                                        PointF(text.first.x, text.first.y - it.height())
+                                                    }
+                                                } else {
+                                                    if (text.first.x + it.width() > width || text.first.y + it.height() > height) {
+                                                        PointF(text.first.x - it.width(), text.first.y - it.height())
+                                                    } else {
+                                                        PointF(text.first.x, text.first.y + it.height())
+                                                    }
+                                                }
                                             }
-                                            val startY = if (lastY > 2 * magnify * range) {
-                                                lastY - 2 * magnify * range
-                                            } else {
-                                                lastY
+                                            3 -> {
+                                                val startPoint = arrayOf(
+                                                        PointF(text.first.x, text.first.y + it.height()),
+                                                        PointF(text.first.x - it.width(), text.first.y + it.height()),
+                                                        PointF(text.first.x - it.width(), text.first.y),
+                                                        PointF(text.first.x, text.first.y)
+                                                )
+                                                val outOfRange = arrayOf(
+                                                        text.first.x + it.width() > width || text.first.y + it.height() > height,
+                                                        text.first.x - it.width() < 0 || text.first.y + it.height() > height,
+                                                        text.first.x - it.width() < 0 || text.first.y - it.height() < 0,
+                                                        text.first.x + it.width() > width || text.first.y - it.height() < 0
+                                                )
+                                                val lineOccupy = arrayOf(false, false, false, false)
+                                                arrayOf(points[0], points[2]).forEach {
+                                                    val offset = it - points[1]
+                                                    when {
+                                                        offset.x > 0 && offset.y > 0 -> lineOccupy[0] = true
+                                                        offset.x < 0 && offset.y > 0 -> lineOccupy[1] = true
+                                                        offset.x < 0 && offset.y < 0 -> lineOccupy[2] = true
+                                                        offset.x > 0 && offset.y < 0 -> lineOccupy[3] = true
+                                                    }
+                                                }
+                                                outOfRange.indices.filter { !outOfRange[it] }.run {
+                                                    startPoint[find { !lineOccupy[it] } ?: first()]
+                                                }
                                             }
-                                            val dstRect = Rect(startX, startY, startX + 2 * magnify * range, startY + 2 * magnify * range)
-                                            val magnifyDistance = magnify.toFloat() * range
-                                            val halfLineLength = Math.min(magnifyDistance, Math.max(10f, .5f * range))
-                                            drawBitmap(this, srcRect, dstRect, store.linePaint)
-                                            drawLine(startX + magnifyDistance,
-                                                    startY + magnifyDistance - halfLineLength,
-                                                    startX + magnifyDistance,
-                                                    startY + magnifyDistance + halfLineLength, store.linePaint)
-                                            drawLine(startX + magnifyDistance - halfLineLength,
-                                                    startY + magnifyDistance,
-                                                    startX + magnifyDistance + halfLineLength,
-                                                    startY + magnifyDistance, store.linePaint)
+                                            else -> throw IllegalArgumentException("Unexpected number of points: ${points.size}")
                                         }
                                     }
-                                } else {
-                                    drawCircle(lastX.toFloat(), lastY.toFloat(), 5f, store.pointPaint)
+                                    drawText(text.second, textLocation.x, textLocation.y, store.stringPaint)
                                 }
                             }
-                        }))
-                    }
-                }
+                        },
+                        null,
+                        stack.canUndo(),
+                        stack.canRedo()
+                ))
             }
         }
     }
 
-    fun addPath(points: List<PointF>, text: Pair<PointF, String>): DispatchAction<ImageFrameStore> {
-        return { store, dispatch, _ ->
-            runOnIo {
-                val stack = stacks[store.layoutPosition]
-                if (points.size > 1 && store.displayModel.images.isNotEmpty()) {
-                    dispatch(ImageCanvasModel(
-                            stack.generate({ createDrawingBase(store)!! }) {
-                                Bitmap.createBitmap(it.width, it.height, it.config).apply {
-                                    Canvas(this).apply {
-                                        drawBitmap(it, 0f, 0f, store.linePaint)
-                                        drawPath(Path().apply {
-                                            moveTo(points[0].x, points[0].y)
-                                            repeat(points.size - 1) {
-                                                lineTo(points[it + 1].x, points[it + 1].y)
-                                            }
-                                        }, store.linePaint)
-                                        val textLocation = Rect().let {
-                                            store.stringPaint.getTextBounds(text.second, 0, text.second.length, it)
-                                            when (points.size) {
-                                                2 -> {
-                                                    if ((points.first().x - points.last().x) * (points.first().y - points.last().y) >= 0) {
-                                                        if (text.first.x + it.width() > width || text.first.y - it.height() < 0) {
-                                                            PointF(text.first.x - it.width(), text.first.y + it.height())
-                                                        } else {
-                                                            PointF(text.first.x, text.first.y - it.height())
-                                                        }
-                                                    } else {
-                                                        if (text.first.x + it.width() > width || text.first.y + it.height() > height) {
-                                                            PointF(text.first.x - it.width(), text.first.y - it.height())
-                                                        } else {
-                                                            PointF(text.first.x, text.first.y + it.height())
-                                                        }
-                                                    }
-                                                }
-                                                3 -> {
-                                                    val startPoint = arrayOf(
-                                                            PointF(text.first.x, text.first.y + it.height()),
-                                                            PointF(text.first.x - it.width(), text.first.y + it.height()),
-                                                            PointF(text.first.x - it.width(), text.first.y),
-                                                            PointF(text.first.x, text.first.y)
-                                                    )
-                                                    val outOfRange = arrayOf(
-                                                            text.first.x + it.width() > width || text.first.y + it.height() > height,
-                                                            text.first.x - it.width() < 0 || text.first.y + it.height() > height,
-                                                            text.first.x - it.width() < 0 || text.first.y - it.height() < 0,
-                                                            text.first.x + it.width() > width || text.first.y - it.height() < 0
-                                                    )
-                                                    val lineOccupy = arrayOf(false, false, false, false)
-                                                    arrayOf(points[0], points[2]).forEach {
-                                                        val offset = it - points[1]
-                                                        when {
-                                                            offset.x > 0 && offset.y > 0 -> lineOccupy[0] = true
-                                                            offset.x < 0 && offset.y > 0 -> lineOccupy[1] = true
-                                                            offset.x < 0 && offset.y < 0 -> lineOccupy[2] = true
-                                                            offset.x > 0 && offset.y < 0 -> lineOccupy[3] = true
-                                                        }
-                                                    }
-                                                    outOfRange.indices.filter { !outOfRange[it] }.run {
-                                                        startPoint[find { !lineOccupy[it] } ?: first()]
-                                                    }
-                                                }
-                                                else -> throw IllegalArgumentException("Unexpected number of points: ${points.size}")
-                                            }
-                                        }
-                                        drawText(text.second, textLocation.x, textLocation.y, store.stringPaint)
-                                    }
-                                }
-                            },
-                            null,
-                            stack.canUndo(),
-                            stack.canRedo()
-                    ))
-                }
-            }
-        }
-    }
-
-    fun undoDrawing(): DispatchAction<ImageFrameStore> {
-        return { store, dispatch, _ ->
-            val stack = stacks[store.layoutPosition]
-            if (stack.canUndo()) {
-                runOnCompute {
-                    dispatch(ImageCanvasModel(stack.undo(), null, stack.canUndo(), stack.canRedo()))
-                }
-            }
-        }
-    }
-
-    fun redoDrawing(): DispatchAction<ImageFrameStore> {
-        return { store, dispatch, _ ->
-            val stack = stacks[store.layoutPosition]
-            if (stack.canRedo()) {
-                runOnCompute {
-                    dispatch(ImageCanvasModel(stack.redo(), null, stack.canUndo(), stack.canRedo()))
-                }
-            }
-        }
-    }
-
-    fun clearDrawing(): DispatchAction<ImageFrameStore> {
-        return { store, dispatch, _ ->
+    fun undoDrawing(): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
+        val stack = stacks[store.layoutPosition]
+        if (stack.canUndo()) {
             runOnCompute {
-                stacks[store.layoutPosition].reset()
-                dispatch(ClearMeasure())
+                dispatch(ImageCanvasModel(stack.undo(), null, stack.canUndo(), stack.canRedo()))
             }
+        }
+    }
+
+    fun redoDrawing(): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
+        val stack = stacks[store.layoutPosition]
+        if (stack.canRedo()) {
+            runOnCompute {
+                dispatch(ImageCanvasModel(stack.redo(), null, stack.canUndo(), stack.canRedo()))
+            }
+        }
+    }
+
+    fun clearDrawing(): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
+        runOnCompute {
+            stacks[store.layoutPosition].reset()
+            dispatch(ClearMeasure())
         }
     }
 
     private fun urisInRange(patientSeriesModel: PatientSeriesModel, start: Int, end: Int)
             = patientSeriesModel.frames.subList(Math.max(0, start), Math.min(end + 1, patientSeriesModel.frames.size)).map { it.frame }
 
-    private fun dispatchShowImage(modId: String, index: Int, dispatch: (Any) -> Unit) {
-        seriesModels.find { it.modId == modId }?.let {
-            findImage(it, index)?.run {
-                dispatch(ShowImage(this, index, it.frames[index].meta))
-                bitmapCache.preload(*urisInRange(it, index - preloadRange, index + preloadRange).toTypedArray())
-            }
+    private fun dispatchShowImage(modId: String, index: Int, dispatch: (Any) -> Unit) = seriesModels.find { it.modId == modId }?.let {
+        findImage(it, index)?.run {
+            dispatch(ShowImage(this, index, it.frames[index].meta))
+            bitmapCache.preload(*urisInRange(it, index - preloadRange, index + preloadRange).toTypedArray())
         }
     }
 
-    private fun findImage(model: PatientSeriesModel, index: Int = 0): Bitmap? {
-        return when {
-            model.frames.isEmpty() || index !in (0 until model.frames.size) -> null
-            else -> loadImage(model.frames[index].frame)
-        }
+    private fun findImage(model: PatientSeriesModel, index: Int = 0) = when {
+        model.frames.isEmpty() || index !in (0 until model.frames.size) -> null
+        else -> loadImage(model.frames[index].frame)
     }
 
-    private fun findFrames(model: PatientSeriesModel, index: Int = 0): List<Bitmap> {
-        return when {
-            model.frames.isEmpty() || index !in (0 until model.frames.size) -> emptyList()
-            else -> model.frames.subList(index, model.frames.size).mapNotNull { loadImage(it.frame) }
-        }
+    private fun findFrames(model: PatientSeriesModel, index: Int = 0) = when {
+        model.frames.isEmpty() || index !in (0 until model.frames.size) -> emptyList()
+        else -> model.frames.subList(index, model.frames.size).mapNotNull { loadImage(it.frame) }
     }
 
-    private fun createDrawingBase(store: ImageFrameStore): Bitmap? {
-        return getCurrentImage(store)?.let { Bitmap.createBitmap(it.width, it.height, it.config) }
-    }
+    private fun createDrawingBase(store: ImageFrameStore) = getCurrentImage(store)?.let { Bitmap.createBitmap(it.width, it.height, it.config) }
 
-    private fun getCurrentImage(store: ImageFrameStore): Bitmap? {
-        return if (store.displayModel.images.isNotEmpty()) {
-            val rawBitmap = store.displayModel.images[0]
-            return if (store.scale != 1.0f) {
-                val newWidth = (rawBitmap.width * store.scale).toInt()
-                val newHeight = (rawBitmap.height * store.scale).toInt()
-                Bitmap.createScaledBitmap(rawBitmap, newWidth, newHeight, false)
-            } else {
-                rawBitmap
-            }
+    private fun getCurrentImage(store: ImageFrameStore) = if (store.displayModel.images.isNotEmpty()) {
+        val rawBitmap = store.displayModel.images[0]
+        if (store.scale != 1.0f) {
+            val newWidth = (rawBitmap.width * store.scale).toInt()
+            val newHeight = (rawBitmap.height * store.scale).toInt()
+            Bitmap.createScaledBitmap(rawBitmap, newWidth, newHeight, false)
         } else {
-            null
+            rawBitmap
         }
+    } else {
+        null
     }
 
     private fun cleanMeasure(store: ImageFrameStore, dispatch: (Any) -> Unit) {
@@ -368,26 +342,22 @@ object ImageActions : RxScheduleSupport {
         }
     }
 
-    private fun loadImage(uri: URI): Bitmap? {
-        return bitmapCache.load(uri)
-    }
+    private fun loadImage(uri: URI) = bitmapCache.load(uri)
 
-    private fun toLines(vararg points: PointF): FloatArray {
-        return when (points.size) {
-            0 -> FloatArray(0)
-            1 -> FloatArray(2).apply {
-                val point = points.first()
-                this[0] = point.x
-                this[1] = point.y
-            }
-            else -> FloatArray((points.size - 1) * 4).apply {
-                repeat(points.size - 1) {
-                    val start = it * 4
-                    this[start] = points[it].x
-                    this[start + 1] = points[it].y
-                    this[start + 2] = points[it + 1].x
-                    this[start + 3] = points[it + 1].y
-                }
+    private fun toLines(vararg points: PointF) = when (points.size) {
+        0 -> FloatArray(0)
+        1 -> FloatArray(2).apply {
+            val point = points.first()
+            this[0] = point.x
+            this[1] = point.y
+        }
+        else -> FloatArray((points.size - 1) * 4).apply {
+            repeat(points.size - 1) {
+                val start = it * 4
+                this[start] = points[it].x
+                this[start + 1] = points[it].y
+                this[start + 2] = points[it + 1].x
+                this[start + 3] = points[it + 1].y
             }
         }
     }

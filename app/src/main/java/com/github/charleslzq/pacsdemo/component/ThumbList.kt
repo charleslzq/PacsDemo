@@ -6,7 +6,6 @@ import android.content.ClipDescription
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.component.store.ImageActions
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.support.DicomSeriesThumbListAdpater
@@ -75,16 +74,7 @@ class ThumbList(
         getThumbView(position)?.isSelected = selected
     }
 
-    private fun getThumbView(position: Int): ImageView? {
-        val viewHolder = view.findViewHolderForAdapterPosition(position)
-        return viewHolder?.let {
-            if (it is DicomSeriesThumbListAdpater.ViewHolder) {
-                it.thumbView
-            } else {
-                null
-            }
-        }
-    }
+    private fun getThumbView(position: Int) = (view.findViewHolderForAdapterPosition(position) as? DicomSeriesThumbListAdpater.ViewHolder)?.thumbView
 
     companion object {
         val tag = "thumbList"

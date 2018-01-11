@@ -8,10 +8,18 @@ import com.github.charleslzq.dicom.data.DicomStudyMetaInfo
 import com.github.charleslzq.kotlin.react.ObservableStatus
 import com.github.charleslzq.kotlin.react.Store
 import com.github.charleslzq.pacsdemo.support.MiddleWare
+import java.net.URI
 
 
 data class ImageDisplayModel(val images: List<Bitmap> = emptyList())
 data class ImageCanvasModel(val drawing: Bitmap? = null, val tmp: Bitmap? = null, val canUndo: Boolean = false, val canRedo: Boolean = false)
+data class ImageFrameModel(val meta: DicomImageMetaInfo, val frame: URI = meta.let { it.files[DEFAULT] }!!) {
+    companion object {
+        val THUMB = "thumb"
+        val DEFAULT = "default"
+        val RAW = "raw"
+    }
+}
 
 /**
  * Created by charleslzq on 17-11-27.

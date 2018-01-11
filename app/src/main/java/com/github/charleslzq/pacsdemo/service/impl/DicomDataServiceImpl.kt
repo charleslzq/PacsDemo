@@ -20,48 +20,40 @@ class DicomDataServiceImpl(
 ) : Binder(), DicomDataService, RxScheduleSupport {
     private val cache = MemCache(DicomPatient::class.java, 5)
 
-    override fun findPatient(patientId: String): DicomPatient? {
-        return cache.load(patientId) {
-            callOnIo {
-                val patientInStore = dataStore.getPatient(patientId)
-                if (patientInStore == null) {
-                    requirePatients(patientId)
-                }
-                patientInStore
+    override fun findPatient(patientId: String) = cache.load(patientId) {
+        callOnIo {
+            val patientInStore = dataStore.getPatient(patientId)
+            if (patientInStore == null) {
+                requirePatients(patientId)
             }
+            patientInStore
         }
     }
 
-    override fun requirePatients(vararg patientId: String) {
-        runOnIo {
-            val patients = sharedPreferences.getStringSet(DicomDataServiceBackground.PATIENTS, emptySet()).toMutableSet()
-            patients.addAll(patientId)
+    override fun requirePatients(vararg patientId: String) = runOnIo {
+        val patients = sharedPreferences.getStringSet(DicomDataServiceBackground.PATIENTS, emptySet()).toMutableSet()
+        patients.addAll(patientId)
 
-            val editor = sharedPreferences.edit()
-            editor.putStringSet(DicomDataServiceBackground.PATIENTS, patients)
-            editor.apply()
+        val editor = sharedPreferences.edit()
+        editor.putStringSet(DicomDataServiceBackground.PATIENTS, patients)
+        editor.apply()
 
-            messageBroker.requirePatients(*patientId)
-        }
+        messageBroker.requirePatients(*patientId)
     }
 
-    override fun refreshPatient(vararg patientId: String) {
-        runOnIo {
-            dataStore.clearData()
+    override fun refreshPatient(vararg patientId: String) = runOnIo {
+        dataStore.clearData()
 
-            val editor = sharedPreferences.edit()
-            editor.putStringSet(DicomDataServiceBackground.PATIENTS, setOf(*patientId))
-            editor.apply()
+        val editor = sharedPreferences.edit()
+        editor.putStringSet(DicomDataServiceBackground.PATIENTS, setOf(*patientId))
+        editor.apply()
 
-            messageBroker.refreshPatients(*patientId)
-        }
+        messageBroker.refreshPatients(*patientId)
     }
 
-    override fun setUrl(url: String) {
-        runOnIo {
-            val editor = sharedPreferences.edit()
-            editor.putString(DicomDataServiceBackground.WS_URL, url)
-            editor.apply()
-        }
+    override fun setUrl(url: String) = runOnIo {
+        val editor = sharedPreferences.edit()
+        editor.putString(DicomDataServiceBackground.WS_URL, url)
+        editor.apply()
     }
 }

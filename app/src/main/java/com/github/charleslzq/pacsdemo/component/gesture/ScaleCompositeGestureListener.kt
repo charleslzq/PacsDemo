@@ -8,9 +8,7 @@ import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore.ScaleChang
 /**
  * Created by charleslzq on 17-11-29.
  */
-open class ScaleCompositeGestureListener(
-        val dispatch: (Any) -> Unit
-) : NoOpCompositeGestureListener() {
+open class ScaleCompositeGestureListener(val dispatch: (Any) -> Unit) : NoOpCompositeGestureListener() {
 
     override fun onSingleTapConfirmed(motionEvent: MotionEvent): Boolean {
         dispatch(ImageClicked())

@@ -22,10 +22,7 @@ operator fun PointF.div(float: Float) = if (float != 0f) PointF(x / float, y / f
 
 fun PointF.distance(pointF: PointF = PointF(0f, 0f)) = Math.sqrt((this - pointF).let { it * it }.toDouble())
 
-class MeasureModeGestureListener(
-        private val measure: ImageFrameStore.Measure,
-        dispatch: (Any) -> Unit
-) : ScaleCompositeGestureListener(dispatch) {
+class MeasureModeGestureListener(private val measure: ImageFrameStore.Measure, dispatch: (Any) -> Unit) : ScaleCompositeGestureListener(dispatch) {
     private val points = Stack<PointF>()
     private val lengthThreshold = 5f
     private val precision = 2

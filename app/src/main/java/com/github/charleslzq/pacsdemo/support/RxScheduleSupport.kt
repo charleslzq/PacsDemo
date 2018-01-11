@@ -8,21 +8,13 @@ import io.reactivex.schedulers.Schedulers
  * Created by charleslzq on 17-12-22.
  */
 interface RxScheduleSupport {
-    fun <T> callOnIo(callable: () -> T): T {
-        return callOn(Schedulers.io(), callable)
-    }
+    fun <T> callOnIo(callable: () -> T) = callOn(Schedulers.io(), callable)
 
-    fun runOnIo(runnable: () -> Unit) {
-        runOn(Schedulers.io(), runnable)
-    }
+    fun runOnIo(runnable: () -> Unit) = runOn(Schedulers.io(), runnable)
 
-    fun <T> callOnCompute(callable: () -> T): T {
-        return callOn(Schedulers.computation(), callable)
-    }
+    fun <T> callOnCompute(callable: () -> T) = callOn(Schedulers.computation(), callable)
 
-    fun runOnCompute(runnable: () -> Unit) {
-        runOn(Schedulers.computation(), runnable)
-    }
+    fun runOnCompute(runnable: () -> Unit) = runOn(Schedulers.computation(), runnable)
 
     fun <T> callOn(scheduler: Scheduler = Schedulers.trampoline(), callable: () -> T): T {
         return Observable.just(1).observeOn(scheduler).map { callable() }.blockingSingle()

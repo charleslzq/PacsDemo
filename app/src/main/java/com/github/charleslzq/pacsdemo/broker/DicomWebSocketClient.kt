@@ -26,20 +26,14 @@ class DicomWebSocketClient(
     private val logTag = this.javaClass.name
     private val heartBeat = "@heart"
 
-    fun connect() {
-        runOnIo {
-            AsyncHttpClient.getDefaultInstance().websocket(url, "dicom", this::onComplete)
-        }
+    fun connect() = runOnIo {
+        AsyncHttpClient.getDefaultInstance().websocket(url, "dicom", this::onComplete)
     }
 
-    fun isOpen(): Boolean {
-        return webSocket?.isOpen ?: false
-    }
+    fun isOpen() = webSocket?.isOpen ?: false
 
-    fun send(message: String) {
-        runOnIo {
-            webSocket?.send(message)
-        }
+    fun send(message: String) = runOnIo {
+        webSocket?.send(message)
     }
 
     private fun onComplete(ex: Exception?, webSocket: WebSocket?) {
@@ -56,11 +50,8 @@ class DicomWebSocketClient(
 
     private fun onMessage(message: String?) {
         if (message != null && message != heartBeat) {
-            val anyMessage = gson.fromJson<Message<Any>>(message, Message::class.java)
-            val headers = anyMessage.headers
-            val type = headers[MessageHeaders.TYPE_HEADER.value]
-            if (type != null) {
-                when (ServerMessagePayloadType.valueOf(type)) {
+            gson.fromJson<Message<Any>>(message, Message::class.java).headers[MessageHeaders.TYPE_HEADER.value]?.let {
+                when (ServerMessagePayloadType.valueOf(it)) {
                     ServerMessagePayloadType.PATIENT -> {
                         val patientMessage = gson.fromJson<Message<DicomPatient>>(message, object : TypeToken<Message<DicomPatient>>() {
                         }.type)

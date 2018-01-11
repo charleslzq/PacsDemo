@@ -124,84 +124,72 @@ class DicomImage(
         }
     }
 
-    private fun getCurrentImage(): Bitmap? {
-        return if (store.displayModel.images.isNotEmpty()) {
-            callOnCompute {
-                scaleIfNecessary(pseudoIfRequired(store.displayModel.images[0])).let { it.copy(it.config, true) }
-            }
-        } else {
-            null
+    private fun getCurrentImage() = if (store.displayModel.images.isNotEmpty()) {
+        callOnCompute {
+            scaleIfNecessary(pseudoIfRequired(store.displayModel.images[0])).let { it.copy(it.config, true) }
         }
+    } else {
+        null
     }
 
-    private fun scaleIfNecessary(rawBitmap: Bitmap): Bitmap {
-        return if (store.scale != 1.0f) {
-            val newWidth = (rawBitmap.width * store.scale).toInt()
-            val newHeight = (rawBitmap.height * store.scale).toInt()
-            Bitmap.createScaledBitmap(rawBitmap, newWidth, newHeight, false)
-        } else {
-            rawBitmap
+    private fun scaleIfNecessary(rawBitmap: Bitmap) = if (store.scale != 1.0f) {
+        val newWidth = (rawBitmap.width * store.scale).toInt()
+        val newHeight = (rawBitmap.height * store.scale).toInt()
+        Bitmap.createScaledBitmap(rawBitmap, newWidth, newHeight, false)
+    } else {
+        rawBitmap
+    }
+
+    private fun pseudoIfRequired(rawBitmap: Bitmap) = if (store.pseudoColor) {
+        val pixels = IntArray(rawBitmap.height * rawBitmap.width)
+        rawBitmap.getPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
+        repeat(pixels.size) {
+            pixels[it] = calculateColor(pixels[it])
         }
-    }
-
-    private fun pseudoIfRequired(rawBitmap: Bitmap): Bitmap {
-        return if (store.pseudoColor) {
-            val pixels = IntArray(rawBitmap.height * rawBitmap.width)
-            rawBitmap.getPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
-            repeat(pixels.size) {
-                pixels[it] = calculateColor(pixels[it])
-            }
-            Bitmap.createBitmap(rawBitmap.width, rawBitmap.height, rawBitmap.config).apply {
-                setPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
-            }
-        } else {
-            rawBitmap
+        Bitmap.createBitmap(rawBitmap.width, rawBitmap.height, rawBitmap.config).apply {
+            setPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
         }
+    } else {
+        rawBitmap
     }
 
-    private fun calculateColor(color: Int): Int {
-        return getPseudoColor((Color.red(color) + Color.green(color) + Color.blue(color) + Color.alpha(color)) / 4)
+    private fun calculateColor(color: Int) = getPseudoColor((Color.red(color) + Color.green(color) + Color.blue(color) + Color.alpha(color)) / 4)
+
+    private fun getPseudoColor(greyValue: Int) = when (greyValue) {
+        in (0..31) -> Color.rgb(
+                0,
+                (255 * greyValue / 32.0).toInt(),
+                (255 * greyValue / 32.0).toInt())
+        in (32..63) -> Color.rgb(
+                0,
+                255,
+                255)
+        in (64..95) -> Color.rgb(
+                0,
+                (255 * (96 - greyValue) / 32.0).toInt(),
+                (255 * (96 - greyValue) / 32.0).toInt())
+        in (96..127) -> Color.rgb((
+                255 * (greyValue - 96) / 64.0).toInt(),
+                (255 * (greyValue - 96) / 32.0).toInt(),
+                (255 * (greyValue - 96) / 32.0).toInt())
+        in (128..191) -> Color.rgb(
+                (255 * (greyValue - 128) / 128.0 + 128).toInt(),
+                0,
+                0)
+        in (192..255) -> Color.rgb(
+                255,
+                (255 * (greyValue - 192) / 63.0).toInt(),
+                (255 * (greyValue - 192) / 63.0).toInt())
+        else -> throw IllegalArgumentException("$greyValue not in (0..255)")
     }
 
-    private fun getPseudoColor(greyValue: Int): Int {
-        return when (greyValue) {
-            in (0..31) -> Color.rgb(
-                    0,
-                    (255 * greyValue / 32.0).toInt(),
-                    (255 * greyValue / 32.0).toInt())
-            in (32..63) -> Color.rgb(
-                    0,
-                    255,
-                    255)
-            in (64..95) -> Color.rgb(
-                    0,
-                    (255 * (96 - greyValue) / 32.0).toInt(),
-                    (255 * (96 - greyValue) / 32.0).toInt())
-            in (96..127) -> Color.rgb((
-                    255 * (greyValue - 96) / 64.0).toInt(),
-                    (255 * (greyValue - 96) / 32.0).toInt(),
-                    (255 * (greyValue - 96) / 32.0).toInt())
-            in (128..191) -> Color.rgb(
-                    (255 * (greyValue - 128) / 128.0 + 128).toInt(),
-                    0,
-                    0)
-            in (192..255) -> Color.rgb(
-                    255,
-                    (255 * (greyValue - 192) / 63.0).toInt(),
-                    (255 * (greyValue - 192) / 63.0).toInt())
-            else -> throw IllegalArgumentException("$greyValue not in (0..255)")
-        }
-    }
-
-    private fun getAnimation(resources: Resources): IndexAwareAnimationDrawable {
-        val animation = IndexAwareAnimationDrawable(store.dispatch, store.autoJumpIndex)
-        animation.isOneShot = true
+    private fun getAnimation(resources: Resources) = IndexAwareAnimationDrawable(store.dispatch, store.autoJumpIndex).apply {
+        isOneShot = true
         store.displayModel.images
                 .map { BitmapDrawable(resources, it).apply { colorFilter = ColorMatrixColorFilter(store.colorMatrix) } }
-                .forEach { animation.addFrame(it, store.duration) }
-        animation.selectDrawable(0)
-        animation.callback = null
-        return animation
+                .forEach { addFrame(it, store.duration) }
+        selectDrawable(0)
+        callback = null
     }
 
     companion object {

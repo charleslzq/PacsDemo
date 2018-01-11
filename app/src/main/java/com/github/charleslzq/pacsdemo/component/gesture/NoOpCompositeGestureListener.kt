@@ -10,17 +10,11 @@ import android.view.View
  */
 open class NoOpCompositeGestureListener : GestureDetector.SimpleOnGestureListener(), ScaleGestureDetector.OnScaleGestureListener {
 
-    override fun onScaleBegin(scaleGestureDetector: ScaleGestureDetector): Boolean {
-        return false
-    }
+    override fun onScaleBegin(scaleGestureDetector: ScaleGestureDetector) = false
 
-    override fun onScaleEnd(scaleGestureDetector: ScaleGestureDetector) {
+    override fun onScaleEnd(scaleGestureDetector: ScaleGestureDetector) {}
 
-    }
-
-    override fun onScale(scaleGestureDetector: ScaleGestureDetector): Boolean {
-        return false
-    }
+    override fun onScale(scaleGestureDetector: ScaleGestureDetector) = false
 
     open fun onOtherGesture(view: View, motionEvent: MotionEvent) = false
 }

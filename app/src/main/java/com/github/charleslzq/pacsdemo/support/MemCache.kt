@@ -24,7 +24,5 @@ class MemCache<T>(
         }
     }
 
-    fun clear() {
-        cache.evictAll()
-    }
+    fun clear() = cache.evictAll()
 }

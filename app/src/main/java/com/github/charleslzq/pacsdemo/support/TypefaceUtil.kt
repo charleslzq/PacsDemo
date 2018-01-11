@@ -17,7 +17,5 @@ object TypefaceUtil {
         return registry[path]!!
     }
 
-    private fun load(context: Context, path: String) {
-        registry.put(path, Typeface.createFromAsset(context.assets, path))
-    }
+    private fun load(context: Context, path: String) = registry.put(path, Typeface.createFromAsset(context.assets, path))
 }

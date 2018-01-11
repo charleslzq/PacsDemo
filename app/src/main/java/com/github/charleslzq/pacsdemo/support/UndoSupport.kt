@@ -24,36 +24,28 @@ class UndoSupport<T> {
 
     fun canRedo() = canceledStack.isNotEmpty()
 
-    fun done(data: T) {
-        doneStack.push(data)
-    }
+    fun done(data: T) = doneStack.push(data)
 
-    fun undo(): T? {
-        return if (canUndo()) {
-            canceledStack.push(doneStack.pop())
-            if (doneStack.isNotEmpty()) {
-                doneStack.peek()
-            } else {
-                null
-            }
-        } else {
-            null
-        }
-    }
-
-    fun redo(): T? {
-        return if (canRedo()) {
-            canceledStack.pop().also { done(it) }
-        } else {
-            null
-        }
-    }
-
-    fun generate(initialValue: () -> T, generator: (T) -> T): T {
-        return generator(if (doneStack.isEmpty()) {
-            initialValue()
-        } else {
+    fun undo() = if (canUndo()) {
+        canceledStack.push(doneStack.pop())
+        if (doneStack.isNotEmpty()) {
             doneStack.peek()
-        }).also { done(it) }
+        } else {
+            null
+        }
+    } else {
+        null
     }
+
+    fun redo() = if (canRedo()) {
+        canceledStack.pop().also { done(it) }
+    } else {
+        null
+    }
+
+    fun generate(initialValue: () -> T, generator: (T) -> T) = generator(if (doneStack.isEmpty()) {
+        initialValue()
+    } else {
+        doneStack.peek()
+    }).also { done(it) }
 }

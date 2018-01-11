@@ -27,9 +27,7 @@ class DicomDataServiceBackground : Service(), RxScheduleSupport {
     private lateinit var patients: Set<String>
     private lateinit var wsUrl: String
 
-    override fun onBind(intent: Intent): IBinder? {
-        return DicomDataServiceImpl(messageBroker, dataStore, sharedPreferences)
-    }
+    override fun onBind(intent: Intent): IBinder? = DicomDataServiceImpl(messageBroker, dataStore, sharedPreferences)
 
     override fun onCreate() {
         super.onCreate()

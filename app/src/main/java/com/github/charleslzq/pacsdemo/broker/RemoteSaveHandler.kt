@@ -19,7 +19,5 @@ class RemoteSaveHandler(
         return imageMap.map { it.key to newUri(path, it.value) }.toMap()
     }
 
-    private fun newUri(imageDir: String, uri: URI): URI {
-        return File(imageDir + File.separator + File(uri).name).toURI()
-    }
+    private fun newUri(imageDir: String, uri: URI) = File(imageDir + File.separator + File(uri).name).toURI()
 }

@@ -1,5 +1,6 @@
 package com.github.charleslzq.pacsdemo.component.store
 
+import android.graphics.Bitmap
 import com.github.charleslzq.kotlin.react.ObservableStatus
 import com.github.charleslzq.kotlin.react.Store
 import com.github.charleslzq.pacsdemo.support.MiddleWare
@@ -8,6 +9,8 @@ import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 /**
  * Created by charleslzq on 17-11-27.
  */
+data class ImageThumbModel(val modId: String, val thumb: Bitmap)
+
 class PacsStore : Store<PacsStore>(MiddleWare.debugLog, buildThunk<PacsStore>()), RxScheduleSupport {
     var thumbList by ObservableStatus(mutableListOf<ImageThumbModel>())
         private set
