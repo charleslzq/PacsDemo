@@ -51,6 +51,7 @@ object ImageActions : RxScheduleSupport {
         if (store.layoutOption != layoutOption) {
             dispatch(PacsStore.ChangeLayout(layoutOption.ordinal))
             store.imageCells.forEach {
+                cleanMeasure(it, it.dispatch)
                 it.dispatch(Reset())
                 it.dispatch(
                         if (layoutOption == PacsStore.LayoutOption.ONE_ONE) {
