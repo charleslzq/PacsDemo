@@ -79,7 +79,7 @@ class DicomImage(
         render(property = ImageFrameStore::measure, require = { store.hasImage }) {
             operationMode = when (store.measure != ImageFrameStore.Measure.NONE) {
                 true -> {
-                    MeasureMode(imageView.context, MeasureModeGestureListener(store.measure, store.dispatch))
+                    MeasureMode(imageView.context, MeasureModeGestureListener(store.dispatch))
                 }
                 false -> {
                     if (store.gestureScale > 1.0f) {
