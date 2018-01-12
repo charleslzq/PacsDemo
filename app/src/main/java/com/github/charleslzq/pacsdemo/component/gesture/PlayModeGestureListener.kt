@@ -1,7 +1,7 @@
 package com.github.charleslzq.pacsdemo.component.gesture
 
 import android.view.MotionEvent
-import com.github.charleslzq.pacsdemo.component.store.ImageActions
+import com.github.charleslzq.pacsdemo.component.store.ImageDisplayActions
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -10,7 +10,7 @@ class PlayModeGestureListener(dispatch: (Any) -> Unit, private val onDragStart: 
 
     override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
         if (Math.abs(distanceX) > 3 * Math.abs(distanceY)) {
-            dispatch(ImageActions.indexScroll(distanceX))
+            dispatch(ImageDisplayActions.indexScroll(distanceX))
         }
         return true
     }
@@ -18,7 +18,7 @@ class PlayModeGestureListener(dispatch: (Any) -> Unit, private val onDragStart: 
     override fun onLongPress(e: MotionEvent) = onDragStart()
 
     override fun onDoubleTap(motionEvent: MotionEvent?): Boolean {
-        dispatch(ImageActions.resetDisplay())
+        dispatch(ImageDisplayActions.resetDisplay())
         return true
     }
 }

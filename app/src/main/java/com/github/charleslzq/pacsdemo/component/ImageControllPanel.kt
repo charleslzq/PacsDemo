@@ -6,9 +6,10 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import com.github.charleslzq.kotlin.react.Component
 import com.github.charleslzq.pacsdemo.R
-import com.github.charleslzq.pacsdemo.component.store.ImageActions
+import com.github.charleslzq.pacsdemo.component.store.ImageDisplayActions
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore.*
+import com.github.charleslzq.pacsdemo.component.store.ImageMeasureActions
 import com.github.charleslzq.pacsdemo.support.TypefaceUtil
 
 /**
@@ -72,35 +73,35 @@ class ImageControllPanel(
         }
 
         undo.setOnClickListener {
-            dispatch(ImageActions.undoDrawing())
+            dispatch(ImageMeasureActions.undoDrawing())
         }
 
         redo.setOnClickListener {
-            dispatch(ImageActions.redoDrawing())
+            dispatch(ImageMeasureActions.redoDrawing())
         }
 
         clear.setOnClickListener {
-            dispatch(ImageActions.clearDrawing())
+            dispatch(ImageMeasureActions.clearDrawing())
         }
 
         first.setOnClickListener {
-            dispatch(ImageActions.showImage(0))
+            dispatch(ImageDisplayActions.showImage(0))
         }
 
         previous.setOnClickListener {
-            dispatch(ImageActions.showImage(store.index - 1))
+            dispatch(ImageDisplayActions.showImage(store.index - 1))
         }
 
         play.setOnClickListener {
-            dispatch(ImageActions.playOrPause())
+            dispatch(ImageDisplayActions.playOrPause())
         }
 
         next.setOnClickListener {
-            dispatch(ImageActions.showImage(store.index + 1))
+            dispatch(ImageDisplayActions.showImage(store.index + 1))
         }
 
         last.setOnClickListener {
-            dispatch(ImageActions.showImage(store.size - 1))
+            dispatch(ImageDisplayActions.showImage(store.size - 1))
         }
 
         render(store::measure) {
@@ -124,7 +125,7 @@ class ImageControllPanel(
                 imageSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                         if (fromUser) {
-                            dispatch(ImageActions.showImage(progress))
+                            dispatch(ImageDisplayActions.showImage(progress))
                         }
                     }
 

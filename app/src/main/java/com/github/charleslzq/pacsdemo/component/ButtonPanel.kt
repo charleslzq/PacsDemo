@@ -6,7 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.PopupMenu
 import com.github.charleslzq.pacsdemo.R
-import com.github.charleslzq.pacsdemo.component.store.ImageActions
+import com.github.charleslzq.pacsdemo.component.store.ImageDisplayActions
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.support.TypefaceUtil
 
@@ -44,7 +44,7 @@ class ButtonPanel(
 
     private fun onLayoutSelected(item: MenuItem): Boolean {
         layoutMap[item.itemId]?.let {
-            store.dispatch(ImageActions.changeLayout(it))
+            store.dispatch(ImageDisplayActions.changeLayout(it))
         }
         return true
     }

@@ -11,7 +11,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.github.charleslzq.dicom.data.DicomStudy
 import com.github.charleslzq.pacsdemo.component.PacsMain
-import com.github.charleslzq.pacsdemo.component.store.ImageActions
+import com.github.charleslzq.pacsdemo.component.store.ImageDisplayActions
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameModel
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
@@ -99,16 +99,16 @@ class PacsDemoActivity : AppCompatActivity(), RxScheduleSupport {
         }.subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation())
                 .subscribe {
-                    pacs.store.dispatch(ImageActions.reloadModels(it))
+                    pacs.store.dispatch(ImageDisplayActions.reloadModels(it))
                     if (seriesId != null) {
                         it.indices.find { index -> it[index].seriesMetaInfo.instanceUID == seriesId }?.let { index ->
                             pacs.store.dispatch(PacsStore.ThumbListItemClicked(index))
                             val imageOrder = imageNum?.run { toInt() } ?: 1
-                            pacs.store.firstCell.dispatch(ImageActions.bindModel(it[index].modId, imageOrder))
+                            pacs.store.firstCell.dispatch(ImageDisplayActions.bindModel(it[index].modId, imageOrder))
                         }
                     } else if (it.isNotEmpty()) {
                         pacs.store.dispatch(PacsStore.ThumbListItemClicked(0))
-                        pacs.store.firstCell.dispatch(ImageActions.bindModel(it[0].modId, 0))
+                        pacs.store.firstCell.dispatch(ImageDisplayActions.bindModel(it[0].modId, 0))
                     }
                 }
     }

@@ -8,7 +8,9 @@ import com.github.charleslzq.dicom.data.DicomStudyMetaInfo
 import com.github.charleslzq.kotlin.react.ObservableStatus
 import com.github.charleslzq.kotlin.react.Store
 import com.github.charleslzq.pacsdemo.support.MiddleWare
+import com.github.charleslzq.pacsdemo.support.UndoSupport
 import java.net.URI
+import java.util.*
 
 
 data class ImageDisplayModel(val images: List<Bitmap> = emptyList())
@@ -24,7 +26,9 @@ data class ImageFrameModel(val meta: DicomImageMetaInfo, val frame: URI = meta.l
 /**
  * Created by charleslzq on 17-11-27.
  */
-class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(MiddleWare.debugLog, buildThunk<ImageFrameStore>()) {
+class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
+        MiddleWare.debugLog,
+        buildThunk<ImageFrameStore>(UndoSupport<Bitmap>(), Stack<PointF>())) {
     var linePaint = Paint()
     var stringPaint = Paint()
     var pointPaint = Paint()

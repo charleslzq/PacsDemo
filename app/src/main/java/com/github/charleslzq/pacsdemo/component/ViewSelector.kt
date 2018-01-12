@@ -8,7 +8,7 @@ import android.widget.LinearLayout
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.ViewFlipper
-import com.github.charleslzq.pacsdemo.component.store.ImageActions
+import com.github.charleslzq.pacsdemo.component.store.ImageDisplayActions
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.support.ViewUtils
 
@@ -27,9 +27,9 @@ class ViewSelector(
         override fun onFling(startEvent: MotionEvent, endEvent: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
             if (Math.abs(startEvent.x - endEvent.x) >= 3 * Math.abs(startEvent.y - endEvent.y)) {
                 if (endEvent.x > startEvent.x) {
-                    store.dispatch(ImageActions.changeLayout(store.layoutOption.ordinal - 1))
+                    store.dispatch(ImageDisplayActions.changeLayout(store.layoutOption.ordinal - 1))
                 } else {
-                    store.dispatch(ImageActions.changeLayout(store.layoutOption.ordinal + 1))
+                    store.dispatch(ImageDisplayActions.changeLayout(store.layoutOption.ordinal + 1))
                 }
             }
             return true

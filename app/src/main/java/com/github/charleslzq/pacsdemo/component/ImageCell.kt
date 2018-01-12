@@ -4,7 +4,7 @@ import android.view.DragEvent
 import android.view.View
 import com.github.charleslzq.kotlin.react.Component
 import com.github.charleslzq.pacsdemo.R
-import com.github.charleslzq.pacsdemo.component.store.ImageActions
+import com.github.charleslzq.pacsdemo.component.store.ImageDisplayActions
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
 
 /**
@@ -30,12 +30,12 @@ class ImageCell(
                     if (tag == DicomImage.tag) {
                         (dragEvent.localState as? ImageFrameStore)?.let {
                             if (it.layoutPosition != imageFrameStore.layoutPosition) {
-                                store.dispatch(ImageActions.moveFrame(it))
+                                store.dispatch(ImageDisplayActions.moveFrame(it))
                             }
                         }
                     } else if (tag == ThumbList.tag) {
                         (dragEvent.localState as? String)?.let {
-                            store.dispatch(ImageActions.bindModel(it))
+                            store.dispatch(ImageDisplayActions.bindModel(it))
                         }
                     }
                 }

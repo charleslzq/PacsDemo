@@ -6,7 +6,7 @@ import android.content.ClipDescription
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import com.github.charleslzq.pacsdemo.component.store.ImageActions
+import com.github.charleslzq.pacsdemo.component.store.ImageDisplayActions
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.support.DicomSeriesThumbListAdpater
 
@@ -34,7 +34,7 @@ class ThumbList(
                     override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
                         if (store.layoutOption == PacsStore.LayoutOption.ONE_ONE && position in 0 until store.thumbList.size) {
                             store.dispatch(PacsStore.ThumbListItemClicked(position))
-                            store.imageCells.first().dispatch(ImageActions.bindModel(getModId(position)))
+                            store.imageCells.first().dispatch(ImageDisplayActions.bindModel(getModId(position)))
                         }
                     }
                 })
