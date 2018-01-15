@@ -79,16 +79,24 @@ object ImageDisplayActions : RxScheduleSupport {
 
     fun moveFrame(imageFrameStore: ImageFrameStore): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
         runOnCompute {
-            dispatch(ImageFrameStore.Reset())
-            store.dispatch(bindModel(imageFrameStore.bindModId, imageFrameStore.index))
-            if (imageFrameStore.reverseColor) {
-                dispatch(ImageFrameStore.ReverseColor())
+            store.dispatch(ImageMeasureActions.clearDrawing())
+            seriesModels.find { it.modId == imageFrameStore.bindModId }!!.let {
+                findImage(it, imageFrameStore.index)!!.run {
+                    store.dispatch(ImageFrameStore.MoveModel(
+                            it.modId,
+                            it.patientMetaInfo,
+                            it.studyMetaInfo,
+                            it.seriesMetaInfo,
+                            it.frames.size,
+                            this,
+                            imageFrameStore.index,
+                            it.frames[imageFrameStore.index].meta,
+                            imageFrameStore.reverseColor,
+                            imageFrameStore.pseudoColor,
+                            imageFrameStore.canvasModel
+                    ))
+                }
             }
-            if (imageFrameStore.pseudoColor) {
-                dispatch(ImageFrameStore.PseudoColor())
-            }
-            dispatch(imageFrameStore.canvasModel)
-            store.dispatch(ImageMeasureActions.moveStack(imageFrameStore))
 
             imageFrameStore.dispatch(ImageFrameStore.Reset())
         }
@@ -97,6 +105,7 @@ object ImageDisplayActions : RxScheduleSupport {
     fun playOrPause(): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
         if (store.playable) {
             runOnIo {
+                store.dispatch(ImageMeasureActions.clearDrawing())
                 if (store.displayModel.images.size > 1 && store.autoJumpIndex != 0) {
                     dispatchShowImage(store.bindModId, store.index, dispatch)
                 } else {
@@ -125,6 +134,7 @@ object ImageDisplayActions : RxScheduleSupport {
     fun indexScroll(scrollDistance: Float): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
         runOnIo {
             if (store.size > 0) {
+                store.dispatch(ImageMeasureActions.clearDrawing())
                 val changeBase = Math.min(300f / store.size, 10f)
                 val offset = (scrollDistance / changeBase).toInt()
                 val newIndex = Math.min(Math.max(store.index - offset, 0), store.size - 1)

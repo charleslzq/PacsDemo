@@ -105,58 +105,61 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
 
         reduce(ImageFrameStore::hideMeta) {
             on<ImageClicked> { !state }
-            on<BindModel>(require = { it.size > 0 }) { false }
+            on<BindModel> { event.size == 0 }
+            on<MoveModel> { event.size == 0 }
             on<ResetDisplay> { false }
             on<Reset> { true }
         }
 
         reduce(ImageFrameStore::bindModId) {
             on<BindModel> { event.modeId }
+            on<MoveModel> { event.modeId }
             on<Reset> { "" }
         }
 
         reduce(ImageFrameStore::size) {
             on<BindModel> { event.size }
+            on<MoveModel> { event.size }
             on<Reset> { 0 }
         }
 
         reduce(ImageFrameStore::patientMeta) {
             on<BindModel> { event.patient }
+            on<MoveModel> { event.patient }
             on<Reset> { DicomPatientMetaInfo() }
         }
 
         reduce(ImageFrameStore::studyMeta) {
             on<BindModel> { event.study }
+            on<MoveModel> { event.study }
             on<Reset> { DicomStudyMetaInfo() }
         }
 
         reduce(ImageFrameStore::seriesMeta) {
             on<BindModel> { event.series }
+            on<MoveModel> { event.series }
             on<Reset> { DicomSeriesMetaInfo() }
         }
 
         reduce(ImageFrameStore::imageMeta) {
             on<ShowImage> { event.meta }
+            on<MoveModel> { event.meta }
             on<PlayIndexChange> { event.meta }
             on<Reset> { DicomImageMetaInfo() }
         }
 
         reduce(ImageFrameStore::index) {
             on<ShowImage> { event.index }
+            on<MoveModel> { event.index }
             on<PlayIndexChange> { event.index }
             on<Reset> { 0 }
         }
 
         reduce(ImageFrameStore::displayModel) {
-            on<ShowImage> {
-                ImageDisplayModel(listOf(event.bitmap))
-            }
-            on<PlayAnimation> {
-                ImageDisplayModel(event.images)
-            }
-            on<Reset> {
-                ImageDisplayModel()
-            }
+            on<ShowImage> { ImageDisplayModel(listOf(event.bitmap)) }
+            on<MoveModel> { ImageDisplayModel(listOf(event.bitmap)) }
+            on<PlayAnimation> { ImageDisplayModel(event.images) }
+            on<Reset> { ImageDisplayModel() }
         }
 
         reduce(ImageFrameStore::gestureScale) {
@@ -166,6 +169,10 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             on<StudyModeReset> {
                 1.0f
             }
+            on<BindModel> {
+                1.0f
+            }
+            on<MoveModel> { 1.0f }
         }
 
         reduce(ImageFrameStore::matrix) {
@@ -181,6 +188,10 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             on<Reset> {
                 Matrix()
             }
+            on<BindModel> {
+                Matrix()
+            }
+            on<MoveModel> { Matrix() }
         }
 
         reduce(ImageFrameStore::reverseColor) {
@@ -196,6 +207,10 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             on<Reset> {
                 false
             }
+            on<BindModel> {
+                false
+            }
+            on<MoveModel> { event.reverseColor }
         }
 
         reduce(ImageFrameStore::colorMatrix) {
@@ -213,6 +228,16 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             on<Reset> {
                 ColorMatrix()
             }
+            on<BindModel> {
+                ColorMatrix()
+            }
+            on<MoveModel> {
+                ColorMatrix().apply {
+                    if (event.reverseColor) {
+                        postConcat(reverseMatrix)
+                    }
+                }
+            }
         }
 
         reduce(ImageFrameStore::pseudoColor) {
@@ -228,6 +253,10 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             on<Reset> {
                 false
             }
+            on<BindModel> {
+                false
+            }
+            on<MoveModel> { event.pseudoColor }
         }
 
         reduce(ImageFrameStore::measure) {
@@ -245,6 +274,10 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             }
             on<ResetMeasure> { Measure.NONE }
             on<Reset> { Measure.NONE }
+            on<BindModel> {
+                Measure.NONE
+            }
+            on<MoveModel> { Measure.NONE }
         }
 
         reduce(ImageFrameStore::canvasModel) {
@@ -252,6 +285,8 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             on<DrawLines> { state.copy(tmp = event.tmp, canUndo = event.canUndo) }
             on<ResetMeasure> { ImageCanvasModel() }
             on<Reset> { ImageCanvasModel() }
+            on<BindModel> { ImageCanvasModel() }
+            on<MoveModel> { event.canvasModel }
             on<ClearMeasure> { ImageCanvasModel() }
         }
     }
@@ -266,6 +301,18 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
                          val study: DicomStudyMetaInfo,
                          val series: DicomSeriesMetaInfo,
                          val size: Int)
+
+    data class MoveModel(val modeId: String,
+                         val patient: DicomPatientMetaInfo,
+                         val study: DicomStudyMetaInfo,
+                         val series: DicomSeriesMetaInfo,
+                         val size: Int,
+                         val bitmap: Bitmap,
+                         val index: Int,
+                         val meta: DicomImageMetaInfo,
+                         val reverseColor: Boolean,
+                         val pseudoColor: Boolean,
+                         val canvasModel: ImageCanvasModel)
 
     data class ShowImage(val bitmap: Bitmap, val index: Int, val meta: DicomImageMetaInfo)
     data class PlayAnimation(val images: List<Bitmap>)
