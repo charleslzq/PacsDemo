@@ -25,10 +25,6 @@ operator fun PointF.div(float: Float) = if (float != 0f) PointF(x / float, y / f
 
 fun PointF.distance(pointF: PointF = PointF(0f, 0f)) = Math.sqrt((this - pointF).let { it * it }.toDouble())
 
-class ValueHolder<T> {
-    var value: T? = null
-}
-
 object ImageMeasureActions : RxScheduleSupport {
     private val precision = 2
 
@@ -89,24 +85,19 @@ object ImageMeasureActions : RxScheduleSupport {
         }
     }
 
-    fun moveStack(imageFrameStore: ImageFrameStore) = buildAction {
-        val undoSupportHolder = ValueHolder<UndoSupport<Bitmap>>()
-        val pointsHolder = ValueHolder<Stack<PointF>>()
-        imageFrameStore.dispatch(getArgs(undoSupportHolder, pointsHolder))
-        undoSupportHolder.value!!.let {
-            undoSupport.copyFrom(it)
-            it.reset()
-        }
-        pointsHolder.value!!.let {
-            points.clear()
-            it.forEach { points.push(it) }
-            it.clear()
-        }
+    fun moveStackFrom(imageFrameStore: ImageFrameStore) = buildAction {
+        undoSupport.reset()
+        points.clear()
+
+        imageFrameStore.dispatch(moveStackTo(undoSupport, points))
     }
 
-    private fun getArgs(undoSupportHolder: ValueHolder<UndoSupport<Bitmap>>, pointsHolder: ValueHolder<Stack<PointF>>) = buildAction {
-        undoSupportHolder.value = undoSupport
-        pointsHolder.value = points
+    private fun moveStackTo(targetUndoSupport: UndoSupport<Bitmap>, targetPoints: Stack<PointF>) = buildAction {
+        targetUndoSupport.copyFrom(undoSupport)
+        points.forEach { targetPoints.push(it) }
+
+        undoSupport.reset()
+        points.clear()
     }
 
     private fun createDrawingBase(store: ImageFrameStore) = getCurrentImage(store)?.let { Bitmap.createBitmap(it.width, it.height, it.config) }
@@ -170,7 +161,11 @@ object ImageMeasureActions : RxScheduleSupport {
     }
 
     private fun calculateAngleText(points: Stack<PointF>, store: ImageFrameStore, width: Int, height: Int): Pair<PointF, String> {
-        val text = calculateAngle(points[0], points[1], points[2]) format precision
+        val text = buildString {
+            append("∠")
+            append(calculateAngle(points[0], points[1], points[2]) format precision)
+            append("°")
+        }
         val rawLocation = points[1]
         return Rect().let {
             store.stringPaint.getTextBounds(text, 0, text.length, it)
