@@ -19,8 +19,8 @@ class PlayMode(
         private val gestureDetector: GestureDetector = GestureDetector(context, playModeGestureListener),
         private val scaleGestureDetector: ScaleGestureDetector = ScaleGestureDetector(context, playModeGestureListener))
     : OperationMode(
-        { _, motionEvent -> scaleGestureDetector.onTouchEvent(motionEvent) },
-        { _, motionEvent -> gestureDetector.onTouchEvent(motionEvent) }
+        { _, motionEvent -> gestureDetector.onTouchEvent(motionEvent) },
+        { _, motionEvent -> scaleGestureDetector.onTouchEvent(motionEvent) }
 )
 
 class StudyMode(
@@ -29,8 +29,8 @@ class StudyMode(
         private val gestureDetector: GestureDetector = GestureDetector(context, studyModeGestureListener),
         private val scaleGestureDetector: ScaleGestureDetector = ScaleGestureDetector(context, studyModeGestureListener))
     : OperationMode(
-        { _, motionEvent -> scaleGestureDetector.onTouchEvent(motionEvent) },
-        { _, motionEvent -> gestureDetector.onTouchEvent(motionEvent) }
+        { _, motionEvent -> gestureDetector.onTouchEvent(motionEvent) },
+        { _, motionEvent -> scaleGestureDetector.onTouchEvent(motionEvent) }
 )
 
 class MeasureMode(
@@ -40,6 +40,6 @@ class MeasureMode(
         private val scaleGestureDetector: ScaleGestureDetector = ScaleGestureDetector(context, measureModeGestureListener))
     : OperationMode(
         measureModeGestureListener::onOtherGesture,
-        { _, motionEvent -> scaleGestureDetector.onTouchEvent(motionEvent) },
-        { _, motionEvent -> gestureDetector.onTouchEvent(motionEvent) }
+        { _, motionEvent -> gestureDetector.onTouchEvent(motionEvent) },
+        { _, motionEvent -> scaleGestureDetector.onTouchEvent(motionEvent) }
 )

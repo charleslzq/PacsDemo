@@ -179,7 +179,12 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             on<ScaleChange> {
                 Matrix(state).apply {
                     val newScale = getNewScaleFactor(event.scaleFactor)
-                    setScale(newScale, newScale)
+                    setScale(newScale, newScale, event.focus.x, event.focus.y)
+                }
+            }
+            on<LocationTranslate> {
+                Matrix(state).apply {
+                    postTranslate(event.distanceX, event.distanceY)
                 }
             }
             on<StudyModeReset> {
@@ -329,7 +334,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     class ReverseColor
     class PseudoColor
 
-    data class ScaleChange(val scaleFactor: Float)
+    data class ScaleChange(val scaleFactor: Float, val focus: PointF)
     data class LocationTranslate(val distanceX: Float, val distanceY: Float)
     data class DrawLines(val tmp: Bitmap?, val canUndo: Boolean)
     class ClearMeasure
