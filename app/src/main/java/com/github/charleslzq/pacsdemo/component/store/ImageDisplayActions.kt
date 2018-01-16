@@ -32,7 +32,8 @@ object ImageDisplayActions : RxScheduleSupport {
             seriesModels.filter { it.modId.isNotBlank() && it.thumb != null }
                     .mapNotNull { BitmapCache.decode(it.thumb!!)?.let { thumb -> ImageThumbModel(it.modId, thumb) } }
         }
-        return { _, dispatch, _ ->
+        return { store, dispatch, _ ->
+            store.dispatch(changeLayout(PacsStore.LayoutOption.ONE_ONE))
             dispatch(PacsStore.SeriesListUpdated(thumbList))
         }
     }
