@@ -6,7 +6,7 @@ import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
 /**
  * Created by charleslzq on 17-11-27.
  */
-class StudyModeGestureListener(dispatch: (Any) -> Unit) : ScaleCompositeGestureListener(dispatch) {
+class StudyModeGestureListener(dispatch: (Any) -> Unit, private val onDragStart: () -> Unit) : ScaleCompositeGestureListener(dispatch) {
 
     override fun onDoubleTap(motionEvent: MotionEvent?): Boolean {
         dispatch(ImageFrameStore.StudyModeReset())
@@ -17,4 +17,6 @@ class StudyModeGestureListener(dispatch: (Any) -> Unit) : ScaleCompositeGestureL
         dispatch(ImageFrameStore.LocationTranslate(distanceX, distanceY))
         return true
     }
+
+    override fun onLongPress(e: MotionEvent) = onDragStart()
 }

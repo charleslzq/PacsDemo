@@ -58,7 +58,7 @@ class DicomImage(
 
         render(ImageFrameStore::gestureScale) {
             if (store.gestureScale > 1 && operationMode is PlayMode) {
-                operationMode = StudyMode(imageView.context, StudyModeGestureListener(store.dispatch))
+                operationMode = StudyMode(imageView.context, StudyModeGestureListener(store.dispatch, this::onDragStart))
             } else if (store.gestureScale == 1.0f && operationMode is StudyMode) {
                 operationMode = PlayMode(imageView.context, PlayModeGestureListener(store.dispatch, this::onDragStart))
             }
@@ -83,7 +83,7 @@ class DicomImage(
                 }
                 false -> {
                     if (store.gestureScale > 1.0f) {
-                        StudyMode(imageView.context, StudyModeGestureListener(store.dispatch))
+                        StudyMode(imageView.context, StudyModeGestureListener(store.dispatch, this::onDragStart))
                     } else {
                         PlayMode(imageView.context, PlayModeGestureListener(store.dispatch, this::onDragStart))
                     }
