@@ -8,8 +8,8 @@ import com.github.charleslzq.pacsdemo.component.store.PacsStore
  * Created by charleslzq on 17-11-27.
  */
 class PacsMain(
-        mainView: View,
-        pacsStore: PacsStore
+    mainView: View,
+    pacsStore: PacsStore
 ) : PacsComponent<View>(mainView, pacsStore) {
     init {
         bind {

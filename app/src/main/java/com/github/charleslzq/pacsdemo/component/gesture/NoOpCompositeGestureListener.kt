@@ -8,7 +8,8 @@ import android.view.View
 /**
  * Created by charleslzq on 17-11-27.
  */
-open class NoOpCompositeGestureListener : GestureDetector.SimpleOnGestureListener(), ScaleGestureDetector.OnScaleGestureListener {
+open class NoOpCompositeGestureListener : GestureDetector.SimpleOnGestureListener(),
+    ScaleGestureDetector.OnScaleGestureListener {
 
     override fun onScaleBegin(scaleGestureDetector: ScaleGestureDetector) = false
 

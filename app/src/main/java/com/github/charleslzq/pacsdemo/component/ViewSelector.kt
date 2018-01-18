@@ -16,25 +16,31 @@ import com.github.charleslzq.pacsdemo.support.ViewUtils
  * Created by charleslzq on 17-11-27.
  */
 class ViewSelector(
-        viewFlipper: ViewFlipper,
-        pacsStore: PacsStore
+    viewFlipper: ViewFlipper,
+    pacsStore: PacsStore
 ) : PacsComponent<ViewFlipper>(viewFlipper, pacsStore) {
-    private val gestureDetector = GestureDetector(view.context, object : GestureDetector.SimpleOnGestureListener() {
-        override fun onDown(e: MotionEvent?): Boolean {
-            return true
-        }
-
-        override fun onFling(startEvent: MotionEvent, endEvent: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-            if (Math.abs(startEvent.x - endEvent.x) >= 3 * Math.abs(startEvent.y - endEvent.y)) {
-                if (endEvent.x > startEvent.x) {
-                    store.dispatch(ImageDisplayActions.changeLayout(store.layoutOption.ordinal - 1))
-                } else {
-                    store.dispatch(ImageDisplayActions.changeLayout(store.layoutOption.ordinal + 1))
-                }
+    private val gestureDetector =
+        GestureDetector(view.context, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onDown(e: MotionEvent?): Boolean {
+                return true
             }
-            return true
-        }
-    })
+
+            override fun onFling(
+                startEvent: MotionEvent,
+                endEvent: MotionEvent,
+                velocityX: Float,
+                velocityY: Float
+            ): Boolean {
+                if (Math.abs(startEvent.x - endEvent.x) >= 3 * Math.abs(startEvent.y - endEvent.y)) {
+                    if (endEvent.x > startEvent.x) {
+                        store.dispatch(ImageDisplayActions.changeLayout(store.layoutOption.ordinal - 1))
+                    } else {
+                        store.dispatch(ImageDisplayActions.changeLayout(store.layoutOption.ordinal + 1))
+                    }
+                }
+                return true
+            }
+        })
 
     init {
         bind {
@@ -59,11 +65,14 @@ class ViewSelector(
                     listOf(displayedChild)
                 }
                 PacsStore.LayoutOption.ONE_TWO -> {
-                    ViewUtils.getTypedChildren(displayedChild as LinearLayout, ConstraintLayout::class.java)
+                    ViewUtils.getTypedChildren(
+                        displayedChild as LinearLayout,
+                        ConstraintLayout::class.java
+                    )
                 }
                 else -> {
                     ViewUtils.getTypedChildren(displayedChild as TableLayout, TableRow::class.java)
-                            .flatMap { ViewUtils.getTypedChildren(it, ConstraintLayout::class.java) }
+                        .flatMap { ViewUtils.getTypedChildren(it, ConstraintLayout::class.java) }
                 }
             }
         }

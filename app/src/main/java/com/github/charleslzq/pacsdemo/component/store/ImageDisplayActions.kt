@@ -12,12 +12,12 @@ import java.net.URI
  * Created by charleslzq on 18-1-12.
  */
 data class PatientSeriesModel(
-        val modId: String = "",
-        val patientMetaInfo: DicomPatientMetaInfo = DicomPatientMetaInfo(),
-        val studyMetaInfo: DicomStudyMetaInfo = DicomStudyMetaInfo(),
-        val seriesMetaInfo: DicomSeriesMetaInfo = DicomSeriesMetaInfo(),
-        val frames: List<ImageFrameModel> = emptyList(),
-        val thumb: URI? = null
+    val modId: String = "",
+    val patientMetaInfo: DicomPatientMetaInfo = DicomPatientMetaInfo(),
+    val studyMetaInfo: DicomStudyMetaInfo = DicomStudyMetaInfo(),
+    val seriesMetaInfo: DicomSeriesMetaInfo = DicomSeriesMetaInfo(),
+    val frames: List<ImageFrameModel> = emptyList(),
+    val thumb: URI? = null
 )
 
 object ImageDisplayActions : RxScheduleSupport {
@@ -30,7 +30,10 @@ object ImageDisplayActions : RxScheduleSupport {
         seriesModels.addAll(patientSeriesModelList)
         val thumbList = callOnIo {
             seriesModels.filter { it.modId.isNotBlank() && it.thumb != null }
-                    .mapNotNull { BitmapCache.decode(it.thumb!!)?.let { thumb -> ImageThumbModel(it.modId, thumb) } }
+                .mapNotNull {
+                    BitmapCache.decode(it.thumb!!)
+                        ?.let { thumb -> ImageThumbModel(it.modId, thumb) }
+                }
         }
         return { store, dispatch, _ ->
             store.dispatch(changeLayout(PacsStore.LayoutOption.ONE_ONE))
@@ -39,70 +42,90 @@ object ImageDisplayActions : RxScheduleSupport {
     }
 
     fun changeLayout(layoutOrdinal: Int): DispatchAction<PacsStore> = { store, _, _ ->
-        val ordinal = layoutOrdinal.rem(PacsStore.LayoutOption.values().size).let { if (it < 0) it + PacsStore.LayoutOption.values().size else it }
+        val ordinal = layoutOrdinal.rem(PacsStore.LayoutOption.values().size)
+            .let { if (it < 0) it + PacsStore.LayoutOption.values().size else it }
         store.dispatch(changeLayout(PacsStore.LayoutOption.values()[ordinal]))
     }
 
-    fun changeLayout(layoutOption: PacsStore.LayoutOption): DispatchAction<PacsStore> = { store, dispatch, _ ->
-        if (store.layoutOption != layoutOption) {
-            dispatch(PacsStore.ChangeLayout(layoutOption.ordinal))
-            store.imageCells.forEach {
-                it.dispatch(ImageFrameStore.Reset())
-                it.dispatch(
+    fun changeLayout(layoutOption: PacsStore.LayoutOption): DispatchAction<PacsStore> =
+        { store, dispatch, _ ->
+            if (store.layoutOption != layoutOption) {
+                dispatch(PacsStore.ChangeLayout(layoutOption.ordinal))
+                store.imageCells.forEach {
+                    it.dispatch(ImageFrameStore.Reset())
+                    it.dispatch(
                         if (layoutOption == PacsStore.LayoutOption.ONE_ONE) {
                             ImageFrameStore.AllowPlay()
                         } else {
                             ImageFrameStore.ForbidPlay()
                         }
-                )
-            }
-            bitmapCache = BitmapCache(100)
-        }
-    }
-
-    fun bindModel(modId: String, index: Int = 0): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
-        runOnIo {
-            store.dispatch(ImageMeasureActions.clearDrawing())
-            seriesModels.find { it.modId == modId }?.let {
-                dispatch(ImageFrameStore.BindModel(modId, it.patientMetaInfo, it.studyMetaInfo, it.seriesMetaInfo, it.frames.size))
-                findImage(it, index)?.run {
-                    dispatch(ImageFrameStore.ShowImage(this, index, it.frames[index].meta))
+                    )
                 }
-                if (store.playable) {
-                    bitmapCache = BitmapCache(Math.max(100, it.frames.size))
-                    bitmapCache.preload(*it.frames.map { it.frame }.toTypedArray())
-                } else {
-                    bitmapCache.preload(*urisInRange(it, index - preloadRange, index + preloadRange).toTypedArray())
-                }
+                bitmapCache = BitmapCache(100)
             }
         }
-    }
 
-    fun moveFrame(imageFrameStore: ImageFrameStore): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
-        runOnCompute {
-            store.dispatch(ImageMeasureActions.clearDrawing())
-            seriesModels.find { it.modId == imageFrameStore.bindModId }!!.let {
-                findImage(it, imageFrameStore.index)!!.run {
-                    store.dispatch(ImageFrameStore.MoveModel(
-                            it.modId,
+    fun bindModel(modId: String, index: Int = 0): DispatchAction<ImageFrameStore> =
+        { store, dispatch, _ ->
+            runOnIo {
+                store.dispatch(ImageMeasureActions.clearDrawing())
+                seriesModels.find { it.modId == modId }?.let {
+                    dispatch(
+                        ImageFrameStore.BindModel(
+                            modId,
                             it.patientMetaInfo,
                             it.studyMetaInfo,
                             it.seriesMetaInfo,
-                            it.frames.size,
-                            this,
-                            imageFrameStore.index,
-                            it.frames[imageFrameStore.index].meta,
-                            imageFrameStore.reverseColor,
-                            imageFrameStore.pseudoColor,
-                            imageFrameStore.canvasModel
-                    ))
+                            it.frames.size
+                        )
+                    )
+                    findImage(it, index)?.run {
+                        dispatch(ImageFrameStore.ShowImage(this, index, it.frames[index].meta))
+                    }
+                    if (store.playable) {
+                        bitmapCache = BitmapCache(Math.max(100, it.frames.size))
+                        bitmapCache.preload(*it.frames.map { it.frame }.toTypedArray())
+                    } else {
+                        bitmapCache.preload(
+                            *urisInRange(
+                                it,
+                                index - preloadRange,
+                                index + preloadRange
+                            ).toTypedArray()
+                        )
+                    }
                 }
             }
-
-            store.dispatch(ImageMeasureActions.moveStackFrom(imageFrameStore))
-            imageFrameStore.dispatch(ImageFrameStore.Reset())
         }
-    }
+
+    fun moveFrame(imageFrameStore: ImageFrameStore): DispatchAction<ImageFrameStore> =
+        { store, dispatch, _ ->
+            runOnCompute {
+                store.dispatch(ImageMeasureActions.clearDrawing())
+                seriesModels.find { it.modId == imageFrameStore.bindModId }!!.let {
+                    findImage(it, imageFrameStore.index)!!.run {
+                        dispatch(
+                            ImageFrameStore.MoveModel(
+                                it.modId,
+                                it.patientMetaInfo,
+                                it.studyMetaInfo,
+                                it.seriesMetaInfo,
+                                it.frames.size,
+                                this,
+                                imageFrameStore.index,
+                                it.frames[imageFrameStore.index].meta,
+                                imageFrameStore.reverseColor,
+                                imageFrameStore.pseudoColor,
+                                imageFrameStore.canvasModel
+                            )
+                        )
+                    }
+                }
+
+                store.dispatch(ImageMeasureActions.moveStackFrom(imageFrameStore))
+                imageFrameStore.dispatch(ImageFrameStore.Reset())
+            }
+        }
 
     fun playOrPause(): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
         if (store.playable) {
@@ -133,17 +156,18 @@ object ImageDisplayActions : RxScheduleSupport {
         }
     }
 
-    fun indexScroll(scrollDistance: Float): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
-        runOnIo {
-            if (store.size > 0) {
-                store.dispatch(ImageMeasureActions.clearDrawing())
-                val changeBase = Math.min(300f / store.size, 10f)
-                val offset = (scrollDistance / changeBase).toInt()
-                val newIndex = Math.min(Math.max(store.index - offset, 0), store.size - 1)
-                dispatchShowImage(store.bindModId, newIndex, dispatch)
+    fun indexScroll(scrollDistance: Float): DispatchAction<ImageFrameStore> =
+        { store, dispatch, _ ->
+            runOnIo {
+                if (store.size > 0) {
+                    store.dispatch(ImageMeasureActions.clearDrawing())
+                    val changeBase = Math.min(300f / store.size, 10f)
+                    val offset = (scrollDistance / changeBase).toInt()
+                    val newIndex = Math.min(Math.max(store.index - offset, 0), store.size - 1)
+                    dispatchShowImage(store.bindModId, newIndex, dispatch)
+                }
             }
         }
-    }
 
     fun resetDisplay(): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
         runOnIo {
@@ -155,15 +179,25 @@ object ImageDisplayActions : RxScheduleSupport {
         }
     }
 
-    private fun urisInRange(patientSeriesModel: PatientSeriesModel, start: Int, end: Int)
-            = patientSeriesModel.frames.subList(Math.max(0, start), Math.min(end + 1, patientSeriesModel.frames.size)).map { it.frame }
+    private fun urisInRange(patientSeriesModel: PatientSeriesModel, start: Int, end: Int) =
+        patientSeriesModel.frames.subList(
+            Math.max(0, start),
+            Math.min(end + 1, patientSeriesModel.frames.size)
+        ).map { it.frame }
 
-    private fun dispatchShowImage(modId: String, index: Int, dispatch: (Any) -> Unit) = seriesModels.find { it.modId == modId }?.let {
-        findImage(it, index)?.run {
-            dispatch(ImageFrameStore.ShowImage(this, index, it.frames[index].meta))
-            bitmapCache.preload(*urisInRange(it, index - preloadRange, index + preloadRange).toTypedArray())
+    private fun dispatchShowImage(modId: String, index: Int, dispatch: (Any) -> Unit) =
+        seriesModels.find { it.modId == modId }?.let {
+            findImage(it, index)?.run {
+                dispatch(ImageFrameStore.ShowImage(this, index, it.frames[index].meta))
+                bitmapCache.preload(
+                    *urisInRange(
+                        it,
+                        index - preloadRange,
+                        index + preloadRange
+                    ).toTypedArray()
+                )
+            }
         }
-    }
 
     private fun findImage(model: PatientSeriesModel, index: Int = 0) = when {
         model.frames.isEmpty() || index !in (0 until model.frames.size) -> null

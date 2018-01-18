@@ -10,8 +10,8 @@ import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
  * Created by charleslzq on 17-12-6.
  */
 class ImageRightTopPanel(
-        view: View,
-        imageFrameStore: ImageFrameStore
+    view: View,
+    imageFrameStore: ImageFrameStore
 ) : Component<View, ImageFrameStore>(view, imageFrameStore) {
     private val patientName: TextView = view.findViewById(R.id.patientName)
     private val patientId: TextView = view.findViewById(R.id.patientId)
@@ -62,7 +62,8 @@ class ImageRightTopPanel(
         }
 
         renderByAll(store::hideMeta, store::measure) {
-            view.visibility = if (store.hideMeta || store.measure != ImageFrameStore.Measure.NONE) View.INVISIBLE else View.VISIBLE
+            view.visibility =
+                    if (store.hideMeta || store.measure != ImageFrameStore.Measure.NONE) View.INVISIBLE else View.VISIBLE
         }
     }
 }

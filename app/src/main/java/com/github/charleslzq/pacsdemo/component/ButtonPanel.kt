@@ -14,17 +14,17 @@ import com.github.charleslzq.pacsdemo.support.TypefaceUtil
  * Created by charleslzq on 17-11-27.
  */
 class ButtonPanel(
-        buttonPanel: View,
-        pacsStore: PacsStore
+    buttonPanel: View,
+    pacsStore: PacsStore
 ) : PacsComponent<View>(buttonPanel, pacsStore) {
     private val splitButton: Button = view.findViewById(R.id.spliteButton)
     private val backButton: Button = view.findViewById(R.id.backButton)
     private val layoutSelector: PopupMenu = PopupMenu(buttonPanel.context, splitButton)
     private val layoutMap = mapOf(
-            R.id.one_one to PacsStore.LayoutOption.ONE_ONE,
-            R.id.one_two to PacsStore.LayoutOption.ONE_TWO,
-            R.id.two_two to PacsStore.LayoutOption.TWO_TWO,
-            R.id.three_three to PacsStore.LayoutOption.THREE_THREE
+        R.id.one_one to PacsStore.LayoutOption.ONE_ONE,
+        R.id.one_two to PacsStore.LayoutOption.ONE_TWO,
+        R.id.two_two to PacsStore.LayoutOption.TWO_TWO,
+        R.id.three_three to PacsStore.LayoutOption.THREE_THREE
     )
 
     init {

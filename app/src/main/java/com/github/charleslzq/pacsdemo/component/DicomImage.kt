@@ -21,11 +21,12 @@ import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
  * Created by charleslzq on 17-11-27.
  */
 class DicomImage(
-        imageLayout: View,
-        imageFrameStore: ImageFrameStore
+    imageLayout: View,
+    imageFrameStore: ImageFrameStore
 ) : Component<View, ImageFrameStore>(imageLayout, imageFrameStore), RxScheduleSupport {
     private val imageView: ImageView = view.findViewById(R.id.image)
-    private var operationMode: OperationMode = PlayMode(imageView.context, PlayModeGestureListener(store.dispatch, this::onDragStart))
+    private var operationMode: OperationMode =
+        PlayMode(imageView.context, PlayModeGestureListener(store.dispatch, this::onDragStart))
         set(value) {
             field = value
             imageView.setOnTouchListener(operationMode)
@@ -58,9 +59,15 @@ class DicomImage(
 
         render(ImageFrameStore::gestureScale) {
             if (store.gestureScale > 1 && operationMode is PlayMode) {
-                operationMode = StudyMode(imageView.context, StudyModeGestureListener(store.dispatch, this::onDragStart))
+                operationMode = StudyMode(
+                    imageView.context,
+                    StudyModeGestureListener(store.dispatch, this::onDragStart)
+                )
             } else if (store.gestureScale == 1.0f && operationMode is StudyMode) {
-                operationMode = PlayMode(imageView.context, PlayModeGestureListener(store.dispatch, this::onDragStart))
+                operationMode = PlayMode(
+                    imageView.context,
+                    PlayModeGestureListener(store.dispatch, this::onDragStart)
+                )
             }
         }
 
@@ -83,9 +90,15 @@ class DicomImage(
                 }
                 false -> {
                     if (store.gestureScale > 1.0f) {
-                        StudyMode(imageView.context, StudyModeGestureListener(store.dispatch, this::onDragStart))
+                        StudyMode(
+                            imageView.context,
+                            StudyModeGestureListener(store.dispatch, this::onDragStart)
+                        )
                     } else {
-                        PlayMode(imageView.context, PlayModeGestureListener(store.dispatch, this::onDragStart))
+                        PlayMode(
+                            imageView.context,
+                            PlayModeGestureListener(store.dispatch, this::onDragStart)
+                        )
                     }
                 }
             }
@@ -102,7 +115,8 @@ class DicomImage(
 
     private fun onDragStart() {
         val dragBuilder = View.DragShadowBuilder(imageView)
-        val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_HTML), ClipData.Item(tag))
+        val clipData =
+            ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_HTML), ClipData.Item(tag))
         @Suppress("DEPRECATION")
         imageView.startDrag(clipData, dragBuilder, store, 0)
     }
@@ -126,7 +140,12 @@ class DicomImage(
 
     private fun getCurrentImage() = if (store.displayModel.images.isNotEmpty()) {
         callOnCompute {
-            scaleIfNecessary(pseudoIfRequired(store.displayModel.images[0])).let { it.copy(it.config, true) }
+            scaleIfNecessary(pseudoIfRequired(store.displayModel.images[0])).let {
+                it.copy(
+                    it.config,
+                    true
+                )
+            }
         }
     } else {
         null
@@ -153,44 +172,57 @@ class DicomImage(
         rawBitmap
     }
 
-    private fun calculateColor(color: Int) = getPseudoColor((Color.red(color) + Color.green(color) + Color.blue(color) + Color.alpha(color)) / 4)
+    private fun calculateColor(color: Int) = getPseudoColor(
+        (Color.red(color) + Color.green(color) + Color.blue(color) + Color.alpha(color)) / 4
+    )
 
     private fun getPseudoColor(greyValue: Int) = when (greyValue) {
         in (0..31) -> Color.rgb(
-                0,
-                (255 * greyValue / 32.0).toInt(),
-                (255 * greyValue / 32.0).toInt())
+            0,
+            (255 * greyValue / 32.0).toInt(),
+            (255 * greyValue / 32.0).toInt()
+        )
         in (32..63) -> Color.rgb(
-                0,
-                255,
-                255)
+            0,
+            255,
+            255
+        )
         in (64..95) -> Color.rgb(
-                0,
-                (255 * (96 - greyValue) / 32.0).toInt(),
-                (255 * (96 - greyValue) / 32.0).toInt())
-        in (96..127) -> Color.rgb((
-                255 * (greyValue - 96) / 64.0).toInt(),
-                (255 * (greyValue - 96) / 32.0).toInt(),
-                (255 * (greyValue - 96) / 32.0).toInt())
+            0,
+            (255 * (96 - greyValue) / 32.0).toInt(),
+            (255 * (96 - greyValue) / 32.0).toInt()
+        )
+        in (96..127) -> Color.rgb(
+            (255 * (greyValue - 96) / 64.0).toInt(),
+            (255 * (greyValue - 96) / 32.0).toInt(),
+            (255 * (greyValue - 96) / 32.0).toInt()
+        )
         in (128..191) -> Color.rgb(
-                (255 * (greyValue - 128) / 128.0 + 128).toInt(),
-                0,
-                0)
+            (255 * (greyValue - 128) / 128.0 + 128).toInt(),
+            0,
+            0
+        )
         in (192..255) -> Color.rgb(
-                255,
-                (255 * (greyValue - 192) / 63.0).toInt(),
-                (255 * (greyValue - 192) / 63.0).toInt())
+            255,
+            (255 * (greyValue - 192) / 63.0).toInt(),
+            (255 * (greyValue - 192) / 63.0).toInt()
+        )
         else -> throw IllegalArgumentException("$greyValue not in (0..255)")
     }
 
-    private fun getAnimation(resources: Resources) = IndexAwareAnimationDrawable(store.dispatch, store.autoJumpIndex).apply {
-        isOneShot = true
-        store.displayModel.images
-                .map { BitmapDrawable(resources, it).apply { colorFilter = ColorMatrixColorFilter(store.colorMatrix) } }
+    private fun getAnimation(resources: Resources) =
+        IndexAwareAnimationDrawable(store.dispatch, store.autoJumpIndex).apply {
+            isOneShot = true
+            store.displayModel.images
+                .map {
+                    BitmapDrawable(resources, it).apply {
+                        colorFilter = ColorMatrixColorFilter(store.colorMatrix)
+                    }
+                }
                 .forEach { addFrame(it, store.duration) }
-        selectDrawable(0)
-        callback = null
-    }
+            selectDrawable(0)
+            callback = null
+        }
 
     companion object {
         val tag = "imageCell"

@@ -59,7 +59,11 @@ class PacsDemoActivity : AppCompatActivity(), RxScheduleSupport {
         pacs = PacsMain(pacsPanel, PacsStore())
         backButton.setOnClickListener { this.finish() }
 
-        bindService(Intent(this, DicomDataServiceBackground::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
+        bindService(
+            Intent(this, DicomDataServiceBackground::class.java),
+            serviceConnection,
+            Context.BIND_AUTO_CREATE
+        )
     }
 
     override fun onDestroy() {
@@ -81,36 +85,42 @@ class PacsDemoActivity : AppCompatActivity(), RxScheduleSupport {
                     patient!!.studies.filter(filter).flatMap { study ->
                         study.series.sortedBy { it.metaInfo.instanceUID }.map {
                             PatientSeriesModel(
-                                    UUID.randomUUID().toString(),
-                                    patient.metaInfo,
-                                    study.metaInfo,
-                                    it.metaInfo,
-                                    it.images.sortedBy { it.instanceNumber?.toInt() }
-                                            .filter { it.files[ImageFrameModel.DEFAULT] != null }
-                                            .map { ImageFrameModel(it) },
-                                    it.images.sortedBy { it.instanceNumber?.toInt() }
-                                            .map { it.files[ImageFrameModel.THUMB] }
-                                            .firstOrNull()
+                                UUID.randomUUID().toString(),
+                                patient.metaInfo,
+                                study.metaInfo,
+                                it.metaInfo,
+                                it.images.sortedBy { it.instanceNumber?.toInt() }
+                                    .filter { it.files[ImageFrameModel.DEFAULT] != null }
+                                    .map { ImageFrameModel(it) },
+                                it.images.sortedBy { it.instanceNumber?.toInt() }
+                                    .map { it.files[ImageFrameModel.THUMB] }
+                                    .firstOrNull()
                             )
                         }
                     }
                 }
             }
         }.subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.computation())
-                .subscribe {
-                    pacs.store.dispatch(ImageDisplayActions.reloadModels(it))
-                    if (seriesId != null) {
-                        it.indices.find { index -> it[index].seriesMetaInfo.instanceUID == seriesId }?.let { index ->
+            .observeOn(Schedulers.computation())
+            .subscribe {
+                pacs.store.dispatch(ImageDisplayActions.reloadModels(it))
+                if (seriesId != null) {
+                    it.indices.find { index -> it[index].seriesMetaInfo.instanceUID == seriesId }
+                        ?.let { index ->
                             pacs.store.dispatch(PacsStore.ThumbListItemClicked(index))
                             val imageOrder = imageNum?.run { toInt() } ?: 1
-                            pacs.store.firstCell.dispatch(ImageDisplayActions.bindModel(it[index].modId, imageOrder))
+                            pacs.store.firstCell.dispatch(
+                                ImageDisplayActions.bindModel(
+                                    it[index].modId,
+                                    imageOrder
+                                )
+                            )
                         }
-                    } else if (it.isNotEmpty()) {
-                        pacs.store.dispatch(PacsStore.ThumbListItemClicked(0))
-                        pacs.store.firstCell.dispatch(ImageDisplayActions.bindModel(it[0].modId, 0))
-                    }
+                } else if (it.isNotEmpty()) {
+                    pacs.store.dispatch(PacsStore.ThumbListItemClicked(0))
+                    pacs.store.firstCell.dispatch(ImageDisplayActions.bindModel(it[0].modId, 0))
                 }
+            }
     }
 
     companion object {

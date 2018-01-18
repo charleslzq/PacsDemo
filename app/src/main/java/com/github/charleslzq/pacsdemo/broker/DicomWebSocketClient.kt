@@ -18,9 +18,9 @@ import com.koushikdutta.async.http.WebSocket
  * Created by charleslzq on 17-11-15.
  */
 class DicomWebSocketClient(
-        private val url: String,
-        private val dicomMessageListener: DicomMessageListener,
-        private val gson: Gson = Converters.registerLocalDateTime(GsonBuilder()).create()
+    private val url: String,
+    private val dicomMessageListener: DicomMessageListener,
+    private val gson: Gson = Converters.registerLocalDateTime(GsonBuilder()).create()
 ) : RxScheduleSupport {
     private var webSocket: WebSocket? = null
     private val logTag = this.javaClass.name
@@ -50,36 +50,57 @@ class DicomWebSocketClient(
 
     private fun onMessage(message: String?) {
         if (message != null && message != heartBeat) {
-            gson.fromJson<Message<Any>>(message, Message::class.java).headers[MessageHeaders.TYPE_HEADER.value]?.let {
+            gson.fromJson<Message<Any>>(
+                message,
+                Message::class.java
+            ).headers[MessageHeaders.TYPE_HEADER.value]?.let {
                 when (ServerMessagePayloadType.valueOf(it)) {
                     ServerMessagePayloadType.PATIENT -> {
-                        val patientMessage = gson.fromJson<Message<DicomPatient>>(message, object : TypeToken<Message<DicomPatient>>() {
-                        }.type)
+                        val patientMessage = gson.fromJson<Message<DicomPatient>>(
+                            message,
+                            object : TypeToken<Message<DicomPatient>>() {
+                            }.type
+                        )
                         dicomMessageListener.onPatient(patientMessage)
                     }
                     ServerMessagePayloadType.PATIENT_META -> {
-                        val patientMessage = gson.fromJson<Message<DicomPatientMetaInfo>>(message, object : TypeToken<Message<DicomPatientMetaInfo>>() {
-                        }.type)
+                        val patientMessage = gson.fromJson<Message<DicomPatientMetaInfo>>(
+                            message,
+                            object : TypeToken<Message<DicomPatientMetaInfo>>() {
+                            }.type
+                        )
                         dicomMessageListener.onPatientMeta(patientMessage)
                     }
                     ServerMessagePayloadType.STUDY_META -> {
-                        val studyMessage = gson.fromJson<Message<DicomStudyMetaInfo>>(message, object : TypeToken<Message<DicomStudyMetaInfo>>() {
-                        }.type)
+                        val studyMessage = gson.fromJson<Message<DicomStudyMetaInfo>>(
+                            message,
+                            object : TypeToken<Message<DicomStudyMetaInfo>>() {
+                            }.type
+                        )
                         dicomMessageListener.onStudyMeta(studyMessage)
                     }
                     ServerMessagePayloadType.SERIES_META -> {
-                        val seriesMessage = gson.fromJson<Message<DicomSeriesMetaInfo>>(message, object : TypeToken<Message<DicomSeriesMetaInfo>>() {
-                        }.type)
+                        val seriesMessage = gson.fromJson<Message<DicomSeriesMetaInfo>>(
+                            message,
+                            object : TypeToken<Message<DicomSeriesMetaInfo>>() {
+                            }.type
+                        )
                         dicomMessageListener.onSeriesMeta(seriesMessage)
                     }
                     ServerMessagePayloadType.IMAGE_META -> {
-                        val imageMessage = gson.fromJson<Message<DicomImageMetaInfo>>(message, object : TypeToken<Message<DicomImageMetaInfo>>() {
-                        }.type)
+                        val imageMessage = gson.fromJson<Message<DicomImageMetaInfo>>(
+                            message,
+                            object : TypeToken<Message<DicomImageMetaInfo>>() {
+                            }.type
+                        )
                         dicomMessageListener.onImageMeta(imageMessage)
                     }
                     ServerMessagePayloadType.FILE -> {
-                        val fileMessage = gson.fromJson<Message<ByteArray>>(message, object : TypeToken<Message<ByteArray>>() {
-                        }.type)
+                        val fileMessage = gson.fromJson<Message<ByteArray>>(
+                            message,
+                            object : TypeToken<Message<ByteArray>>() {
+                            }.type
+                        )
                         dicomMessageListener.onFile(fileMessage)
                     }
                 }

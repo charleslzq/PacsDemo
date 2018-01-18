@@ -14,8 +14,17 @@ import java.util.*
 
 
 data class ImageDisplayModel(val images: List<Bitmap> = emptyList())
-data class ImageCanvasModel(val drawing: Bitmap? = null, val tmp: Bitmap? = null, val canUndo: Boolean = false, val canRedo: Boolean = false)
-data class ImageFrameModel(val meta: DicomImageMetaInfo, val frame: URI = meta.let { it.files[DEFAULT] }!!) {
+data class ImageCanvasModel(
+    val drawing: Bitmap? = null,
+    val tmp: Bitmap? = null,
+    val canUndo: Boolean = false,
+    val canRedo: Boolean = false
+)
+
+data class ImageFrameModel(
+    val meta: DicomImageMetaInfo,
+    val frame: URI = meta.let { it.files[DEFAULT] }!!
+) {
     companion object {
         val THUMB = "thumb"
         val DEFAULT = "default"
@@ -27,8 +36,9 @@ data class ImageFrameModel(val meta: DicomImageMetaInfo, val frame: URI = meta.l
  * Created by charleslzq on 17-11-27.
  */
 class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
-        MiddleWare.debugLog,
-        buildThunk<ImageFrameStore>(UndoSupport<Bitmap>(), Stack<PointF>())) {
+    MiddleWare.debugLog,
+    buildThunk<ImageFrameStore>(UndoSupport<Bitmap>(), Stack<PointF>())
+) {
     var linePaint = Paint()
     var stringPaint = Paint()
     var pointPaint = Paint()
@@ -296,28 +306,33 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
         }
     }
 
-    private fun getNewScaleFactor(rawScaleFactor: Float): Float = Math.max(1.0f, Math.min(rawScaleFactor * gestureScale, 5.0f))
+    private fun getNewScaleFactor(rawScaleFactor: Float): Float =
+        Math.max(1.0f, Math.min(rawScaleFactor * gestureScale, 5.0f))
 
     class AllowPlay
     class ForbidPlay
 
-    data class BindModel(val modeId: String,
-                         val patient: DicomPatientMetaInfo,
-                         val study: DicomStudyMetaInfo,
-                         val series: DicomSeriesMetaInfo,
-                         val size: Int)
+    data class BindModel(
+        val modeId: String,
+        val patient: DicomPatientMetaInfo,
+        val study: DicomStudyMetaInfo,
+        val series: DicomSeriesMetaInfo,
+        val size: Int
+    )
 
-    data class MoveModel(val modeId: String,
-                         val patient: DicomPatientMetaInfo,
-                         val study: DicomStudyMetaInfo,
-                         val series: DicomSeriesMetaInfo,
-                         val size: Int,
-                         val bitmap: Bitmap,
-                         val index: Int,
-                         val meta: DicomImageMetaInfo,
-                         val reverseColor: Boolean,
-                         val pseudoColor: Boolean,
-                         val canvasModel: ImageCanvasModel)
+    data class MoveModel(
+        val modeId: String,
+        val patient: DicomPatientMetaInfo,
+        val study: DicomStudyMetaInfo,
+        val series: DicomSeriesMetaInfo,
+        val size: Int,
+        val bitmap: Bitmap,
+        val index: Int,
+        val meta: DicomImageMetaInfo,
+        val reverseColor: Boolean,
+        val pseudoColor: Boolean,
+        val canvasModel: ImageCanvasModel
+    )
 
     data class ShowImage(val bitmap: Bitmap, val index: Int, val meta: DicomImageMetaInfo)
     data class PlayAnimation(val images: List<Bitmap>)
@@ -346,11 +361,13 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     }
 
     companion object {
-        private val reverseMatrix = ColorMatrix(floatArrayOf(
+        private val reverseMatrix = ColorMatrix(
+            floatArrayOf(
                 -1f, 0f, 0f, 0f, 255f,
                 0f, -1f, 0f, 0f, 255f,
                 0f, 0f, -1f, 0f, 255f,
                 0f, 0f, 0f, 1f, 0f
-        ))
+            )
+        )
     }
 }

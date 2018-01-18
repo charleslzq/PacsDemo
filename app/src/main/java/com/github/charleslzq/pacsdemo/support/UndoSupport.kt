@@ -43,9 +43,11 @@ class UndoSupport<T> {
         null
     }
 
-    fun generate(initialValue: () -> T, generator: (T) -> T) = generator(if (doneStack.isEmpty()) {
-        initialValue()
-    } else {
-        doneStack.peek()
-    }).also { done(it) }
+    fun generate(initialValue: () -> T, generator: (T) -> T) = generator(
+        if (doneStack.isEmpty()) {
+            initialValue()
+        } else {
+            doneStack.peek()
+        }
+    ).also { done(it) }
 }

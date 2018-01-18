@@ -10,8 +10,8 @@ import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
  * Created by charleslzq on 17-12-6.
  */
 class ImageLeftTopPanel(
-        panelView: View,
-        imageFrameStore: ImageFrameStore
+    panelView: View,
+    imageFrameStore: ImageFrameStore
 ) : Component<View, ImageFrameStore>(panelView, imageFrameStore) {
     private val windowInfo: TextView = view.findViewById(R.id.windowInfo)
     private val sliceInfo: TextView = view.findViewById(R.id.sliceInfo)
@@ -24,12 +24,16 @@ class ImageLeftTopPanel(
             sliceInfo.visibility = View.GONE
 
             if (it.windowCenter != null && it.windowWidth != null) {
-                windowInfo.post { windowInfo.text = "窗宽: ${it.windowWidth!!} 窗位: ${it.windowCenter!!}" }
+                windowInfo.post {
+                    windowInfo.text = "窗宽: ${it.windowWidth!!} 窗位: ${it.windowCenter!!}"
+                }
                 windowInfo.visibility = View.VISIBLE
             }
 
             if (it.sliceLocation != null && it.sliceThickness != null) {
-                sliceInfo.post { sliceInfo.text = "T:${it.sliceThickness}mm L:${it.sliceLocation}mm" }
+                sliceInfo.post {
+                    sliceInfo.text = "T:${it.sliceThickness}mm L:${it.sliceLocation}mm"
+                }
                 sliceInfo.visibility = View.VISIBLE
             }
         }
@@ -46,14 +50,17 @@ class ImageLeftTopPanel(
         renderByAll(store::size, store::index) {
             if (store.hasImage) {
                 imageProgress.visibility = View.VISIBLE
-                imageProgress.post { imageProgress.text = "IMAGE: ${store.index + 1}/${store.size}" }
+                imageProgress.post {
+                    imageProgress.text = "IMAGE: ${store.index + 1}/${store.size}"
+                }
             } else {
                 imageProgress.visibility = View.GONE
             }
         }
 
         renderByAll(store::hideMeta, store::measure) {
-            view.visibility = if (store.hideMeta || store.measure != ImageFrameStore.Measure.NONE) View.INVISIBLE else View.VISIBLE
+            view.visibility =
+                    if (store.hideMeta || store.measure != ImageFrameStore.Measure.NONE) View.INVISIBLE else View.VISIBLE
         }
     }
 }

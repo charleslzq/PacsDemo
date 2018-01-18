@@ -9,17 +9,17 @@ import com.google.gson.GsonBuilder
  * Created by charleslzq on 17-11-15.
  */
 class DicomWebSocketMessageBroker(
-        url: String,
-        private val clientId: String,
-        private val gson: Gson = Converters.registerLocalDateTime(GsonBuilder()).create()
+    url: String,
+    private val clientId: String,
+    private val gson: Gson = Converters.registerLocalDateTime(GsonBuilder()).create()
 ) : DicomMessageBroker {
     private val dicomMessageListener = CompositeDicomMessageListener()
     private val dicomClient = DicomWebSocketClient(url, dicomMessageListener, gson)
 
     override fun requirePatients(vararg patientId: String) {
         val headers = mapOf(
-                MessageHeaders.CLIENT_ID.value to clientId,
-                MessageHeaders.TYPE_HEADER.value to ClientMessagePayloadType.PATIENT.name
+            MessageHeaders.CLIENT_ID.value to clientId,
+            MessageHeaders.TYPE_HEADER.value to ClientMessagePayloadType.PATIENT.name
         ).toMutableMap()
         val idList = listOf(*patientId)
         val message = Message(headers, idList)
@@ -29,8 +29,8 @@ class DicomWebSocketMessageBroker(
 
     override fun refreshPatients(vararg patientId: String) {
         val headers = mapOf(
-                MessageHeaders.CLIENT_ID.value to clientId,
-                MessageHeaders.TYPE_HEADER.value to ClientMessagePayloadType.PATIENT_REFRESH.name
+            MessageHeaders.CLIENT_ID.value to clientId,
+            MessageHeaders.TYPE_HEADER.value to ClientMessagePayloadType.PATIENT_REFRESH.name
         ).toMutableMap()
         val idList = listOf(*patientId)
         val message = Message(headers, idList)
@@ -40,8 +40,8 @@ class DicomWebSocketMessageBroker(
 
     override fun requireFiles(imageDir: String, fileUris: List<String>) {
         val headers = mapOf(
-                MessageHeaders.TYPE_HEADER.value to ClientMessagePayloadType.FILE.name,
-                MessageHeaders.IMG_DIR.value to imageDir
+            MessageHeaders.TYPE_HEADER.value to ClientMessagePayloadType.FILE.name,
+            MessageHeaders.IMG_DIR.value to imageDir
         ).toMutableMap()
         val message = Message(headers, fileUris)
         connect()

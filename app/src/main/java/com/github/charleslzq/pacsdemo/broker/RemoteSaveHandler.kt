@@ -8,7 +8,7 @@ import java.net.URI
  * Created by charleslzq on 17-11-15.
  */
 class RemoteSaveHandler(
-        private val dicomMessageBroker: DicomMessageBroker
+    private val dicomMessageBroker: DicomMessageBroker
 ) : DicomImageFileSaveHandler {
 
     override fun save(path: String, imageMap: Map<String, URI>): Map<String, URI> {
@@ -19,5 +19,6 @@ class RemoteSaveHandler(
         return imageMap.map { it.key to newUri(path, it.value) }.toMap()
     }
 
-    private fun newUri(imageDir: String, uri: URI) = File(imageDir + File.separator + File(uri).name).toURI()
+    private fun newUri(imageDir: String, uri: URI) =
+        File(imageDir + File.separator + File(uri).name).toURI()
 }

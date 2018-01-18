@@ -11,8 +11,8 @@ import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
  * Created by charleslzq on 17-11-27.
  */
 class ImageCell(
-        baseView: View,
-        imageFrameStore: ImageFrameStore
+    baseView: View,
+    imageFrameStore: ImageFrameStore
 ) : Component<View, ImageFrameStore>(baseView, imageFrameStore) {
     init {
         bind {

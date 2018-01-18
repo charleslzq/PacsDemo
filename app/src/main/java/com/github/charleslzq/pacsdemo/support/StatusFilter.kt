@@ -8,7 +8,10 @@ import com.github.charleslzq.kotlin.react.ObservableStatus
  */
 object StatusFilter {
     fun <T> debugLog() = ObservableStatus.buildFilter<T> {
-        Log.d("StatusDebug", "Property ${valueChange.first} changed from ${valueChange.second} to ${valueChange.third}")
+        Log.d(
+            "StatusDebug",
+            "Property ${valueChange.first} changed from ${valueChange.second} to ${valueChange.third}"
+        )
         next(valueChange)
     }
 }

@@ -8,8 +8,10 @@ import android.view.ViewGroup
  */
 object ViewUtils {
 
-    fun getAllChildren(viewGroup: ViewGroup) = (0 until viewGroup.childCount).map { viewGroup.getChildAt(it) }
+    fun getAllChildren(viewGroup: ViewGroup) =
+        (0 until viewGroup.childCount).map { viewGroup.getChildAt(it) }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T : View> getTypedChildren(viewGroup: ViewGroup, klass: Class<T>) = getAllChildren(viewGroup).filter { it::class.java == klass }.map { it as T }
+    fun <T : View> getTypedChildren(viewGroup: ViewGroup, klass: Class<T>) =
+        getAllChildren(viewGroup).filter { it::class.java == klass }.map { it as T }
 }

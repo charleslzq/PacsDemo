@@ -12,7 +12,7 @@ import com.github.charleslzq.pacsdemo.component.store.ImageThumbModel
  * Created by charleslzq on 17-11-20.
  */
 class DicomSeriesThumbListAdpater(
-        val thumbList: MutableList<ImageThumbModel>
+    val thumbList: MutableList<ImageThumbModel>
 ) : RecyclerView.Adapter<DicomSeriesThumbListAdpater.ViewHolder>(), RxScheduleSupport {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.thumbView.setImageBitmap(thumbList[position].thumb)
@@ -23,12 +23,13 @@ class DicomSeriesThumbListAdpater(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.piece_thumb_item, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.piece_thumb_item, parent, false)
         return ViewHolder(view)
     }
 
     class ViewHolder(
-            view: View,
-            val thumbView: ImageView = view.findViewById(R.id.thumbView)
+        view: View,
+        val thumbView: ImageView = view.findViewById(R.id.thumbView)
     ) : RecyclerView.ViewHolder(view)
 }

@@ -17,21 +17,22 @@ import com.github.charleslzq.pacsdemo.R
 class ItemClickSupport private constructor(private val mRecyclerView: RecyclerView) {
     private var mOnItemClickListener: OnItemClickListener? = null
     private var mOnItemLongClickListener: OnItemLongClickListener? = null
-    private val mOnClickListener = object : View.OnClickListener {
-        override fun onClick(v: View) {
-            if (mOnItemClickListener != null) {
-                val holder = mRecyclerView.getChildViewHolder(v)
-                mOnItemClickListener!!.onItemClicked(mRecyclerView, holder.getAdapterPosition(), v)
-            }
+    private val mOnClickListener: (View) -> Unit = {
+        if (mOnItemClickListener != null) {
+            val holder = mRecyclerView.getChildViewHolder(it)
+            mOnItemClickListener!!.onItemClicked(mRecyclerView, holder.adapterPosition, it)
         }
     }
-    private val mOnLongClickListener = object : View.OnLongClickListener {
-        override fun onLongClick(v: View): Boolean {
-            if (mOnItemLongClickListener != null) {
-                val holder = mRecyclerView.getChildViewHolder(v)
-                return mOnItemLongClickListener!!.onItemLongClicked(mRecyclerView, holder.getAdapterPosition(), v)
-            }
-            return false
+    private val mOnLongClickListener: (View) -> Boolean = {
+        if (mOnItemLongClickListener != null) {
+            val holder = mRecyclerView.getChildViewHolder(it)
+            mOnItemLongClickListener!!.onItemLongClicked(
+                mRecyclerView,
+                holder.adapterPosition,
+                it
+            )
+        } else {
+            false
         }
     }
     private val mAttachListener = object : RecyclerView.OnChildAttachStateChangeListener {

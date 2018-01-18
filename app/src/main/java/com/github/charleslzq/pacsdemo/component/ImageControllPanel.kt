@@ -16,8 +16,8 @@ import com.github.charleslzq.pacsdemo.support.TypefaceUtil
  * Created by charleslzq on 17-12-19.
  */
 class ImageControllPanel(
-        baseView: View,
-        imageFrameStore: ImageFrameStore
+    baseView: View,
+    imageFrameStore: ImageFrameStore
 ) : Component<View, ImageFrameStore>(baseView, imageFrameStore) {
     private val play: Button = view.findViewById(R.id.imagePlay)
     private val first: Button = view.findViewById(R.id.firstImage)
@@ -123,7 +123,11 @@ class ImageControllPanel(
                 imageSeekBar.progress = store.index
                 imageSeekBar.visibility = View.VISIBLE
                 imageSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    override fun onProgressChanged(
+                        seekBar: SeekBar?,
+                        progress: Int,
+                        fromUser: Boolean
+                    ) {
                         if (fromUser) {
                             dispatch(ImageDisplayActions.showImage(progress))
                         }
@@ -160,11 +164,12 @@ class ImageControllPanel(
 
         renderByAll(store::displayModel, store::index) {
             play.post {
-                play.text = if (store.displayModel.images.size > 1 && store.index != store.size - 1) {
-                    view.context.resources.getString(R.string.image_pause)
-                } else {
-                    view.context.resources.getString(R.string.image_play)
-                }
+                play.text =
+                        if (store.displayModel.images.size > 1 && store.index != store.size - 1) {
+                            view.context.resources.getString(R.string.image_pause)
+                        } else {
+                            view.context.resources.getString(R.string.image_play)
+                        }
             }
         }
 

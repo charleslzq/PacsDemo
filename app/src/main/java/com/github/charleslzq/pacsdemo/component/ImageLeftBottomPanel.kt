@@ -10,8 +10,8 @@ import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
  * Created by charleslzq on 17-12-6.
  */
 class ImageLeftBottomPanel(
-        panelView: View,
-        imageFrameStore: ImageFrameStore
+    panelView: View,
+    imageFrameStore: ImageFrameStore
 ) : Component<View, ImageFrameStore>(panelView, imageFrameStore) {
     private val xRayInfo: TextView = view.findViewById(R.id.xRayInfo)
     private val timeInfo: TextView = view.findViewById(R.id.time)
@@ -42,7 +42,8 @@ class ImageLeftBottomPanel(
         }
 
         renderByAll(store::hideMeta, store::measure) {
-            view.visibility = if (store.hideMeta || store.measure != ImageFrameStore.Measure.NONE) View.INVISIBLE else View.VISIBLE
+            view.visibility =
+                    if (store.hideMeta || store.measure != ImageFrameStore.Measure.NONE) View.INVISIBLE else View.VISIBLE
         }
     }
 }

@@ -27,7 +27,8 @@ class DicomDataServiceBackground : Service(), RxScheduleSupport {
     private lateinit var patients: Set<String>
     private lateinit var wsUrl: String
 
-    override fun onBind(intent: Intent): IBinder? = DicomDataServiceImpl(messageBroker, dataStore, sharedPreferences)
+    override fun onBind(intent: Intent): IBinder? =
+        DicomDataServiceImpl(messageBroker, dataStore, sharedPreferences)
 
     override fun onCreate() {
         super.onCreate()
@@ -38,9 +39,9 @@ class DicomDataServiceBackground : Service(), RxScheduleSupport {
 
         callOnIo {
             Triple(
-                    sharedPreferences.getString(CLIENT_ID, UUID.randomUUID().toString().toUpperCase()),
-                    sharedPreferences.getStringSet(PATIENTS, setOf("03117795")),
-                    sharedPreferences.getString(WS_URL, "ws://10.0.2.2:8080/pacs")
+                sharedPreferences.getString(CLIENT_ID, UUID.randomUUID().toString().toUpperCase()),
+                sharedPreferences.getStringSet(PATIENTS, setOf("03117795")),
+                sharedPreferences.getString(WS_URL, "ws://10.0.2.2:8080/pacs")
             )
         }.apply {
             clientId = first

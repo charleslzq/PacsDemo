@@ -11,7 +11,8 @@ import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
  */
 data class ImageThumbModel(val modId: String, val thumb: Bitmap)
 
-class PacsStore : Store<PacsStore>(MiddleWare.debugLog, buildThunk<PacsStore>()), RxScheduleSupport {
+class PacsStore : Store<PacsStore>(MiddleWare.debugLog, buildThunk<PacsStore>()),
+    RxScheduleSupport {
     var thumbList by ObservableStatus(mutableListOf<ImageThumbModel>())
         private set
     var selected: Int by ObservableStatus(-1)

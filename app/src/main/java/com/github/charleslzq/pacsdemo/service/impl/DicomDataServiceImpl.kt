@@ -14,9 +14,9 @@ import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
  * Created by charleslzq on 17-11-15.
  */
 class DicomDataServiceImpl(
-        private val messageBroker: DicomMessageBroker,
-        private val dataStore: DicomDataStore,
-        private val sharedPreferences: SharedPreferences
+    private val messageBroker: DicomMessageBroker,
+    private val dataStore: DicomDataStore,
+    private val sharedPreferences: SharedPreferences
 ) : Binder(), DicomDataService, RxScheduleSupport {
     private val cache = MemCache(DicomPatient::class.java, 5)
 
@@ -31,7 +31,9 @@ class DicomDataServiceImpl(
     }
 
     override fun requirePatients(vararg patientId: String) = runOnIo {
-        val patients = sharedPreferences.getStringSet(DicomDataServiceBackground.PATIENTS, emptySet()).toMutableSet()
+        val patients =
+            sharedPreferences.getStringSet(DicomDataServiceBackground.PATIENTS, emptySet())
+                .toMutableSet()
         patients.addAll(patientId)
 
         val editor = sharedPreferences.edit()

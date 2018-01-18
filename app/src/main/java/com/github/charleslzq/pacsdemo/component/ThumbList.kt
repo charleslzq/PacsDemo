@@ -14,8 +14,8 @@ import com.github.charleslzq.pacsdemo.support.DicomSeriesThumbListAdpater
  * Created by charleslzq on 17-11-27.
  */
 class ThumbList(
-        recyclerView: RecyclerView,
-        pacsStore: PacsStore
+    recyclerView: RecyclerView,
+    pacsStore: PacsStore
 ) : PacsComponent<RecyclerView>(recyclerView, pacsStore) {
 
     init {
@@ -30,27 +30,42 @@ class ThumbList(
             }
             view.adapter.notifyDataSetChanged()
             if (store.thumbList.isNotEmpty()) {
-                ItemClickSupport.addTo(view).setOnItemClickListener(object : ItemClickSupport.OnItemClickListener {
-                    override fun onItemClicked(recyclerView: RecyclerView, position: Int, v: View) {
-                        if (store.layoutOption == PacsStore.LayoutOption.ONE_ONE && position in 0 until store.thumbList.size) {
-                            store.dispatch(PacsStore.ThumbListItemClicked(position))
-                            store.imageCells.first().dispatch(ImageDisplayActions.bindModel(getModId(position)))
-                        }
-                    }
-                })
-                ItemClickSupport.addTo(view).setOnItemLongClickListener(object : ItemClickSupport.OnItemLongClickListener {
-                    @Suppress("DEPRECATION")
-                    override fun onItemLongClicked(recyclerView: RecyclerView, position: Int, v: View): Boolean {
-                        if (store.layoutOption != PacsStore.LayoutOption.ONE_ONE) {
-                            getThumbView(position)?.let {
-                                val dragBuilder = View.DragShadowBuilder(it)
-                                val clipData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), ClipData.Item(tag))
-                                it.startDrag(clipData, dragBuilder, getModId(position), 0)
+                ItemClickSupport.addTo(view)
+                    .setOnItemClickListener(object : ItemClickSupport.OnItemClickListener {
+                        override fun onItemClicked(
+                            recyclerView: RecyclerView,
+                            position: Int,
+                            v: View
+                        ) {
+                            if (store.layoutOption == PacsStore.LayoutOption.ONE_ONE && position in 0 until store.thumbList.size) {
+                                store.dispatch(PacsStore.ThumbListItemClicked(position))
+                                store.imageCells.first()
+                                    .dispatch(ImageDisplayActions.bindModel(getModId(position)))
                             }
                         }
-                        return true
-                    }
-                })
+                    })
+                ItemClickSupport.addTo(view)
+                    .setOnItemLongClickListener(object : ItemClickSupport.OnItemLongClickListener {
+                        @Suppress("DEPRECATION")
+                        override fun onItemLongClicked(
+                            recyclerView: RecyclerView,
+                            position: Int,
+                            v: View
+                        ): Boolean {
+                            if (store.layoutOption != PacsStore.LayoutOption.ONE_ONE) {
+                                getThumbView(position)?.let {
+                                    val dragBuilder = View.DragShadowBuilder(it)
+                                    val clipData = ClipData(
+                                        tag,
+                                        arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN),
+                                        ClipData.Item(tag)
+                                    )
+                                    it.startDrag(clipData, dragBuilder, getModId(position), 0)
+                                }
+                            }
+                            return true
+                        }
+                    })
             }
         }
 
@@ -74,7 +89,8 @@ class ThumbList(
         getThumbView(position)?.isSelected = selected
     }
 
-    private fun getThumbView(position: Int) = (view.findViewHolderForAdapterPosition(position) as? DicomSeriesThumbListAdpater.ViewHolder)?.thumbView
+    private fun getThumbView(position: Int) =
+        (view.findViewHolderForAdapterPosition(position) as? DicomSeriesThumbListAdpater.ViewHolder)?.thumbView
 
     companion object {
         val tag = "thumbList"
