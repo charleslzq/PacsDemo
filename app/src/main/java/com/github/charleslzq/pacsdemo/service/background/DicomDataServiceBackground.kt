@@ -82,10 +82,10 @@ class DicomDataServiceBackground : Service(), RxScheduleSupport {
     }
 
     companion object {
-        val CLIENT_ID = "clientId"
-        val WS_URL = "wsUrl"
-        val PATIENTS = "patients"
-        val STORE_BASE = "/Pacs/Dicom/Store"
-        val SHARED_PREFERENCE = "com.github.charleslzq.pacsdemo"
+        const val CLIENT_ID = "clientId"
+        const val WS_URL = "wsUrl"
+        const val PATIENTS = "patients"
+        const val STORE_BASE = "/Pacs/Dicom/Store"
+        const val SHARED_PREFERENCE = "com.github.charleslzq.pacsdemo"
     }
 }

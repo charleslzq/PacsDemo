@@ -30,7 +30,7 @@ fun PointF.distance(pointF: PointF = PointF(0f, 0f)) =
     Math.sqrt((this - pointF).let { it * it }.toDouble())
 
 object ImageMeasureActions : RxScheduleSupport {
-    private val precision = 2
+    private const val PRECISION = 2
 
     fun selectPoint(point: PointF, replaceLast: Boolean, showMagnify: Boolean) = buildAction {
         runOnCompute {
@@ -181,7 +181,7 @@ object ImageMeasureActions : RxScheduleSupport {
         width: Int,
         height: Int
     ): Pair<PointF, String> {
-        val text = (points.first().distance(points.last()) / store.scale) format precision
+        val text = (points.first().distance(points.last()) / store.scale) format PRECISION
         val rawLocation = (points.first() + points.last()) / 2f
         return Rect().let {
             store.stringPaint.getTextBounds(text, 0, text.length, it)
@@ -209,7 +209,7 @@ object ImageMeasureActions : RxScheduleSupport {
     ): Pair<PointF, String> {
         val text = buildString {
             append("∠")
-            append(calculateAngle(points[0], points[1], points[2]) format precision)
+            append(calculateAngle(points[0], points[1], points[2]) format PRECISION)
             append("°")
         }
         val rawLocation = points[1]

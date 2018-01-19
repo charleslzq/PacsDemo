@@ -23,7 +23,7 @@ data class PatientSeriesModel(
 object ImageDisplayActions : RxScheduleSupport {
     private val seriesModels: MutableList<PatientSeriesModel> = mutableListOf()
     private var bitmapCache = BitmapCache()
-    private val preloadRange = 5
+    private const val PRE_LOAD_RANGE = 5
 
     fun reloadModels(patientSeriesModelList: List<PatientSeriesModel>): DispatchAction<PacsStore> {
         seriesModels.clear()
@@ -89,8 +89,8 @@ object ImageDisplayActions : RxScheduleSupport {
                         bitmapCache.preload(
                             *urisInRange(
                                 it,
-                                index - preloadRange,
-                                index + preloadRange
+                                index - PRE_LOAD_RANGE,
+                                index + PRE_LOAD_RANGE
                             ).toTypedArray()
                         )
                     }
@@ -192,8 +192,8 @@ object ImageDisplayActions : RxScheduleSupport {
                 bitmapCache.preload(
                     *urisInRange(
                         it,
-                        index - preloadRange,
-                        index + preloadRange
+                        index - PRE_LOAD_RANGE,
+                        index + PRE_LOAD_RANGE
                     ).toTypedArray()
                 )
             }

@@ -42,7 +42,7 @@ class ImageControllPanel(
     private val dispatch = store.dispatch
 
     init {
-        val fontAwesomeTypeface = TypefaceUtil.getTypeFace(view.context, TypefaceUtil.fontAwesome)
+        val fontAwesomeTypeface = TypefaceUtil.getTypeFace(view.context, TypefaceUtil.FONT_AWESOME)
         measureLine.typeface = fontAwesomeTypeface
         measureAngle.typeface = fontAwesomeTypeface
         pseudo.typeface = fontAwesomeTypeface

@@ -37,7 +37,7 @@ class ButtonPanel(
             layoutSelector.show()
         }
 
-        val fontAwesomeTypeface = TypefaceUtil.getTypeFace(view.context, TypefaceUtil.fontAwesome)
+        val fontAwesomeTypeface = TypefaceUtil.getTypeFace(view.context, TypefaceUtil.FONT_AWESOME)
         splitButton.typeface = fontAwesomeTypeface
         backButton.typeface = fontAwesomeTypeface
     }

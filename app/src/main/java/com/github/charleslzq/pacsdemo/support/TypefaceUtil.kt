@@ -7,7 +7,7 @@ import android.graphics.Typeface
  * Created by charleslzq on 17-12-6.
  */
 object TypefaceUtil {
-    val fontAwesome = "fontawesome-webfont.ttf"
+    const val FONT_AWESOME = "fontawesome-webfont.ttf"
     private val registry = mutableMapOf<String, Typeface>()
 
     fun getTypeFace(context: Context, path: String): Typeface {

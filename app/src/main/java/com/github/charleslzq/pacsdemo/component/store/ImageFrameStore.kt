@@ -26,9 +26,9 @@ data class ImageFrameModel(
     val frame: URI = meta.let { it.files[DEFAULT] }!!
 ) {
     companion object {
-        val THUMB = "thumb"
-        val DEFAULT = "default"
-        val RAW = "raw"
+        const val THUMB = "thumb"
+        const val DEFAULT = "default"
+        const val RAW = "raw"
     }
 }
 
