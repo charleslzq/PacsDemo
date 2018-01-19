@@ -108,8 +108,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
         pointPaint.style = Paint.Style.FILL_AND_STROKE
 
         reduce(ImageFrameStore::allowPlay) {
-            on<AllowPlay> { true }
-            on<ForbidPlay> { false }
+            on<SetPlayable> { event.value }
             on<Reset> { true }
         }
 
@@ -309,8 +308,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     private fun getNewScaleFactor(rawScaleFactor: Float): Float =
         Math.max(1.0f, Math.min(rawScaleFactor * gestureScale, 5.0f))
 
-    class AllowPlay
-    class ForbidPlay
+    class SetPlayable(val value: Boolean)
 
     data class BindModel(
         val modeId: String,

@@ -38,8 +38,9 @@ object ImageMeasureActions : RxScheduleSupport {
                 points.pop()
             }
             points.push(point)
-            val width = getCurrentImage(store)!!.width
-            val height = getCurrentImage(store)!!.height
+            val image = getCurrentImage(store)!!
+            val width = image.width
+            val height = image.height
             val drawingText = when {
                 !showMagnify && points.size == 2 && store.measure == Measure.LINE -> calculateLineText(
                     points,

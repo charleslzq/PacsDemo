@@ -2,7 +2,6 @@ package com.github.charleslzq.pacsdemo.broker
 
 import android.util.Log
 import com.fatboyindustrial.gsonjodatime.Converters
-import com.github.charleslzq.dicom.data.*
 import com.github.charleslzq.pacsdemo.broker.message.DicomMessageListener
 import com.github.charleslzq.pacsdemo.broker.message.Message
 import com.github.charleslzq.pacsdemo.broker.message.MessageHeaders
@@ -55,56 +54,27 @@ class DicomWebSocketClient(
                 Message::class.java
             ).headers[MessageHeaders.TYPE_HEADER.value]?.let {
                 when (ServerMessagePayloadType.valueOf(it)) {
-                    ServerMessagePayloadType.PATIENT -> {
-                        val patientMessage = gson.fromJson<Message<DicomPatient>>(
-                            message,
-                            object : TypeToken<Message<DicomPatient>>() {
-                            }.type
-                        )
-                        dicomMessageListener.onPatient(patientMessage)
-                    }
-                    ServerMessagePayloadType.PATIENT_META -> {
-                        val patientMessage = gson.fromJson<Message<DicomPatientMetaInfo>>(
-                            message,
-                            object : TypeToken<Message<DicomPatientMetaInfo>>() {
-                            }.type
-                        )
-                        dicomMessageListener.onPatientMeta(patientMessage)
-                    }
-                    ServerMessagePayloadType.STUDY_META -> {
-                        val studyMessage = gson.fromJson<Message<DicomStudyMetaInfo>>(
-                            message,
-                            object : TypeToken<Message<DicomStudyMetaInfo>>() {
-                            }.type
-                        )
-                        dicomMessageListener.onStudyMeta(studyMessage)
-                    }
-                    ServerMessagePayloadType.SERIES_META -> {
-                        val seriesMessage = gson.fromJson<Message<DicomSeriesMetaInfo>>(
-                            message,
-                            object : TypeToken<Message<DicomSeriesMetaInfo>>() {
-                            }.type
-                        )
-                        dicomMessageListener.onSeriesMeta(seriesMessage)
-                    }
-                    ServerMessagePayloadType.IMAGE_META -> {
-                        val imageMessage = gson.fromJson<Message<DicomImageMetaInfo>>(
-                            message,
-                            object : TypeToken<Message<DicomImageMetaInfo>>() {
-                            }.type
-                        )
-                        dicomMessageListener.onImageMeta(imageMessage)
-                    }
-                    ServerMessagePayloadType.FILE -> {
-                        val fileMessage = gson.fromJson<Message<ByteArray>>(
-                            message,
-                            object : TypeToken<Message<ByteArray>>() {
-                            }.type
-                        )
-                        dicomMessageListener.onFile(fileMessage)
-                    }
+                    ServerMessagePayloadType.PATIENT -> dicomMessageListener.onPatient(
+                        toObject(message)
+                    )
+                    ServerMessagePayloadType.PATIENT_META -> dicomMessageListener.onPatientMeta(
+                        toObject(message)
+                    )
+                    ServerMessagePayloadType.STUDY_META -> dicomMessageListener.onStudyMeta(
+                        toObject(message)
+                    )
+                    ServerMessagePayloadType.SERIES_META -> dicomMessageListener.onSeriesMeta(
+                        toObject(message)
+                    )
+                    ServerMessagePayloadType.IMAGE_META -> dicomMessageListener.onImageMeta(
+                        toObject(message)
+                    )
+                    ServerMessagePayloadType.FILE -> dicomMessageListener.onFile(toObject(message))
                 }
             }
         }
     }
+
+    private inline fun <reified M> toObject(message: String) =
+        gson.fromJson<M>(message, object : TypeToken<M>() {}.type)
 }

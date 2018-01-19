@@ -53,13 +53,7 @@ object ImageDisplayActions : RxScheduleSupport {
                 dispatch(PacsStore.ChangeLayout(layoutOption.ordinal))
                 store.imageCells.forEach {
                     it.dispatch(ImageFrameStore.Reset())
-                    it.dispatch(
-                        if (layoutOption == PacsStore.LayoutOption.ONE_ONE) {
-                            ImageFrameStore.AllowPlay()
-                        } else {
-                            ImageFrameStore.ForbidPlay()
-                        }
-                    )
+                    it.dispatch(ImageFrameStore.SetPlayable(layoutOption == PacsStore.LayoutOption.ONE_ONE))
                 }
                 bitmapCache = BitmapCache(100)
             }
