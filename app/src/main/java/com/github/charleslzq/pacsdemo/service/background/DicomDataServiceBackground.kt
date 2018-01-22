@@ -20,7 +20,7 @@ import java.io.File
 import java.util.*
 
 class DicomDataServiceBackground : Service(), RxScheduleSupport {
-    private val logTag = this.javaClass.name
+    private val logTag = javaClass.name
     private lateinit var messageBroker: DicomMessageBroker
     private lateinit var dataStore: DicomDataStore<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>
     private lateinit var sharedPreferences: SharedPreferences

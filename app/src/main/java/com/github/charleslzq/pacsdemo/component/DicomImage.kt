@@ -26,7 +26,7 @@ class DicomImage(
 ) : Component<View, ImageFrameStore>(imageLayout, imageFrameStore), RxScheduleSupport {
     private val imageView: ImageView = view.findViewById(R.id.image)
     private var operationMode: OperationMode =
-        PlayMode(imageView.context, PlayModeGestureListener(store.dispatch, this::onDragStart))
+        PlayMode(imageView.context, PlayModeGestureListener(store.dispatch, ::onDragStart))
         set(value) {
             field = value
             imageView.setOnTouchListener(operationMode)
@@ -61,12 +61,12 @@ class DicomImage(
             if (store.gestureScale > 1 && operationMode is PlayMode) {
                 operationMode = StudyMode(
                     imageView.context,
-                    StudyModeGestureListener(store.dispatch, this::onDragStart)
+                    StudyModeGestureListener(store.dispatch, ::onDragStart)
                 )
             } else if (store.gestureScale == 1.0f && operationMode is StudyMode) {
                 operationMode = PlayMode(
                     imageView.context,
-                    PlayModeGestureListener(store.dispatch, this::onDragStart)
+                    PlayModeGestureListener(store.dispatch, ::onDragStart)
                 )
             }
         }
@@ -92,12 +92,12 @@ class DicomImage(
                     if (store.gestureScale > 1.0f) {
                         StudyMode(
                             imageView.context,
-                            StudyModeGestureListener(store.dispatch, this::onDragStart)
+                            StudyModeGestureListener(store.dispatch, ::onDragStart)
                         )
                     } else {
                         PlayMode(
                             imageView.context,
-                            PlayModeGestureListener(store.dispatch, this::onDragStart)
+                            PlayModeGestureListener(store.dispatch, ::onDragStart)
                         )
                     }
                 }

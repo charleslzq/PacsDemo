@@ -59,7 +59,7 @@ class PacsDemoActivity : AppCompatActivity() {
         }
 
         pacs = PacsMain(pacsPanel, PacsStore())
-        backButton.setOnClickListener { this.finish() }
+        backButton.setOnClickListener { finish() }
 
         bindService(
             Intent(this, DicomDataServiceBackground::class.java),

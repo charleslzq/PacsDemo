@@ -32,7 +32,7 @@ class ButtonPanel(
         layoutSelector.menu.add(Menu.NONE, R.id.one_two, Menu.NONE, "1 X 2")
         layoutSelector.menu.add(Menu.NONE, R.id.two_two, Menu.NONE, "2 X 2")
         layoutSelector.menu.add(Menu.NONE, R.id.three_three, Menu.NONE, "3 X 3")
-        layoutSelector.setOnMenuItemClickListener(this::onLayoutSelected)
+        layoutSelector.setOnMenuItemClickListener(::onLayoutSelected)
         splitButton.setOnClickListener {
             layoutSelector.show()
         }

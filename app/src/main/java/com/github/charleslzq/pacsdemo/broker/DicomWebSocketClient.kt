@@ -22,11 +22,11 @@ class DicomWebSocketClient(
     private val gson: Gson = Converters.registerLocalDateTime(GsonBuilder()).create()
 ) : RxScheduleSupport {
     private var webSocket: WebSocket? = null
-    private val logTag = this.javaClass.name
+    private val logTag = javaClass.name
     private val heartBeat = "@heart"
 
     fun connect() = runOnIo {
-        AsyncHttpClient.getDefaultInstance().websocket(url, "dicom", this::onComplete)
+        AsyncHttpClient.getDefaultInstance().websocket(url, "dicom", ::onComplete)
     }
 
     fun isOpen() = webSocket?.isOpen ?: false
