@@ -17,13 +17,12 @@ import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.component.store.PatientSeriesModel
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackground
-import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_pacs_demo.*
 import java.util.*
 
-class PacsDemoActivity : AppCompatActivity(), RxScheduleSupport {
+class PacsDemoActivity : AppCompatActivity() {
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             dicomDataService = null
