@@ -42,19 +42,21 @@ class ImageControllPanel(
     private val dispatch = store.dispatch
 
     init {
-        val fontAwesomeTypeface = TypefaceUtil.getTypeFace(view.context, TypefaceUtil.FONT_AWESOME)
-        measureLine.typeface = fontAwesomeTypeface
-        measureAngle.typeface = fontAwesomeTypeface
-        pseudo.typeface = fontAwesomeTypeface
-        reverse.typeface = fontAwesomeTypeface
-        undo.typeface = fontAwesomeTypeface
-        redo.typeface = fontAwesomeTypeface
-        clear.typeface = fontAwesomeTypeface
-        play.typeface = fontAwesomeTypeface
-        previous.typeface = fontAwesomeTypeface
-        next.typeface = fontAwesomeTypeface
-        first.typeface = fontAwesomeTypeface
-        last.typeface = fontAwesomeTypeface
+        TypefaceUtil.configureTextView(
+            TypefaceUtil.FONT_AWESOME,
+            measureLine,
+            measureAngle,
+            pseudo,
+            reverse,
+            undo,
+            redo,
+            clear,
+            play,
+            previous,
+            next,
+            first,
+            last
+        )
 
         measureAngle.setOnClickListener {
             dispatch(MeasureAngleTurned())

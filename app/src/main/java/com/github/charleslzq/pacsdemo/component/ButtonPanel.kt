@@ -37,9 +37,7 @@ class ButtonPanel(
             layoutSelector.show()
         }
 
-        val fontAwesomeTypeface = TypefaceUtil.getTypeFace(view.context, TypefaceUtil.FONT_AWESOME)
-        splitButton.typeface = fontAwesomeTypeface
-        backButton.typeface = fontAwesomeTypeface
+        TypefaceUtil.configureTextView(TypefaceUtil.FONT_AWESOME, splitButton, backButton)
     }
 
     private fun onLayoutSelected(item: MenuItem): Boolean {

@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.os.Environment
 import android.os.IBinder
 import android.util.Log
+import com.github.charleslzq.dicom.data.*
 import com.github.charleslzq.dicom.store.DicomDataFileStore
 import com.github.charleslzq.dicom.store.DicomDataStore
 import com.github.charleslzq.pacsdemo.broker.DicomMessageBroker
@@ -21,7 +22,7 @@ import java.util.*
 class DicomDataServiceBackground : Service(), RxScheduleSupport {
     private val logTag = this.javaClass.name
     private lateinit var messageBroker: DicomMessageBroker
-    private lateinit var dataStore: DicomDataStore
+    private lateinit var dataStore: DicomDataStore<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var clientId: String
     private lateinit var patients: Set<String>
@@ -73,7 +74,11 @@ class DicomDataServiceBackground : Service(), RxScheduleSupport {
                     stopSelf()
                 }
             }
-            DicomDataFileStore(storeRoot, saveHandler)
+            DicomDataFileStore<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>(
+                storeRoot,
+                DicomDataFactory.Default(),
+                saveHandler
+            )
         }
 
         messageBroker.register(StoreMessageListener(dataStore))

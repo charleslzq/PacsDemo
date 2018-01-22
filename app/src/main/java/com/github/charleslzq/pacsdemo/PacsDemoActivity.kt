@@ -9,7 +9,10 @@ import android.os.IBinder
 import android.os.StrictMode
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import com.github.charleslzq.dicom.data.DicomImageMetaInfo
+import com.github.charleslzq.dicom.data.DicomSeriesMetaInfo
 import com.github.charleslzq.dicom.data.DicomStudy
+import com.github.charleslzq.dicom.data.DicomStudyMetaInfo
 import com.github.charleslzq.pacsdemo.component.PacsMain
 import com.github.charleslzq.pacsdemo.component.store.ImageDisplayActions
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameModel
@@ -76,7 +79,8 @@ class PacsDemoActivity : AppCompatActivity() {
             when (patient == null) {
                 true -> emptyList()
                 false -> {
-                    val filter: (DicomStudy) -> Boolean = if (studyId == null) {
+                    val filter: (DicomStudy<DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>) -> Boolean =
+                        if (studyId == null) {
                         { true }
                     } else {
                         { it.metaInfo.instanceUID == studyId }

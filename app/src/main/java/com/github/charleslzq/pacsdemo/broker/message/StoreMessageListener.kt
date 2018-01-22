@@ -7,9 +7,10 @@ import java.io.File
 /**
  * Created by charleslzq on 17-11-15.
  */
-class StoreMessageListener(private val dicomDataStore: DicomDataStore) : DicomMessageListener {
+class StoreMessageListener(private val dicomDataStore: DicomDataStore<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>) :
+    DicomMessageListener {
 
-    override fun onPatient(dicomPatientMessage: Message<DicomPatient>) =
+    override fun onPatient(dicomPatientMessage: Message<DicomPatient<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>>) =
         dicomDataStore.savePatient(dicomPatientMessage.payload)
 
     override fun onPatientMeta(dicomPatientMetaInfoMessage: Message<DicomPatientMetaInfo>) =

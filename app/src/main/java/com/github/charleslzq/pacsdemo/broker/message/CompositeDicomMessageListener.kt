@@ -13,7 +13,7 @@ class CompositeDicomMessageListener : DicomMessageListener {
 
     fun cancel(listener: DicomMessageListener) = listeners.remove(listener)
 
-    override fun onPatient(dicomPatientMessage: Message<DicomPatient>) =
+    override fun onPatient(dicomPatientMessage: Message<DicomPatient<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>>) =
         listeners.forEach { it.onPatient(dicomPatientMessage) }
 
     override fun onPatientMeta(dicomPatientMetaInfoMessage: Message<DicomPatientMetaInfo>) =

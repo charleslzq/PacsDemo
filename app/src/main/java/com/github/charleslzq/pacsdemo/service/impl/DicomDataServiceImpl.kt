@@ -2,7 +2,7 @@ package com.github.charleslzq.pacsdemo.service.impl
 
 import android.content.SharedPreferences
 import android.os.Binder
-import com.github.charleslzq.dicom.data.DicomPatient
+import com.github.charleslzq.dicom.data.*
 import com.github.charleslzq.dicom.store.DicomDataStore
 import com.github.charleslzq.pacsdemo.broker.DicomMessageBroker
 import com.github.charleslzq.pacsdemo.service.DicomDataService
@@ -15,11 +15,12 @@ import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
  */
 class DicomDataServiceImpl(
     private val messageBroker: DicomMessageBroker,
-    private val dataStore: DicomDataStore,
+    private val dataStore: DicomDataStore<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>,
     private val sharedPreferences: SharedPreferences
 ) : Binder(), DicomDataService, RxScheduleSupport {
     private val cache = MemCache(DicomPatient::class.java, 5)
 
+    @Suppress("UNCHECKED_CAST")
     override fun findPatient(patientId: String) = cache.load(patientId) {
         callOnIo {
             listOfNotNull(dataStore.getPatient(patientId)).apply {
@@ -28,7 +29,7 @@ class DicomDataServiceImpl(
                 }
             }
         }.firstOrNull()
-    }
+    } as DicomPatient<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>
 
     override fun requirePatients(vararg patientId: String) = runOnIo {
         val patients =
