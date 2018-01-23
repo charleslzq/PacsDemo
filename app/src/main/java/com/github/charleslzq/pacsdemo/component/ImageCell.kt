@@ -3,6 +3,7 @@ package com.github.charleslzq.pacsdemo.component
 import android.view.DragEvent
 import android.view.View
 import com.github.charleslzq.kotlin.react.Component
+import com.github.charleslzq.kotlin.react.ObservableStatus.Companion.resetFields
 import com.github.charleslzq.pacsdemo.R
 import com.github.charleslzq.pacsdemo.component.store.ImageDisplayActions
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
@@ -15,6 +16,8 @@ class ImageCell(
     imageFrameStore: ImageFrameStore
 ) : Component<View, ImageFrameStore>(baseView, imageFrameStore) {
     init {
+        resetFields(store)
+
         bind {
             child { ImageLeftTopPanel(byId(R.id.leftTopPanel), store) }
             child { ImageRightTopPanel(byId(R.id.rightTopPanel), store) }

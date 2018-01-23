@@ -21,18 +21,18 @@ data class PatientSeriesModel(
 )
 
 object ImageDisplayActions : RxScheduleSupport {
-    private val seriesModels: MutableList<PatientSeriesModel> = mutableListOf()
+    private val seriesModels: MutableMap<String, PatientSeriesModel> = mutableMapOf()
     private var bitmapCache = BitmapCache()
     private const val PRE_LOAD_RANGE = 5
 
     fun reloadModels(patientSeriesModelList: List<PatientSeriesModel>): DispatchAction<PacsStore> {
         seriesModels.clear()
-        seriesModels.addAll(patientSeriesModelList)
+        patientSeriesModelList.forEach { seriesModels[it.modId] = it }
         val thumbList = callOnIo {
-            seriesModels.filter { it.modId.isNotBlank() && it.thumb != null }
+            seriesModels.filter { it.value.thumb != null }
                 .mapNotNull {
-                    BitmapCache.decode(it.thumb!!)
-                        ?.let { thumb -> ImageThumbModel(it.modId, thumb) }
+                    BitmapCache.decode(it.value.thumb!!)
+                        ?.let { thumb -> ImageThumbModel(it.key, thumb) }
                 }
         }
         return { store, dispatch, _ ->
@@ -63,7 +63,7 @@ object ImageDisplayActions : RxScheduleSupport {
         { store, dispatch, _ ->
             runOnIo {
                 store.dispatch(ImageMeasureActions.clearDrawing())
-                seriesModels.find { it.modId == modId }?.let {
+                seriesModels[modId]?.let {
                     dispatch(
                         ImageFrameStore.BindModel(
                             modId,
@@ -96,7 +96,7 @@ object ImageDisplayActions : RxScheduleSupport {
         { store, dispatch, _ ->
             runOnCompute {
                 store.dispatch(ImageMeasureActions.clearDrawing())
-                seriesModels.find { it.modId == imageFrameStore.bindModId }!!.let {
+                seriesModels[imageFrameStore.bindModId]!!.let {
                     findImage(it, imageFrameStore.index)!!.run {
                         dispatch(
                             ImageFrameStore.MoveModel(
@@ -128,7 +128,7 @@ object ImageDisplayActions : RxScheduleSupport {
                 if (store.displayModel.images.size > 1 && store.autoJumpIndex != 0) {
                     dispatchShowImage(store.bindModId, store.index, dispatch)
                 } else {
-                    seriesModels.find { it.modId == store.bindModId }?.let {
+                    seriesModels[store.bindModId]?.let {
                         dispatch(ImageFrameStore.PlayAnimation(findFrames(it, store.autoJumpIndex)))
                     }
                 }
@@ -143,7 +143,7 @@ object ImageDisplayActions : RxScheduleSupport {
     }
 
     fun playIndexChange(index: Int): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
-        seriesModels.find { it.modId == store.bindModId }?.let {
+        seriesModels[store.bindModId]?.let {
             if (index in 0 until it.frames.size) {
                 dispatch(ImageFrameStore.PlayIndexChange(index, it.frames[index].meta))
             }
@@ -180,7 +180,7 @@ object ImageDisplayActions : RxScheduleSupport {
         ).map { it.frame }
 
     private fun dispatchShowImage(modId: String, index: Int, dispatch: (Any) -> Unit) =
-        seriesModels.find { it.modId == modId }?.let {
+        seriesModels[modId]?.let {
             findImage(it, index)?.run {
                 dispatch(ImageFrameStore.ShowImage(this, index, it.frames[index].meta))
                 bitmapCache.preload(
