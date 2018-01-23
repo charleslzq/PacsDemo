@@ -29,7 +29,7 @@ class DicomDataServiceImpl(
                 }
             }
         }.firstOrNull()
-    } as DicomPatient<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>
+    } as? DicomPatient<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>
 
     override fun requirePatients(vararg patientId: String) = runOnIo {
         val patients =
