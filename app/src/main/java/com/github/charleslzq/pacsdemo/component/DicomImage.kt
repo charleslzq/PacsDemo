@@ -69,7 +69,7 @@ class DicomImage(
         }
 
         render(ImageFrameStore::matrix) {
-            imageView.imageMatrix = store.matrix
+            imageView.imageMatrix = store.compositeMatrix
         }
 
         render(ImageFrameStore::colorMatrix) {

@@ -37,7 +37,7 @@ object ImageMeasureActions : RxScheduleSupport {
             if (replaceLast && points.isNotEmpty()) {
                 points.pop()
             }
-            points.push(point)
+            points.push(mapPoint(store, point))
             val image = getCurrentImage(store)!!
             val width = image.width
             val height = image.height
@@ -135,18 +135,20 @@ object ImageMeasureActions : RxScheduleSupport {
         }
 
     private fun createDrawingBase(store: ImageFrameStore) =
-        getCurrentImage(store)?.let { Bitmap.createBitmap(it.width, it.height, it.config) }
+        getCurrentImage(store)?.let {
+            Bitmap.createBitmap(it.width, it.height, it.config)
+        }
+
+    private fun mapPoint(store: ImageFrameStore, point: PointF) =
+        FloatArray(2).apply {
+            this[0] = point.x
+            this[1] = point.y
+            store.getInvertMatrix().mapPoints(this)
+        }.let { PointF(it[0], it[1]) }
 
     private fun getCurrentImage(store: ImageFrameStore) =
         if (store.displayModel.images.isNotEmpty()) {
-            val rawBitmap = store.displayModel.images[0]
-            if (store.scale != 1.0f) {
-                val newWidth = (rawBitmap.width * store.scale).toInt()
-                val newHeight = (rawBitmap.height * store.scale).toInt()
-                Bitmap.createScaledBitmap(rawBitmap, newWidth, newHeight, false)
-            } else {
-                rawBitmap
-            }
+            store.displayModel.images[0]
         } else {
             null
         }

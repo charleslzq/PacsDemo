@@ -73,6 +73,8 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     var autoScale by ObservableStatus(1.0f)
     var gestureScale by ObservableStatus(1.0f)
         private set
+    val compositeMatrix
+        get() = Matrix(matrix).apply { postScale(autoScale, autoScale) }
     var matrix by ObservableStatus(Matrix())
         private set
     var colorMatrix by ObservableStatus(ColorMatrix())
@@ -306,9 +308,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     }
 
     fun getInvertMatrix() = Matrix().apply {
-        if (!matrix.invert(this)) {
-            throw IllegalStateException("Error on invert image matrix")
-        }
+        compositeMatrix.invert(this)
     }
 
     private fun getNewScaleFactor(rawScaleFactor: Float): Float =
