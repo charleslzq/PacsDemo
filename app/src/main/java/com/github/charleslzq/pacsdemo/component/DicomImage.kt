@@ -3,10 +3,7 @@ package com.github.charleslzq.pacsdemo.component
 import android.content.ClipData
 import android.content.ClipDescription
 import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.ColorMatrixColorFilter
+import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import android.widget.ImageView
@@ -43,7 +40,7 @@ class DicomImage(
                 imageView.background = null
             }
             if (it.images.isNotEmpty()) {
-                callOnCompute { autoAdjustScale(it.images[0]) }
+                runOnCompute { autoAdjustScale(it.images[0]) }
             }
             if (it.images.size > 1) {
                 imageView.setImageBitmap(null)
@@ -136,11 +133,14 @@ class DicomImage(
             imageView.layoutParams.height = desiredHeight
             desiredHeight.toFloat() / imageHeight
         }
+        imageView.imageMatrix = Matrix().apply {
+            setScale(store.autoScale, store.autoScale)
+        }
     }
 
     private fun getCurrentImage() = if (store.displayModel.images.isNotEmpty()) {
         callOnCompute {
-            scaleIfNecessary(pseudoIfRequired(store.displayModel.images[0])).let {
+            pseudoIfRequired(store.displayModel.images[0]).let {
                 it.copy(
                     it.config,
                     true
@@ -149,14 +149,6 @@ class DicomImage(
         }
     } else {
         null
-    }
-
-    private fun scaleIfNecessary(rawBitmap: Bitmap) = if (store.scale != 1.0f) {
-        val newWidth = (rawBitmap.width * store.scale).toInt()
-        val newHeight = (rawBitmap.height * store.scale).toInt()
-        Bitmap.createScaledBitmap(rawBitmap, newWidth, newHeight, false)
-    } else {
-        rawBitmap
     }
 
     private fun pseudoIfRequired(rawBitmap: Bitmap) = if (store.pseudoColor) {

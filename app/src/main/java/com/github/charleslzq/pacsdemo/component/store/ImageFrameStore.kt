@@ -188,7 +188,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             on<ScaleChange> {
                 Matrix(state).apply {
                     val newScale = getNewScaleFactor(event.scaleFactor)
-                    setScale(newScale, newScale, event.focus.x, event.focus.y)
+                    postScale(newScale, newScale, event.focus.x, event.focus.y)
                 }
             }
             on<LocationTranslate> {
@@ -302,6 +302,12 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             on<BindModel> { ImageCanvasModel() }
             on<MoveModel> { event.canvasModel }
             on<ClearMeasure> { ImageCanvasModel() }
+        }
+    }
+
+    fun getInvertMatrix() = Matrix().apply {
+        if (!matrix.invert(this)) {
+            throw IllegalStateException("Error on invert image matrix")
         }
     }
 

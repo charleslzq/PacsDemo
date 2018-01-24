@@ -81,10 +81,10 @@ class PacsDemoActivity : AppCompatActivity() {
                 false -> {
                     val filter: (DicomStudy<DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>) -> Boolean =
                         if (studyId == null) {
-                        { true }
-                    } else {
-                        { it.metaInfo.instanceUID == studyId }
-                    }
+                            { true }
+                        } else {
+                            { it.metaInfo.instanceUID == studyId }
+                        }
                     patient!!.studies.filter(filter).flatMap { study ->
                         study.series.sortedBy { it.metaInfo.instanceUID }.map {
                             PatientSeriesModel(
