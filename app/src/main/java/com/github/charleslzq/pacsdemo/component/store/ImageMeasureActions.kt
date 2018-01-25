@@ -108,7 +108,7 @@ object ImageMeasureActions : RxScheduleSupport {
     }
 
     /**
-     * 重做上一次撤销的操作(不包括撤销的未完成操作)
+     * @return 重做上一次撤销的操作(不包括撤销的未完成操作)
      */
     fun redoDrawing() = buildAction {
         if (undoSupport.canRedo()) {
