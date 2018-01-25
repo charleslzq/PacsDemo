@@ -60,15 +60,27 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     /**
      * 测量模式中线的paint
      */
-    var linePaint = Paint()
+    private val _linePaint = Paint()
+    val linePaint
+        get() = Paint(_linePaint).apply {
+            strokeWidth = _linePaint.strokeWidth / scale
+        }
     /**
      * 测量模式中字的paint
      */
-    var stringPaint = Paint()
+    private val _stringPaint = Paint()
+    val stringPaint
+        get() = Paint(_stringPaint).apply {
+            textSize = _stringPaint.textSize / scale
+        }
     /**
      * 测量模式中未完成端点的paint
      */
-    var pointPaint = Paint()
+    private val _pointPaint = Paint()
+    val pointPaint
+        get() = Paint(_pointPaint).apply {
+            strokeWidth = _pointPaint.strokeWidth / scale
+        }
     /**
      * 放大镜显示的区域范围
      */
@@ -192,18 +204,18 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
         get() = if (index == size - 1) 0 else index
 
     init {
-        linePaint.color = Color.RED
-        linePaint.strokeWidth = 3f
-        linePaint.isAntiAlias = true
-        linePaint.strokeJoin = Paint.Join.ROUND
-        linePaint.style = Paint.Style.STROKE
-        stringPaint.strokeWidth = 1f
-        stringPaint.color = Color.RED
-        stringPaint.isLinearText = true
-        stringPaint.textSize = 20f
-        pointPaint.color = Color.RED
-        pointPaint.strokeWidth = 3f
-        pointPaint.style = Paint.Style.FILL_AND_STROKE
+        _linePaint.color = Color.RED
+        _linePaint.strokeWidth = 3f
+        _linePaint.isAntiAlias = true
+        _linePaint.strokeJoin = Paint.Join.ROUND
+        _linePaint.style = Paint.Style.STROKE
+        _stringPaint.strokeWidth = 1f
+        _stringPaint.color = Color.RED
+        _stringPaint.isLinearText = true
+        _stringPaint.textSize = 20f
+        _pointPaint.color = Color.RED
+        _pointPaint.strokeWidth = 3f
+        _pointPaint.style = Paint.Style.FILL_AND_STROKE
 
         reduce(ImageFrameStore::allowPlay) {
             on<SetAllowPlay> { event.value }

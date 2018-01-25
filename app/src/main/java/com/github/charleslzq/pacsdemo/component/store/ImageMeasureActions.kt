@@ -48,9 +48,15 @@ object ImageMeasureActions : RxScheduleSupport {
                 points.pop()
             }
             points.push(mapPoint(store, point))
-            val image = getCurrentImage(store)!!
-            val width = image.width
-            val height = image.height
+            val leftTopPoint = mapPoint(store, PointF(0f, 0f))
+            val rightBottomPoint = getCurrentImage(store)!!.let {
+                mapPoint(
+                    store,
+                    PointF(it.width * store.autoScale, it.height * store.autoScale)
+                )
+            }
+            val width = (rightBottomPoint.x - leftTopPoint.x).toInt()
+            val height = (rightBottomPoint.y - leftTopPoint.y).toInt()
             val drawingText = when {
                 !showMagnify && points.size == 2 && store.measure == Measure.LINE -> calculateLineText(
                     points,
@@ -325,7 +331,7 @@ object ImageMeasureActions : RxScheduleSupport {
                             if (showMagnify) {
                                 getCurrentImage(store)?.run {
                                     val range = arrayOf(
-                                        store.range,
+                                        (store.range / store.scale).toInt(),
                                         width - lastX,
                                         lastX,
                                         height - lastY,
@@ -380,7 +386,12 @@ object ImageMeasureActions : RxScheduleSupport {
                                     }
                                 }
                             } else {
-                                drawCircle(lastX.toFloat(), lastY.toFloat(), 5f, store.pointPaint)
+                                drawCircle(
+                                    lastX.toFloat(),
+                                    lastY.toFloat(),
+                                    5f / store.scale,
+                                    store.pointPaint
+                                )
                             }
                         }
                     }, true))
