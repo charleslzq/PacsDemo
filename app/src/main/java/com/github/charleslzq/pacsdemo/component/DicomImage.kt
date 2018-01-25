@@ -213,6 +213,6 @@ class DicomImage(
         }
 
     companion object {
-        val tag = "imageCell"
+        const val tag = "imageCell"
     }
 }

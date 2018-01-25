@@ -94,6 +94,6 @@ class ThumbList(
         (view.findViewHolderForAdapterPosition(position) as? DicomSeriesThumbListAdpater.ViewHolder)?.thumbView
 
     companion object {
-        val tag = "thumbList"
+        const val tag = "thumbList"
     }
 }
