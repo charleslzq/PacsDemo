@@ -23,25 +23,29 @@ class ImageLeftTopPanel(
             windowInfo.visibility = View.GONE
             sliceInfo.visibility = View.GONE
 
-            if (it.windowCenter != null && it.windowWidth != null) {
-                windowInfo.post {
-                    windowInfo.text = "窗宽: ${it.windowWidth!!} 窗位: ${it.windowCenter!!}"
-                }
+            if (it.windowCenter.isNotBlank() && it.windowWidth.isNotBlank()) {
+                windowInfo.text = windowInfo.resources.getString(
+                    R.string.window_info,
+                    it.windowCenter,
+                    it.windowWidth
+                )
                 windowInfo.visibility = View.VISIBLE
             }
 
-            if (it.sliceLocation != null && it.sliceThickness != null) {
-                sliceInfo.post {
-                    sliceInfo.text = "T:${it.sliceThickness}mm L:${it.sliceLocation}mm"
-                }
+            if (it.sliceLocation > 0 && it.sliceThickness > 0) {
+                sliceInfo.text = sliceInfo.resources.getString(
+                    R.string.slice_info,
+                    it.sliceLocation,
+                    it.sliceThickness
+                )
                 sliceInfo.visibility = View.VISIBLE
             }
         }
 
         renderByAll(store::autoScale, store::gestureScale) {
             if (store.hasImage) {
+                scaleInfo.text = scaleInfo.resources.getString(R.string.scale_info, store.scale)
                 scaleInfo.visibility = View.VISIBLE
-                scaleInfo.post { scaleInfo.text = "缩放: ${store.scale}倍" }
             } else {
                 scaleInfo.visibility = View.GONE
             }
@@ -50,9 +54,11 @@ class ImageLeftTopPanel(
         renderByAll(store::size, store::index) {
             if (store.hasImage) {
                 imageProgress.visibility = View.VISIBLE
-                imageProgress.post {
-                    imageProgress.text = "IMAGE: ${store.index + 1}/${store.size}"
-                }
+                imageProgress.text = imageProgress.resources.getString(
+                    R.string.image_progress,
+                    store.index + 1,
+                    store.size
+                )
             } else {
                 imageProgress.visibility = View.GONE
             }

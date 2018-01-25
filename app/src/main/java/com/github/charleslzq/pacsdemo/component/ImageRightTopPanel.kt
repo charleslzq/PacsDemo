@@ -27,36 +27,34 @@ class ImageRightTopPanel(
             patientInfo.visibility = visible
             institutionName.visibility = visible
 
-            it.name?.let {
-                patientName.post { patientName.text = it }
+            it.name.takeIf { it.isNotBlank() }.let {
+                patientName.text = it
                 patientName.visibility = View.VISIBLE
             }
-            it.id?.let {
-                patientId.post { patientId.text = it }
+            it.id.takeIf { it.isNotBlank() }.let {
+                patientId.text = it
                 patientId.visibility = View.VISIBLE
             }
 
-            if (it.birthday != null && it.sex != null) {
-                patientInfo.post {
-                    patientInfo.text = buildString {
-                        append(it.birthday!!)
-                        append(" ")
-                        append(it.sex!!)
-                    }
+            if (it.birthday.isNotBlank() && it.sex.isNotBlank()) {
+                patientInfo.text = buildString {
+                    append(it.birthday)
+                    append(" ")
+                    append(it.sex)
                 }
                 patientInfo.visibility = View.VISIBLE
             }
 
-            it.institutionName?.let {
-                institutionName.post { institutionName.text = it }
+            it.institutionName.takeIf { it.isNotBlank() }.let {
+                institutionName.text = it
                 institutionName.visibility = View.VISIBLE
             }
         }
 
         render(store::seriesMeta) {
             description.visibility = View.GONE
-            it.description?.let {
-                description.post { description.text = it }
+            it.description.takeIf { it.isNotBlank() }.let {
+                description.text = it
                 description.visibility = View.VISIBLE
             }
         }

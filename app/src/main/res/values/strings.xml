@@ -15,4 +15,8 @@
     <string name="image_to_first">&#xf049;</string>
     <string name="image_to_last">&#xf050;</string>
     <string name="image_pause">&#xf04c;</string>
+    <string name="window_info">窗宽: %1$s 窗位: %2$s</string>
+    <string name="slice_info">T: %1$fmm L: %2$fmm</string>
+    <string name="scale_info">缩放: %1$f倍</string>
+    <string name="image_progress">IMAGE: %1$d/%2$d</string>
 </resources>

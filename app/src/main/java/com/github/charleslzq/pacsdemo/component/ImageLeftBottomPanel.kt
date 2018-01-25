@@ -21,10 +21,10 @@ class ImageLeftBottomPanel(
             xRayInfo.visibility = View.GONE
 
             buildString {
-                it.xRayTubCurrent?.let { append("$it mA ") }
-                it.kvp?.let { append("$it KV") }
+                it.xRayTubCurrent.takeIf { it > 0 }.let { append("$it mA ") }
+                it.kvp.takeIf { it > 0 }.let { append("$it KV") }
             }.takeIf { it.isNotBlank() }?.let {
-                xRayInfo.post { xRayInfo.text = it }
+                xRayInfo.text = it
                 xRayInfo.visibility = View.VISIBLE
             }
         }
@@ -33,10 +33,10 @@ class ImageLeftBottomPanel(
             timeInfo.visibility = View.GONE
 
             buildString {
-                it.date?.apply { append(this + " ") }
-                it.time?.apply { append(this) }
+                it.date.takeIf { it.isNotBlank() }.apply { append(this + " ") }
+                it.time.takeIf { it.isNotBlank() }.apply { append(this) }
             }.takeIf { it.isNotBlank() }?.let {
-                timeInfo.post { timeInfo.text = it }
+                timeInfo.text = it
                 timeInfo.visibility = View.VISIBLE
             }
         }

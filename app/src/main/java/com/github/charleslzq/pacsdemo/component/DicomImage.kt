@@ -134,8 +134,10 @@ class DicomImage(
             imageView.layoutParams.height = desiredHeight
             desiredHeight.toFloat() / imageHeight
         }
-        imageView.imageMatrix = Matrix().apply {
-            setScale(store.autoScale, store.autoScale)
+        imageView.post {
+            imageView.imageMatrix = Matrix().apply {
+                setScale(store.autoScale, store.autoScale)
+            }
         }
     }
 
