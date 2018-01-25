@@ -18,9 +18,19 @@ class ButtonPanel(
     buttonPanel: View,
     pacsStore: PacsStore
 ) : PacsComponent<View>(buttonPanel, pacsStore) {
-    private val splitButton: Button = view.findViewById(R.id.spliteButton)
+    private val splitButton: Button = view.findViewById<Button>(R.id.spliteButton).apply {
+        setOnClickListener {
+            layoutSelector.show()
+        }
+    }
     private val backButton: Button = view.findViewById(R.id.backButton)
-    private val layoutSelector: PopupMenu = PopupMenu(buttonPanel.context, splitButton)
+    private val layoutSelector: PopupMenu = PopupMenu(buttonPanel.context, splitButton).apply {
+        menu.add(Menu.NONE, R.id.one_one, Menu.NONE, "1 X 1")
+        menu.add(Menu.NONE, R.id.one_two, Menu.NONE, "1 X 2")
+        menu.add(Menu.NONE, R.id.two_two, Menu.NONE, "2 X 2")
+        menu.add(Menu.NONE, R.id.three_three, Menu.NONE, "3 X 3")
+        setOnMenuItemClickListener(::onLayoutSelected)
+    }
     private val layoutMap = mapOf(
         R.id.one_one to PacsStore.LayoutOption.ONE_ONE,
         R.id.one_two to PacsStore.LayoutOption.ONE_TWO,
@@ -29,15 +39,6 @@ class ButtonPanel(
     )
 
     init {
-        layoutSelector.menu.add(Menu.NONE, R.id.one_one, Menu.NONE, "1 X 1")
-        layoutSelector.menu.add(Menu.NONE, R.id.one_two, Menu.NONE, "1 X 2")
-        layoutSelector.menu.add(Menu.NONE, R.id.two_two, Menu.NONE, "2 X 2")
-        layoutSelector.menu.add(Menu.NONE, R.id.three_three, Menu.NONE, "3 X 3")
-        layoutSelector.setOnMenuItemClickListener(::onLayoutSelected)
-        splitButton.setOnClickListener {
-            layoutSelector.show()
-        }
-
         TypefaceUtil.configureTextView(TypefaceUtil.FONT_AWESOME, splitButton, backButton)
     }
 

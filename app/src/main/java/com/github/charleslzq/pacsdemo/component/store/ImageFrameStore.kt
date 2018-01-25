@@ -60,7 +60,13 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     /**
      * 测量模式中线的paint
      */
-    private val _linePaint = Paint()
+    private val _linePaint = Paint().apply {
+        color = Color.RED
+        strokeWidth = 3f
+        isAntiAlias = true
+        strokeJoin = Paint.Join.ROUND
+        style = Paint.Style.STROKE
+    }
     val linePaint
         get() = Paint(_linePaint).apply {
             strokeWidth = _linePaint.strokeWidth / scale
@@ -68,7 +74,12 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     /**
      * 测量模式中字的paint
      */
-    private val _stringPaint = Paint()
+    private val _stringPaint = Paint().apply {
+        strokeWidth = 1f
+        color = Color.RED
+        isLinearText = true
+        textSize = 20f
+    }
     val stringPaint
         get() = Paint(_stringPaint).apply {
             textSize = _stringPaint.textSize / scale
@@ -76,7 +87,11 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     /**
      * 测量模式中未完成端点的paint
      */
-    private val _pointPaint = Paint()
+    private val _pointPaint = Paint().apply {
+        color = Color.RED
+        strokeWidth = 3f
+        style = Paint.Style.FILL_AND_STROKE
+    }
     val pointPaint
         get() = Paint(_pointPaint).apply {
             strokeWidth = _pointPaint.strokeWidth / scale
@@ -204,19 +219,6 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
         get() = if (index == size - 1) 0 else index
 
     init {
-        _linePaint.color = Color.RED
-        _linePaint.strokeWidth = 3f
-        _linePaint.isAntiAlias = true
-        _linePaint.strokeJoin = Paint.Join.ROUND
-        _linePaint.style = Paint.Style.STROKE
-        _stringPaint.strokeWidth = 1f
-        _stringPaint.color = Color.RED
-        _stringPaint.isLinearText = true
-        _stringPaint.textSize = 20f
-        _pointPaint.color = Color.RED
-        _pointPaint.strokeWidth = 3f
-        _pointPaint.style = Paint.Style.FILL_AND_STROKE
-
         reduce(ImageFrameStore::allowPlay) {
             on<SetAllowPlay> { event.value }
             on<Reset> { true }
