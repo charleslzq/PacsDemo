@@ -23,7 +23,7 @@ class ImageCell(
             child { ImageLeftTopPanel(byId(R.id.leftTopPanel), store) }
             child { ImageRightTopPanel(byId(R.id.rightTopPanel), store) }
             child { ImageLeftBottomPanel(byId(R.id.leftBottomPanel), store) }
-            child { ImageControllPanel(byId(R.id.imageController), store) }
+            child { ImageControlPanel(byId(R.id.imageController), store) }
             child { DicomImage(byId(R.id.imageContainer), store) }
         }
 

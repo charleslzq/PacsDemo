@@ -142,14 +142,7 @@ class DicomImage(
     }
 
     private fun getCurrentImage() = if (store.displayModel.images.isNotEmpty()) {
-        callOnCompute {
-            pseudoIfRequired(store.displayModel.images[0]).let {
-                it.copy(
-                    it.config,
-                    true
-                )
-            }
-        }
+        callOnCompute { pseudoIfRequired(store.displayModel.images[0]) }
     } else {
         null
     }
@@ -164,7 +157,7 @@ class DicomImage(
             setPixels(pixels, 0, rawBitmap.width, 0, 0, rawBitmap.width, rawBitmap.height)
         }
     } else {
-        rawBitmap
+        rawBitmap.run { copy(config, true) }
     }
 
     private fun calculateColor(color: Int) = getPseudoColor(

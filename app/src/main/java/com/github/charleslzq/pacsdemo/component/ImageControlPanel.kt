@@ -16,23 +16,47 @@ import com.github.charleslzq.pacsdemo.support.TypefaceUtil
  * Created by charleslzq on 17-12-19.
  * 图像单元格右下角的控制面板
  */
-class ImageControllPanel(
+class ImageControlPanel(
     baseView: View,
     imageFrameStore: ImageFrameStore
 ) : Component<View, ImageFrameStore>(baseView, imageFrameStore) {
-    private val play: Button = view.findViewById(R.id.imagePlay)
-    private val first: Button = view.findViewById(R.id.firstImage)
-    private val previous: Button = view.findViewById(R.id.previousImage)
-    private val next: Button = view.findViewById(R.id.nextImage)
-    private val last: Button = view.findViewById(R.id.lastImage)
+    private val play: Button = view.findViewById<Button>(R.id.imagePlay).apply {
+        setOnClickListener { dispatch(ImageDisplayActions.playOrPause()) }
+    }
+    private val first: Button = view.findViewById<Button>(R.id.firstImage).apply {
+        setOnClickListener { dispatch(ImageDisplayActions.showImage(0)) }
+    }
+    private val previous: Button = view.findViewById<Button>(R.id.previousImage).apply {
+        setOnClickListener { dispatch(ImageDisplayActions.showImage(store.index - 1)) }
+    }
+    private val next: Button = view.findViewById<Button>(R.id.nextImage).apply {
+        setOnClickListener { dispatch(ImageDisplayActions.showImage(store.index + 1)) }
+    }
+    private val last: Button = view.findViewById<Button>(R.id.lastImage).apply {
+        setOnClickListener { dispatch(ImageDisplayActions.showImage(store.size - 1)) }
+    }
 
-    private val measureAngle: Button = view.findViewById(R.id.measureAngleButton)
-    private val measureLine: Button = view.findViewById(R.id.measureLineButton)
-    private val pseudo: Button = view.findViewById(R.id.pseudoColorButton)
-    private val reverse: Button = view.findViewById(R.id.reverseButton)
-    private val undo: Button = view.findViewById(R.id.undoButton)
-    private val redo: Button = view.findViewById(R.id.redoButton)
-    private val clear: Button = view.findViewById(R.id.clearButton)
+    private val measureAngle: Button = view.findViewById<Button>(R.id.measureAngleButton).apply {
+        setOnClickListener { dispatch(MeasureAngleTurned()) }
+    }
+    private val measureLine: Button = view.findViewById<Button>(R.id.measureLineButton).apply {
+        setOnClickListener { dispatch(MeasureLineTurned()) }
+    }
+    private val pseudo: Button = view.findViewById<Button>(R.id.pseudoColorButton).apply {
+        setOnClickListener { dispatch(PseudoColor()) }
+    }
+    private val reverse: Button = view.findViewById<Button>(R.id.reverseButton).apply {
+        setOnClickListener { dispatch(ReverseColor()) }
+    }
+    private val undo: Button = view.findViewById<Button>(R.id.undoButton).apply {
+        setOnClickListener { dispatch(ImageMeasureActions.undoDrawing()) }
+    }
+    private val redo: Button = view.findViewById<Button>(R.id.redoButton).apply {
+        setOnClickListener { dispatch(ImageMeasureActions.redoDrawing()) }
+    }
+    private val clear: Button = view.findViewById<Button>(R.id.clearButton).apply {
+        setOnClickListener { dispatch(ImageMeasureActions.clearDrawing()) }
+    }
 
     private val imageSeekBar: SeekBar = view.findViewById(R.id.imageSeekBar)
 
@@ -58,54 +82,6 @@ class ImageControllPanel(
             first,
             last
         )
-
-        measureAngle.setOnClickListener {
-            dispatch(MeasureAngleTurned())
-        }
-
-        measureLine.setOnClickListener {
-            dispatch(MeasureLineTurned())
-        }
-
-        reverse.setOnClickListener {
-            dispatch(ReverseColor())
-        }
-
-        pseudo.setOnClickListener {
-            dispatch(PseudoColor())
-        }
-
-        undo.setOnClickListener {
-            dispatch(ImageMeasureActions.undoDrawing())
-        }
-
-        redo.setOnClickListener {
-            dispatch(ImageMeasureActions.redoDrawing())
-        }
-
-        clear.setOnClickListener {
-            dispatch(ImageMeasureActions.clearDrawing())
-        }
-
-        first.setOnClickListener {
-            dispatch(ImageDisplayActions.showImage(0))
-        }
-
-        previous.setOnClickListener {
-            dispatch(ImageDisplayActions.showImage(store.index - 1))
-        }
-
-        play.setOnClickListener {
-            dispatch(ImageDisplayActions.playOrPause())
-        }
-
-        next.setOnClickListener {
-            dispatch(ImageDisplayActions.showImage(store.index + 1))
-        }
-
-        last.setOnClickListener {
-            dispatch(ImageDisplayActions.showImage(store.size - 1))
-        }
 
         render(store::measure) {
             measureAngle.isSelected = it == ImageFrameStore.Measure.ANGEL
