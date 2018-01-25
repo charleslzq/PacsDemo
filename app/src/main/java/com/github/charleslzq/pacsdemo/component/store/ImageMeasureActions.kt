@@ -26,12 +26,22 @@ operator fun PointF.div(float: Float) = if (float != 0f) PointF(
     y / float
 ) else throw IllegalArgumentException("divider is zero")
 
+/**
+ * 计算两点之间的距离
+ * @param pointF 另一个点, 默认值为原点
+ */
 fun PointF.distance(pointF: PointF = PointF(0f, 0f)) =
     Math.sqrt((this - pointF).let { it * it }.toDouble())
 
 object ImageMeasureActions : RxScheduleSupport {
     private const val PRECISION = 2
 
+    /**
+     * @param point 选取的点
+     * @param replaceLast 是否替换上一个选取的点
+     * @param showMagnify 是否显示放大镜
+     * @return 选择一个点的操作
+     */
     fun selectPoint(point: PointF, replaceLast: Boolean, showMagnify: Boolean) = buildAction {
         runOnCompute {
             if (replaceLast && points.isNotEmpty()) {
@@ -72,6 +82,9 @@ object ImageMeasureActions : RxScheduleSupport {
         }
     }
 
+    /**
+     * @return 撤销上一次绘制的操作(包括未完成的绘制)
+     */
     fun undoDrawing() = buildAction {
         if (points.isNotEmpty()) {
             runOnCompute {
@@ -94,6 +107,9 @@ object ImageMeasureActions : RxScheduleSupport {
         }
     }
 
+    /**
+     * 重做上一次撤销的操作(不包括撤销的未完成操作)
+     */
     fun redoDrawing() = buildAction {
         if (undoSupport.canRedo()) {
             runOnCompute {
@@ -110,6 +126,9 @@ object ImageMeasureActions : RxScheduleSupport {
         }
     }
 
+    /**
+     * @return 清除绘制的操作
+     */
     fun clearDrawing() = buildAction {
         runOnCompute {
             undoSupport.reset()
@@ -118,6 +137,9 @@ object ImageMeasureActions : RxScheduleSupport {
         }
     }
 
+    /**
+     * @return 移动撤销/重做栈的操作
+     */
     fun moveStackFrom(imageFrameStore: ImageFrameStore) = buildAction {
         undoSupport.reset()
         points.clear()
@@ -134,11 +156,17 @@ object ImageMeasureActions : RxScheduleSupport {
             points.clear()
         }
 
+    /**
+     * 创建与当前图像相同大小的bitmap用于绘制
+     */
     private fun createDrawingBase(store: ImageFrameStore) =
         getCurrentImage(store)?.let {
             Bitmap.createBitmap(it.width, it.height, it.config)
         }
 
+    /**
+     * 将触摸选取的点坐标转换成原始图像上的点坐标
+     */
     private fun mapPoint(store: ImageFrameStore, point: PointF) =
         FloatArray(2).apply {
             this[0] = point.x
@@ -153,6 +181,9 @@ object ImageMeasureActions : RxScheduleSupport {
             null
         }
 
+    /**
+     * 将点列表转换成坐标列表,供canvas绘制用
+     */
     private fun toLines(vararg points: PointF) = when (points.size) {
         0 -> FloatArray(0)
         1 -> FloatArray(2).apply {
@@ -171,6 +202,9 @@ object ImageMeasureActions : RxScheduleSupport {
         }
     }
 
+    /**
+     * 计算三个点的夹角
+     */
     private fun calculateAngle(startPoint: PointF, anglePoint: PointF, endPoint: PointF) =
         ((startPoint - anglePoint) to (endPoint - anglePoint)).let {
             ((it.first * it.second) / (it.first.distance() * it.second.distance())).let {

@@ -10,6 +10,7 @@ import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
 
 /**
  * Created by charleslzq on 17-11-27.
+ * 图像单元格
  */
 class ImageCell(
     baseView: View,

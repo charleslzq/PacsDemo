@@ -11,6 +11,9 @@ import com.github.charleslzq.pacsdemo.component.store.ImageMeasureActions
 class MeasureModeGestureListener(dispatch: (Any) -> Unit) :
     ScaleCompositeGestureListener(dispatch) {
 
+    /**
+     * 触摸选择测量端点
+     */
     override fun onOtherGesture(view: View, motionEvent: MotionEvent): Boolean {
         when (motionEvent.action) {
             MotionEvent.ACTION_DOWN -> dispatch(

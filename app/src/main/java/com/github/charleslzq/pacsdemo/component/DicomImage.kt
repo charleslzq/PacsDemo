@@ -16,6 +16,7 @@ import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 
 /**
  * Created by charleslzq on 17-11-27.
+ * 图像组件
  */
 class DicomImage(
     imageLayout: View,

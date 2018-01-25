@@ -4,6 +4,7 @@ import com.github.charleslzq.dicom.data.*
 
 /**
  * Created by charleslzq on 17-11-15.
+ * 将多个DicomMessageListener合成一个
  */
 class CompositeDicomMessageListener : DicomMessageListener {
     private val listeners: MutableList<DicomMessageListener> =

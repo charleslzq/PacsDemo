@@ -12,6 +12,10 @@ import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 
 /**
  * Created by charleslzq on 17-11-15.
+ * 本地dicom数据服务实现
+ * @param messageBroker 本地消息代理
+ * @param dataStore 本地数据存储服务
+ * @param sharedPreferences android共享数据库,存储clientId等
  */
 class DicomDataServiceImpl(
     private val messageBroker: DicomMessageBroker,

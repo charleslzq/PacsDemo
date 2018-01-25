@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder
 
 /**
  * Created by charleslzq on 17-11-15.
+ * 消息代理websocket实现
  */
 class DicomWebSocketMessageBroker(
     url: String,

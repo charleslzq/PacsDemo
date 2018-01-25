@@ -3,7 +3,8 @@ package com.github.charleslzq.pacsdemo.broker
 import com.github.charleslzq.pacsdemo.broker.message.DicomMessageListener
 
 /**
- * Created by charleslzq on 17-11-15.
+ * Created by charleslzq on 17-11-15
+ * 消息代理接口.
  */
 interface DicomMessageBroker {
     fun requirePatients(vararg patientId: String)

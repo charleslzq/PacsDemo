@@ -9,11 +9,17 @@ import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
 class StudyModeGestureListener(dispatch: (Any) -> Unit, private val onDragStart: () -> Unit) :
     ScaleCompositeGestureListener(dispatch) {
 
+    /**
+     * 双击重置
+     */
     override fun onDoubleTap(motionEvent: MotionEvent?): Boolean {
         dispatch(ImageFrameStore.StudyModeReset())
         return true
     }
 
+    /**
+     * 左右滑动移动图像位置
+     */
     override fun onScroll(
         e1: MotionEvent?,
         e2: MotionEvent?,
@@ -24,5 +30,8 @@ class StudyModeGestureListener(dispatch: (Any) -> Unit, private val onDragStart:
         return true
     }
 
+    /**
+     * 响应托放操作
+     */
     override fun onLongPress(e: MotionEvent) = onDragStart()
 }

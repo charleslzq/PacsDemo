@@ -15,6 +15,10 @@ import com.koushikdutta.async.http.WebSocket
 
 /**
  * Created by charleslzq on 17-11-15.
+ * websocket客户端
+ * @param url 服务器端websocket端点
+ * @param dicomMessageListener 消息处理器
+ * @param gson 将消息转换成对象
  */
 class DicomWebSocketClient(
     private val url: String,
@@ -25,12 +29,21 @@ class DicomWebSocketClient(
     private val logTag = javaClass.name
     private val heartBeat = "@heart"
 
+    /**
+     * 连接服务器
+     */
     fun connect() = runOnIo {
         AsyncHttpClient.getDefaultInstance().websocket(url, "dicom", ::onComplete)
     }
 
+    /**
+     * 是否连接到了服务器
+     */
     fun isOpen() = webSocket?.isOpen ?: false
 
+    /**
+     * 发送消息,未连接是没有任何操作
+     */
     fun send(message: String) = runOnIo {
         webSocket?.send(message)
     }

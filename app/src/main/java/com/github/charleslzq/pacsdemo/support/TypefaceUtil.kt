@@ -11,6 +11,11 @@ object TypefaceUtil {
     const val FONT_AWESOME = "fontawesome-webfont.ttf"
     private val registry = mutableMapOf<String, Typeface>()
 
+    /**
+     * 将TextView的typeface配置成指定路径的Typeface文件
+     * @param path Typeface文件路径
+     * @param textView 需要配置的TextView列表
+     */
     fun configureTextView(path: String, vararg textView: TextView) {
         textView.forEach { it.typeface = getTypeFace(it.context, path) }
     }

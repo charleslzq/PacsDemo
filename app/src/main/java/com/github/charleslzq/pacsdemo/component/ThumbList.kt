@@ -12,6 +12,7 @@ import com.github.charleslzq.pacsdemo.support.DicomSeriesThumbListAdpater
 
 /**
  * Created by charleslzq on 17-11-27.
+ * 主组件右侧的缩略图列表
  */
 class ThumbList(
     recyclerView: RecyclerView,

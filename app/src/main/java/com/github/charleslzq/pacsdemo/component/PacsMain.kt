@@ -6,6 +6,7 @@ import com.github.charleslzq.pacsdemo.component.store.PacsStore
 
 /**
  * Created by charleslzq on 17-11-27.
+ * 主组件
  */
 class PacsMain(
     mainView: View,

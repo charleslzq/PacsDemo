@@ -25,6 +25,9 @@ object ImageDisplayActions : RxScheduleSupport {
     private var bitmapCache = BitmapCache()
     private const val PRE_LOAD_RANGE = 5
 
+    /**
+     * @return 更新dicom数据模型列表操作, 会将布局调整至1*1并更新缩略图列表
+     */
     fun reloadModels(patientSeriesModelList: List<PatientSeriesModel>): DispatchAction<PacsStore> {
         seriesModels.clear()
         patientSeriesModelList.forEach { seriesModels[it.modId] = it }
@@ -41,24 +44,33 @@ object ImageDisplayActions : RxScheduleSupport {
         }
     }
 
+    /**
+     * @return 更改布局操作
+     */
     fun changeLayout(layoutOrdinal: Int): DispatchAction<PacsStore> = { store, _, _ ->
         val ordinal = layoutOrdinal.rem(PacsStore.LayoutOption.values().size)
             .let { if (it < 0) it + PacsStore.LayoutOption.values().size else it }
         store.dispatch(changeLayout(PacsStore.LayoutOption.values()[ordinal]))
     }
 
+    /**
+     * @return 更改布局操作
+     */
     fun changeLayout(layoutOption: PacsStore.LayoutOption): DispatchAction<PacsStore> =
         { store, dispatch, _ ->
             if (store.layoutOption != layoutOption) {
                 dispatch(PacsStore.ChangeLayout(layoutOption.ordinal))
                 store.imageCells.forEach {
                     it.dispatch(ImageFrameStore.Reset())
-                    it.dispatch(ImageFrameStore.SetPlayable(layoutOption == PacsStore.LayoutOption.ONE_ONE))
+                    it.dispatch(ImageFrameStore.SetAllowPlay(layoutOption == PacsStore.LayoutOption.ONE_ONE))
                 }
                 bitmapCache = BitmapCache(100)
             }
         }
 
+    /**
+     * @return 绑定模型到某个单元格的操作
+     */
     fun bindModel(modId: String, index: Int = 0): DispatchAction<ImageFrameStore> =
         { store, dispatch, _ ->
             runOnIo {
@@ -92,6 +104,9 @@ object ImageDisplayActions : RxScheduleSupport {
             }
         }
 
+    /**
+     * @return 移动单元格数据到另一个单元格的操作
+     */
     fun moveFrame(imageFrameStore: ImageFrameStore): DispatchAction<ImageFrameStore> =
         { store, dispatch, _ ->
             runOnCompute {
@@ -121,6 +136,9 @@ object ImageDisplayActions : RxScheduleSupport {
             }
         }
 
+    /**
+     * @return 播放或者暂停的操作(取决于当前处于播放还是暂停状态)
+     */
     fun playOrPause(): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
         if (store.playable) {
             runOnIo {
@@ -136,12 +154,18 @@ object ImageDisplayActions : RxScheduleSupport {
         }
     }
 
+    /**
+     * @return 显示指定序号图像的操作
+     */
     fun showImage(index: Int): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
         runOnIo {
             dispatchShowImage(store.bindModId, index, dispatch)
         }
     }
 
+    /**
+     * @return 更新图像序号和元信息的操作
+     */
     fun playIndexChange(index: Int): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
         seriesModels[store.bindModId]?.let {
             if (index in 0 until it.frames.size) {
@@ -150,6 +174,9 @@ object ImageDisplayActions : RxScheduleSupport {
         }
     }
 
+    /**
+     * @return 响应手指滑动显示图像的操作
+     */
     fun indexScroll(scrollDistance: Float): DispatchAction<ImageFrameStore> =
         { store, dispatch, _ ->
             runOnIo {
@@ -163,6 +190,9 @@ object ImageDisplayActions : RxScheduleSupport {
             }
         }
 
+    /**
+     * @return 重置图像显示状态的操作
+     */
     fun resetDisplay(): DispatchAction<ImageFrameStore> = { store, dispatch, _ ->
         runOnIo {
             store.dispatch(ImageMeasureActions.clearDrawing())
@@ -193,11 +223,17 @@ object ImageDisplayActions : RxScheduleSupport {
             }
         }
 
+    /**
+     * 在数据模型中寻找指定序号的图像
+     */
     private fun findImage(model: PatientSeriesModel, index: Int = 0) = when {
         model.frames.isEmpty() || index !in (0 until model.frames.size) -> null
         else -> loadImage(model.frames[index].frame)
     }
 
+    /**
+     * 在数据模型中, 返回指定序号的图像及其之后的图像的列表,用于动画播放
+     */
     private fun findFrames(model: PatientSeriesModel, index: Int = 0) = when {
         model.frames.isEmpty() || index !in (0 until model.frames.size) -> emptyList()
         else -> model.frames.subList(index, model.frames.size).mapNotNull { loadImage(it.frame) }

@@ -6,6 +6,8 @@ import java.io.File
 
 /**
  * Created by charleslzq on 17-11-15.
+ * 将服务器端发过来的dicom消息的负载保存下来
+ * @param dicomDataStore 本地dicom数据存储库
  */
 class StoreMessageListener(private val dicomDataStore: DicomDataStore<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>) :
     DicomMessageListener {

@@ -4,6 +4,7 @@ import com.github.charleslzq.dicom.data.*
 
 /**
  * Created by charleslzq on 17-11-15.
+ * 处理服务器端发过来的dicom消息的接口
  */
 interface DicomMessageListener {
     fun onPatient(dicomPatientMessage: Message<DicomPatient<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>>)

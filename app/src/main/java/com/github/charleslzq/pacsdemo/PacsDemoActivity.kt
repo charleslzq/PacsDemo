@@ -73,6 +73,9 @@ class PacsDemoActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    /**
+     * 根据这些参数加载dicom图像列表
+     */
     fun load(patientId: String?, studyId: String?, seriesId: String?, imageNum: String?) {
         Observable.fromCallable {
             val patient = patientId?.let { dicomDataService?.findPatient(it) }

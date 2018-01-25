@@ -14,6 +14,7 @@ import com.github.charleslzq.pacsdemo.support.ViewUtils
 
 /**
  * Created by charleslzq on 17-11-27.
+ * 布局切换组件
  */
 class ViewSelector(
     viewFlipper: ViewFlipper,
@@ -25,6 +26,9 @@ class ViewSelector(
                 return true
             }
 
+            /**
+             * 左右滑切换布局
+             */
             override fun onFling(
                 startEvent: MotionEvent,
                 endEvent: MotionEvent,
@@ -58,6 +62,9 @@ class ViewSelector(
     }
 
     companion object {
+        /**
+         * 获取当前布局下的所有图像单元格组件
+         */
         private fun getImageCellsFromPanel(view: ViewFlipper): List<View> {
             val displayedChild = view.getChildAt(view.displayedChild)
             return when (PacsStore.LayoutOption.values()[view.displayedChild]) {

@@ -9,6 +9,9 @@ import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore.ImageClick
 open class ScaleCompositeGestureListener(val dispatch: (Any) -> Unit) :
     NoOpCompositeGestureListener() {
 
+    /**
+     * 响应单击
+     */
     override fun onSingleTapConfirmed(motionEvent: MotionEvent): Boolean {
         dispatch(ImageClicked())
         return true

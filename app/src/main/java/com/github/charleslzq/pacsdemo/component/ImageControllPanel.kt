@@ -14,6 +14,7 @@ import com.github.charleslzq.pacsdemo.support.TypefaceUtil
 
 /**
  * Created by charleslzq on 17-12-19.
+ * 图像单元格右下角的控制面板
  */
 class ImageControllPanel(
     baseView: View,

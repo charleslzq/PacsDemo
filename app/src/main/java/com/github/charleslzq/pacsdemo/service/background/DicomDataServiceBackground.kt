@@ -19,6 +19,9 @@ import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 import java.io.File
 import java.util.*
 
+/**
+ * 本地dicom数据的android后台服务
+ */
 class DicomDataServiceBackground : Service(), RxScheduleSupport {
     private val logTag = javaClass.name
     private lateinit var messageBroker: DicomMessageBroker

@@ -12,8 +12,19 @@ import com.github.charleslzq.pacsdemo.support.UndoSupport
 import java.net.URI
 import java.util.*
 
-
+/**
+ * 图像显示模型.
+ * @param images 所需显示的图像. 大小为1时显示图像, 大于1时作为动画播放
+ */
 data class ImageDisplayModel(val images: List<Bitmap> = emptyList())
+
+/**
+ * 图像测量模型
+ * @param drawing 当前已绘制完成的测量线/角
+ * @param tmp 当前绘制未完成的测量线/角(例如只选择了一个点的测量线)
+ * @param canUndo 是否能撤销
+ * @param canRedo 是否能重做
+ */
 data class ImageCanvasModel(
     val drawing: Bitmap? = null,
     val tmp: Bitmap? = null,
@@ -21,6 +32,11 @@ data class ImageCanvasModel(
     val canRedo: Boolean = false
 )
 
+/**
+ * dicom图像文件数据模型
+ * @param meta 图像元信息
+ * @param frame 图像URI
+ */
 data class ImageFrameModel(
     val meta: DicomImageMetaInfo,
     val frame: URI = meta.let { it.files[DEFAULT] }!!
@@ -34,64 +50,144 @@ data class ImageFrameModel(
 
 /**
  * Created by charleslzq on 17-11-27.
+ * 图像单元格store
+ * @param layoutPosition 位置参数 0-8
  */
 class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     MiddleWare.debugLog,
     buildThunk<ImageFrameStore>(UndoSupport<Bitmap>(), Stack<PointF>())
 ) {
+    /**
+     * 测量模式中线的paint
+     */
     var linePaint = Paint()
+    /**
+     * 测量模式中字的paint
+     */
     var stringPaint = Paint()
+    /**
+     * 测量模式中未完成端点的paint
+     */
     var pointPaint = Paint()
+    /**
+     * 放大镜显示的区域范围
+     */
     var range = 50
 
+    /**
+     * 是否允许播放动画
+     */
     var allowPlay = true
         private set
+    /**
+     * 是否隐藏单元格四个角上的元信息面板和控制面板
+     */
     var hideMeta by ObservableStatus(true)
         private set
 
+    /**
+     * 绑定的dicom数据模型id
+     */
     var bindModId = ""
         private set
+    /**
+     * 播放动画每帧的时间
+     */
     var duration = 40
         private set
+    /**
+     * 当前series中图像的张数
+     */
     var size by ObservableStatus(0)
         private set
+    /**
+     * 病人元信息
+     */
     var patientMeta by ObservableStatus(DicomPatientMetaInfo())
         private set
+    /**
+     * study元信息
+     */
     var studyMeta by ObservableStatus(DicomStudyMetaInfo())
         private set
+    /**
+     * series元信息
+     */
     var seriesMeta by ObservableStatus(DicomSeriesMetaInfo())
         private set
+    /**
+     * 图像元信息
+     */
     var imageMeta by ObservableStatus(DicomImageMetaInfo())
         private set
+    /**
+     * 当前图片在series中的位置
+     */
     var index by ObservableStatus(0)
         private set
     var displayModel by ObservableStatus(ImageDisplayModel())
         private set
 
+    /**
+     * 总的缩放比
+     */
     val scale
         get() = autoScale * gestureScale
+    /**
+     * 图像和ImageView适配所需的缩放比.因为动画只能放在背景中播放,为了让其不变形,只能将ImageView的长宽调整为适应图像
+     */
     var autoScale by ObservableStatus(1.0f)
+    /**
+     * 通过触摸缩放图形的缩放比
+     */
     var gestureScale by ObservableStatus(1.0f)
         private set
+    /**
+     * 复合了自动扩充和触摸调整因素的位置矩阵
+     */
     val compositeMatrix
         get() = Matrix(matrix).apply { postScale(autoScale, autoScale) }
+    /**
+     * 通过触摸调整后的位置矩阵
+     */
     var matrix by ObservableStatus(Matrix())
         private set
+    /**
+     * 颜色显示矩阵
+     */
     var colorMatrix by ObservableStatus(ColorMatrix())
         private set
+    /**
+     * 是否反色
+     */
     var reverseColor by ObservableStatus(false)
         private set
+    /**
+     * 是否伪彩
+     */
     var pseudoColor by ObservableStatus(false)
         private set
 
+    /**
+     * 所处的测量模式
+     */
     var measure by ObservableStatus(Measure.NONE)
         private set
     var canvasModel by ObservableStatus(ImageCanvasModel())
 
+    /**
+     * 是否可播放
+     */
     val playable
         get() = allowPlay && size > 1
+    /**
+     * 当前series模型是否有图片
+     */
     val hasImage
         get() = size > 0
+    /**
+     * 给播放用的index. 实现当前图像为最后一张时点播放将从头播放的功能
+     */
     val autoJumpIndex
         get() = if (index == size - 1) 0 else index
 
@@ -110,7 +206,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
         pointPaint.style = Paint.Style.FILL_AND_STROKE
 
         reduce(ImageFrameStore::allowPlay) {
-            on<SetPlayable> { event.value }
+            on<SetAllowPlay> { event.value }
             on<Reset> { true }
         }
 
@@ -307,6 +403,9 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
         }
     }
 
+    /**
+     * 获取当前位置矩阵的反矩阵, 给测量模式计算点所赢处的原始坐标
+     */
     fun getInvertMatrix() = Matrix().apply {
         compositeMatrix.invert(this)
     }
@@ -314,8 +413,14 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     private fun getNewScaleFactor(rawScaleFactor: Float): Float =
         Math.max(1.0f, Math.min(rawScaleFactor * gestureScale, 5.0f))
 
-    class SetPlayable(val value: Boolean)
+    /**
+     * 修改是否允许播放
+     */
+    class SetAllowPlay(val value: Boolean)
 
+    /**
+     * 绑定模型事件(点击/拖放缩略图列表中的元素)
+     */
     data class BindModel(
         val modeId: String,
         val patient: DicomPatientMetaInfo,
@@ -324,6 +429,9 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
         val size: Int
     )
 
+    /**
+     * 移动模型事件(拖放图像单元格中的图像)
+     */
     data class MoveModel(
         val modeId: String,
         val patient: DicomPatientMetaInfo,
@@ -340,6 +448,9 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
 
     data class ShowImage(val bitmap: Bitmap, val index: Int, val meta: DicomImageMetaInfo)
     data class PlayAnimation(val images: List<Bitmap>)
+    /**
+     * 播放过程中更新图像的序号和元信息
+     */
     data class PlayIndexChange(val index: Int, val meta: DicomImageMetaInfo)
 
     class StudyModeReset

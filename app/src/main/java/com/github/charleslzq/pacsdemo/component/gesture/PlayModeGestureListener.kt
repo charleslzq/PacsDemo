@@ -9,6 +9,9 @@ import com.github.charleslzq.pacsdemo.component.store.ImageDisplayActions
 class PlayModeGestureListener(dispatch: (Any) -> Unit, private val onDragStart: () -> Unit) :
     ScaleCompositeGestureListener(dispatch) {
 
+    /**
+     * 左右滑动选择一个series中的指定图片
+     */
     override fun onScroll(
         e1: MotionEvent?,
         e2: MotionEvent?,
@@ -21,8 +24,14 @@ class PlayModeGestureListener(dispatch: (Any) -> Unit, private val onDragStart: 
         return true
     }
 
+    /**
+     * 响应托放操作
+     */
     override fun onLongPress(e: MotionEvent) = onDragStart()
 
+    /**
+     * 双击重置
+     */
     override fun onDoubleTap(motionEvent: MotionEvent?): Boolean {
         dispatch(ImageDisplayActions.resetDisplay())
         return true

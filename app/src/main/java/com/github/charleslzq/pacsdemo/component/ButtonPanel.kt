@@ -12,6 +12,7 @@ import com.github.charleslzq.pacsdemo.support.TypefaceUtil
 
 /**
  * Created by charleslzq on 17-11-27.
+ * 右下角控制面板, 包含后退和调整布局按钮
  */
 class ButtonPanel(
     buttonPanel: View,
