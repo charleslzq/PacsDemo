@@ -50,6 +50,4 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
     implementation 'com.github.charleslzq:kotlin-react:1.2.0-RC3'
     implementation 'com.android.support:cardview-v7:26.1.0'
-    implementation 'in.championswimmer:SimpleFingerGestures_Android_Library:1.2'
-    implementation 'com.github.Almeros:android-gesture-detectors:v1.0'
 }
