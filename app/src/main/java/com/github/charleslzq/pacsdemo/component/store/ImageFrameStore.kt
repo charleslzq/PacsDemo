@@ -60,42 +60,30 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     /**
      * 测量模式中线的paint
      */
-    private val _linePaint = Paint().apply {
+    val linePaint = Paint().apply {
         color = Color.RED
         strokeWidth = 3f
         isAntiAlias = true
         strokeJoin = Paint.Join.ROUND
         style = Paint.Style.STROKE
     }
-    val linePaint
-        get() = Paint(_linePaint).apply {
-            strokeWidth = _linePaint.strokeWidth / scale
-        }
     /**
      * 测量模式中字的paint
      */
-    private val _stringPaint = Paint().apply {
+    val stringPaint = Paint().apply {
         strokeWidth = 1f
         color = Color.RED
         isLinearText = true
         textSize = 20f
     }
-    val stringPaint
-        get() = Paint(_stringPaint).apply {
-            textSize = _stringPaint.textSize / scale
-        }
     /**
      * 测量模式中未完成端点的paint
      */
-    private val _pointPaint = Paint().apply {
+    val pointPaint = Paint().apply {
         color = Color.RED
         strokeWidth = 3f
         style = Paint.Style.FILL_AND_STROKE
     }
-    val pointPaint
-        get() = Paint(_pointPaint).apply {
-            strokeWidth = _pointPaint.strokeWidth / scale
-        }
     /**
      * 放大镜显示的区域范围
      */
@@ -180,13 +168,13 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
         get() = Matrix(matrix).apply { postScale(autoScale, autoScale) }
     private val matrixValues
         get() = FloatArray(9).apply { compositeMatrix.getValues(this) }
-    val imageX
+    private val imageX
         get() = matrixValues[Matrix.MTRANS_X]
-    val imageY
+    private val imageY
         get() = matrixValues[Matrix.MTRANS_Y]
-    val imageWidth
+    private val imageWidth
         get() = if (displayModel.images.isNotEmpty()) matrixValues[Matrix.MSCALE_X] * displayModel.images[0].width else -1f
-    val imageHeight
+    private val imageHeight
         get() = if (displayModel.images.isNotEmpty()) matrixValues[Matrix.MSCALE_Y] * displayModel.images[0].height else -1f
     /**
      * 通过触摸调整后的位置矩阵
