@@ -92,19 +92,45 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     /**
      * 是否允许播放动画
      */
-    var allowPlay = true
-        private set
+    private var allowPlay = true
+
+    init {
+        reduce(ImageFrameStore::allowPlay) {
+            on<SetAllowPlay> { event.value }
+            on<Reset> { true }
+        }
+    }
+
     /**
      * 是否隐藏单元格四个角上的元信息面板和控制面板
      */
     var hideMeta by ObservableStatus(true)
         private set
 
+    init {
+        reduce(ImageFrameStore::hideMeta) {
+            on<ImageClicked> { !state }
+            on<BindModel> { event.size == 0 }
+            on<MoveModel> { event.size == 0 }
+            on<ResetDisplay> { false }
+            on<Reset> { true }
+        }
+    }
+
     /**
      * 绑定的dicom数据模型id
      */
     var bindModId = ""
         private set
+
+    init {
+        reduce(ImageFrameStore::bindModId) {
+            on<BindModel> { event.modeId }
+            on<MoveModel> { event.modeId }
+            on<Reset> { "" }
+        }
+    }
+
     /**
      * 播放动画每帧的时间
      */
@@ -115,33 +141,97 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      */
     var size by ObservableStatus(0)
         private set
+
+    init {
+        reduce(ImageFrameStore::size) {
+            on<BindModel> { event.size }
+            on<MoveModel> { event.size }
+            on<Reset> { 0 }
+        }
+    }
+
     /**
      * 病人元信息
      */
     var patientMeta by ObservableStatus(DicomPatientMetaInfo())
         private set
+
+    init {
+        reduce(ImageFrameStore::patientMeta) {
+            on<BindModel> { event.patient }
+            on<MoveModel> { event.patient }
+            on<Reset> { DicomPatientMetaInfo() }
+        }
+    }
+
     /**
      * study元信息
      */
     var studyMeta by ObservableStatus(DicomStudyMetaInfo())
         private set
+
+    init {
+        reduce(ImageFrameStore::studyMeta) {
+            on<BindModel> { event.study }
+            on<MoveModel> { event.study }
+            on<Reset> { DicomStudyMetaInfo() }
+        }
+    }
+
     /**
      * series元信息
      */
     var seriesMeta by ObservableStatus(DicomSeriesMetaInfo())
         private set
+
+    init {
+        reduce(ImageFrameStore::seriesMeta) {
+            on<BindModel> { event.series }
+            on<MoveModel> { event.series }
+            on<Reset> { DicomSeriesMetaInfo() }
+        }
+    }
+
     /**
      * 图像元信息
      */
     var imageMeta by ObservableStatus(DicomImageMetaInfo())
         private set
+
+    init {
+        reduce(ImageFrameStore::imageMeta) {
+            on<ShowImage> { event.meta }
+            on<MoveModel> { event.meta }
+            on<PlayIndexChange> { event.meta }
+            on<Reset> { DicomImageMetaInfo() }
+        }
+    }
+
     /**
      * 当前图片在series中的位置
      */
     var index by ObservableStatus(0)
         private set
+
+    init {
+        reduce(ImageFrameStore::index) {
+            on<ShowImage> { event.index }
+            on<MoveModel> { event.index }
+            on<PlayIndexChange> { event.index }
+            on<Reset> { 0 }
+        }
+    }
     var displayModel by ObservableStatus(ImageDisplayModel())
         private set
+
+    init {
+        reduce(ImageFrameStore::displayModel) {
+            on<ShowImage> { ImageDisplayModel(listOf(event.bitmap)) }
+            on<MoveModel> { ImageDisplayModel(listOf(event.bitmap)) }
+            on<PlayAnimation> { ImageDisplayModel(event.images) }
+            on<Reset> { ImageDisplayModel() }
+        }
+    }
 
     /**
      * 总的缩放比
@@ -161,6 +251,22 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      */
     var gestureScale by ObservableStatus(1.0f)
         private set
+
+    init {
+        reduce(ImageFrameStore::gestureScale) {
+            on<ScaleChange> {
+                state * event.scaleFactor
+            }
+            on<StudyModeReset> {
+                1.0f
+            }
+            on<BindModel> {
+                1.0f
+            }
+            on<MoveModel> { 1.0f }
+        }
+    }
+
     /**
      * 复合了自动扩充和触摸调整因素的位置矩阵
      */
@@ -181,123 +287,8 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      */
     var matrix by ObservableStatus(Matrix())
         private set
-    /**
-     * 颜色显示矩阵
-     */
-    var colorMatrix by ObservableStatus(ColorMatrix())
-        private set
-    /**
-     * 是否反色
-     */
-    var reverseColor by ObservableStatus(false)
-        private set
-    /**
-     * 是否伪彩
-     */
-    var pseudoColor by ObservableStatus(false)
-        private set
-
-    /**
-     * 所处的测量模式
-     */
-    var measure by ObservableStatus(Measure.NONE)
-        private set
-    var canvasModel by ObservableStatus(ImageCanvasModel())
-
-    /**
-     * 是否可播放
-     */
-    val playable
-        get() = allowPlay && size > 1
-    /**
-     * 当前series模型是否有图片
-     */
-    val hasImage
-        get() = size > 0
-    /**
-     * 给播放用的index. 实现当前图像为最后一张时点播放将从头播放的功能
-     */
-    val autoJumpIndex
-        get() = if (index == size - 1) 0 else index
 
     init {
-        reduce(ImageFrameStore::allowPlay) {
-            on<SetAllowPlay> { event.value }
-            on<Reset> { true }
-        }
-
-        reduce(ImageFrameStore::hideMeta) {
-            on<ImageClicked> { !state }
-            on<BindModel> { event.size == 0 }
-            on<MoveModel> { event.size == 0 }
-            on<ResetDisplay> { false }
-            on<Reset> { true }
-        }
-
-        reduce(ImageFrameStore::bindModId) {
-            on<BindModel> { event.modeId }
-            on<MoveModel> { event.modeId }
-            on<Reset> { "" }
-        }
-
-        reduce(ImageFrameStore::size) {
-            on<BindModel> { event.size }
-            on<MoveModel> { event.size }
-            on<Reset> { 0 }
-        }
-
-        reduce(ImageFrameStore::patientMeta) {
-            on<BindModel> { event.patient }
-            on<MoveModel> { event.patient }
-            on<Reset> { DicomPatientMetaInfo() }
-        }
-
-        reduce(ImageFrameStore::studyMeta) {
-            on<BindModel> { event.study }
-            on<MoveModel> { event.study }
-            on<Reset> { DicomStudyMetaInfo() }
-        }
-
-        reduce(ImageFrameStore::seriesMeta) {
-            on<BindModel> { event.series }
-            on<MoveModel> { event.series }
-            on<Reset> { DicomSeriesMetaInfo() }
-        }
-
-        reduce(ImageFrameStore::imageMeta) {
-            on<ShowImage> { event.meta }
-            on<MoveModel> { event.meta }
-            on<PlayIndexChange> { event.meta }
-            on<Reset> { DicomImageMetaInfo() }
-        }
-
-        reduce(ImageFrameStore::index) {
-            on<ShowImage> { event.index }
-            on<MoveModel> { event.index }
-            on<PlayIndexChange> { event.index }
-            on<Reset> { 0 }
-        }
-
-        reduce(ImageFrameStore::displayModel) {
-            on<ShowImage> { ImageDisplayModel(listOf(event.bitmap)) }
-            on<MoveModel> { ImageDisplayModel(listOf(event.bitmap)) }
-            on<PlayAnimation> { ImageDisplayModel(event.images) }
-            on<Reset> { ImageDisplayModel() }
-        }
-
-        reduce(ImageFrameStore::gestureScale) {
-            on<ScaleChange> {
-                state * event.scaleFactor
-            }
-            on<StudyModeReset> {
-                1.0f
-            }
-            on<BindModel> {
-                1.0f
-            }
-            on<MoveModel> { 1.0f }
-        }
-
         reduce(ImageFrameStore::matrix) {
             on<ScaleChange> {
                 Matrix(state).apply {
@@ -328,26 +319,15 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             }
             on<MoveModel> { Matrix() }
         }
+    }
 
-        reduce(ImageFrameStore::reverseColor) {
-            on<ReverseColor> {
-                !state
-            }
-            on<ResetDisplay> {
-                false
-            }
-            on<StudyModeReset> {
-                false
-            }
-            on<Reset> {
-                false
-            }
-            on<BindModel> {
-                false
-            }
-            on<MoveModel> { event.reverseColor }
-        }
+    /**
+     * 颜色显示矩阵
+     */
+    var colorMatrix by ObservableStatus(ColorMatrix())
+        private set
 
+    init {
         reduce(ImageFrameStore::colorMatrix) {
             on<ReverseColor> {
                 ColorMatrix(state).apply {
@@ -374,7 +354,40 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
                 }
             }
         }
+    }
+    /**
+     * 是否反色
+     */
+    var reverseColor by ObservableStatus(false)
+        private set
 
+    init {
+        reduce(ImageFrameStore::reverseColor) {
+            on<ReverseColor> {
+                !state
+            }
+            on<ResetDisplay> {
+                false
+            }
+            on<StudyModeReset> {
+                false
+            }
+            on<Reset> {
+                false
+            }
+            on<BindModel> {
+                false
+            }
+            on<MoveModel> { event.reverseColor }
+        }
+    }
+    /**
+     * 是否伪彩
+     */
+    var pseudoColor by ObservableStatus(false)
+        private set
+
+    init {
         reduce(ImageFrameStore::pseudoColor) {
             on<PseudoColor> {
                 !state
@@ -393,7 +406,15 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             }
             on<MoveModel> { event.pseudoColor }
         }
+    }
 
+    /**
+     * 所处的测量模式
+     */
+    var measure by ObservableStatus(Measure.NONE)
+        private set
+
+    init {
         reduce(ImageFrameStore::measure) {
             on<MeasureLineTurned> {
                 when (state) {
@@ -414,7 +435,12 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             }
             on<MoveModel> { Measure.NONE }
         }
+    }
 
+    var canvasModel by ObservableStatus(ImageCanvasModel())
+        private set
+
+    init {
         reduce(ImageFrameStore::canvasModel) {
             on<ImageCanvasModel> { event }
             on<DrawLines> { state.copy(tmp = event.tmp, canUndo = event.canUndo) }
@@ -425,6 +451,22 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             on<ClearMeasure> { ImageCanvasModel() }
         }
     }
+
+    /**
+     * 是否可播放
+     */
+    val playable
+        get() = allowPlay && size > 1
+    /**
+     * 当前series模型是否有图片
+     */
+    val hasImage
+        get() = size > 0
+    /**
+     * 给播放用的index. 实现当前图像为最后一张时点播放将从头播放的功能
+     */
+    val autoJumpIndex
+        get() = if (index == size - 1) 0 else index
 
     /**
      * 获取当前位置矩阵的反矩阵, 给测量模式计算点所赢处的原始坐标

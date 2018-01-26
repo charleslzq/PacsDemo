@@ -24,16 +24,41 @@ class PacsStore : Store<PacsStore>(MiddleWare.debugLog, buildThunk<PacsStore>())
      */
     var thumbList by ObservableStatus(mutableListOf<ImageThumbModel>())
         private set
+
+    init {
+        reduce(PacsStore::thumbList) {
+            on<SeriesListUpdated> { event.thumbList.toMutableList() }
+        }
+    }
+
     /**
      * 被选中的缩略图的序号, 仅在1*1布局下有用
      */
     var selected: Int by ObservableStatus(-1)
         private set
+
+    init {
+        reduce(PacsStore::selected) {
+            on<ChangeLayout> { -1 }
+            on<SeriesListUpdated> { -1 }
+            on<ThumbListItemClicked>(require = { layoutOption == LayoutOption.ONE_ONE }) {
+                event.position
+            }
+        }
+    }
+
     /**
      * 布局
      */
     var layoutOption: LayoutOption by ObservableStatus(LayoutOption.ONE_ONE)
         private set
+
+    init {
+        reduce(PacsStore::layoutOption) {
+            on<ChangeLayout> { LayoutOption.values()[event.layoutOrdinal] }
+        }
+    }
+
     /**
      * 单元格store列表
      */
@@ -43,24 +68,6 @@ class PacsStore : Store<PacsStore>(MiddleWare.debugLog, buildThunk<PacsStore>())
      */
     val firstCell
         get() = imageCells.first()
-
-    init {
-        reduce(PacsStore::thumbList) {
-            on<SeriesListUpdated> { event.thumbList.toMutableList() }
-        }
-
-        reduce(PacsStore::selected) {
-            on<ChangeLayout> { -1 }
-            on<SeriesListUpdated> { -1 }
-            on<ThumbListItemClicked>(require = { layoutOption == LayoutOption.ONE_ONE }) {
-                event.position
-            }
-        }
-
-        reduce(PacsStore::layoutOption) {
-            on<ChangeLayout> { LayoutOption.values()[event.layoutOrdinal] }
-        }
-    }
 
     enum class LayoutOption {
         ONE_ONE,
