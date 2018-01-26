@@ -164,6 +164,10 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * 图像和ImageView适配所需的缩放比.因为动画只能放在背景中播放,为了让其不变形,只能将ImageView的长宽调整为适应图像
      */
     var autoScale by ObservableStatus(1.0f)
+    val viewWidth
+        get() = if (displayModel.images.isNotEmpty()) displayModel.images[0].width * autoScale else -1f
+    val viewHeight
+        get() = if (displayModel.images.isNotEmpty()) displayModel.images[0].height * autoScale else -1f
     /**
      * 通过触摸缩放图形的缩放比
      */
@@ -174,6 +178,16 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      */
     val compositeMatrix
         get() = Matrix(matrix).apply { postScale(autoScale, autoScale) }
+    private val matrixValues
+        get() = FloatArray(9).apply { compositeMatrix.getValues(this) }
+    val imageX
+        get() = matrixValues[Matrix.MTRANS_X]
+    val imageY
+        get() = matrixValues[Matrix.MTRANS_Y]
+    val imageWidth
+        get() = if (displayModel.images.isNotEmpty()) matrixValues[Matrix.MSCALE_X] * displayModel.images[0].width else -1f
+    val imageHeight
+        get() = if (displayModel.images.isNotEmpty()) matrixValues[Matrix.MSCALE_Y] * displayModel.images[0].height else -1f
     /**
      * 通过触摸调整后的位置矩阵
      */
@@ -285,7 +299,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
 
         reduce(ImageFrameStore::gestureScale) {
             on<ScaleChange> {
-                getNewScaleFactor(event.scaleFactor)
+                state * event.scaleFactor
             }
             on<StudyModeReset> {
                 1.0f
@@ -299,13 +313,20 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
         reduce(ImageFrameStore::matrix) {
             on<ScaleChange> {
                 Matrix(state).apply {
-                    val newScale = getNewScaleFactor(event.scaleFactor)
-                    postScale(newScale, newScale, event.focus.x, event.focus.y)
+                    postScale(event.scaleFactor, event.scaleFactor, event.focus.x, event.focus.y)
                 }
             }
             on<LocationTranslate> {
                 Matrix(state).apply {
-                    postTranslate(event.distanceX, event.distanceY)
+                    val offsetX = Math.min(
+                        -imageX,
+                        Math.max(-event.distanceX, viewWidth - imageX - imageWidth)
+                    )
+                    val offsetY = Math.min(
+                        -imageY,
+                        Math.max(-event.distanceY, viewHeight - imageY - imageHeight)
+                    )
+                    postTranslate(offsetX, offsetY)
                 }
             }
             on<StudyModeReset> {

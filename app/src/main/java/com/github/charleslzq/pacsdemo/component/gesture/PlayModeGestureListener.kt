@@ -17,12 +17,15 @@ class PlayModeGestureListener(dispatch: (Any) -> Unit, private val onDragStart: 
         e2: MotionEvent?,
         distanceX: Float,
         distanceY: Float
-    ): Boolean {
+    ) = if (e1?.pointerCount == 1 && e2?.pointerCount == 1) {
         if (Math.abs(distanceX) > 3 * Math.abs(distanceY)) {
             dispatch(ImageDisplayActions.indexScroll(distanceX))
         }
-        return true
+        true
+    } else {
+        false
     }
+
 
     /**
      * 响应托放操作

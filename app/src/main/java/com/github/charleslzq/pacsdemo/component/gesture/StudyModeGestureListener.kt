@@ -25,9 +25,11 @@ class StudyModeGestureListener(dispatch: (Any) -> Unit, private val onDragStart:
         e2: MotionEvent?,
         distanceX: Float,
         distanceY: Float
-    ): Boolean {
+    ) = if (e1?.pointerCount == 1 && e2?.pointerCount == 1) {
         dispatch(ImageFrameStore.LocationTranslate(distanceX, distanceY))
-        return true
+        true
+    } else {
+        false
     }
 
     /**

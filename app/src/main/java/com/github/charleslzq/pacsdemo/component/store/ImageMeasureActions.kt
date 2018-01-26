@@ -52,7 +52,7 @@ object ImageMeasureActions : RxScheduleSupport {
             val rightBottomPoint = getCurrentImage(store)!!.let {
                 mapPoint(
                     store,
-                    PointF(it.width * store.autoScale, it.height * store.autoScale)
+                    PointF(store.viewWidth, store.viewHeight)
                 )
             }
             val width = (rightBottomPoint.x - leftTopPoint.x).toInt()
