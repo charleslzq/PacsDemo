@@ -56,7 +56,7 @@ class DicomImage(
             }
         }
 
-        render(ImageFrameStore::gestureScale) {
+        render(ImageFrameStore::matrix) {
             if (store.gestureScale > 1 && operationMode is PlayMode) {
                 operationMode = StudyMode(
                     imageView.context,

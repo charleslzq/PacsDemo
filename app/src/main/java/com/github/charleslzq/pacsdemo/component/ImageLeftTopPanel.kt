@@ -42,7 +42,7 @@ class ImageLeftTopPanel(
             }
         }
 
-        renderByAll(store::autoScale, store::gestureScale) {
+        renderByAll(store::autoScale, store::matrix) {
             if (store.hasImage) {
                 scaleInfo.text = scaleInfo.resources.getString(R.string.scale_info, store.scale)
                 scaleInfo.visibility = View.VISIBLE

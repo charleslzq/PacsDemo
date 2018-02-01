@@ -254,23 +254,8 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     /**
      * 通过触摸缩放图形的缩放比
      */
-    var gestureScale by ObservableStatus(1.0f)
-        private set
-
-    init {
-        reduce(ImageFrameStore::gestureScale) {
-            on<ScaleChange> {
-                state * event.scaleFactor
-            }
-            on<StudyModeReset> {
-                1.0f
-            }
-            on<BindModel> {
-                1.0f
-            }
-            on<MoveModel> { 1.0f }
-        }
-    }
+    val gestureScale
+        get() = FloatArray(9).apply { matrix.getValues(this) }[Matrix.MSCALE_X]
 
     /**
      * 复合了自动扩充和触摸调整因素的位置矩阵
@@ -294,14 +279,16 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     /**
      * 通过触摸调整后的位置矩阵
      */
-    var matrix by ObservableStatus(Matrix())
+    var matrix by ObservableStatus(
+        Matrix(),
+        debugLog({ "matrix scale" }) { FloatArray(9).apply { it.getValues(this) }[Matrix.MSCALE_X].toString() })
         private set
 
     init {
         reduce(ImageFrameStore::matrix) {
             on<ScaleChange> {
                 Matrix(state).apply {
-                    postScale(event.scaleFactor, event.scaleFactor, event.focus.x, event.focus.y)
+                    postScale(event.scaleFactor, event.scaleFactor, viewWidth / 2, viewHeight / 2)
                 }
             }
             on<LocationTranslate> {
