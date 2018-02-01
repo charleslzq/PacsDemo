@@ -288,7 +288,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
         reduce(ImageFrameStore::matrix) {
             on<ScaleChange> {
                 Matrix(state).apply {
-                    postScale(event.scaleFactor, event.scaleFactor, viewWidth / 2, viewHeight / 2)
+                    postScale(event.scaleFactor, event.scaleFactor, event.focus.x, event.focus.y)
                 }
             }
             on<LocationTranslate> {
