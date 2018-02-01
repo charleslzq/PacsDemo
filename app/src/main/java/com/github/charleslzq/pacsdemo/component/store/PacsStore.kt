@@ -3,8 +3,8 @@ package com.github.charleslzq.pacsdemo.component.store
 import android.graphics.Bitmap
 import com.github.charleslzq.kotlin.react.ObservableStatus
 import com.github.charleslzq.kotlin.react.Store
-import com.github.charleslzq.pacsdemo.support.MiddleWare
-import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
+import com.github.charleslzq.pacsdemo.support.callOnIo
+import com.github.charleslzq.pacsdemo.support.debugLog
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -17,8 +17,7 @@ data class ImageThumbModel(val modId: String, val thumb: Bitmap)
 /**
  * 主store
  */
-class PacsStore : Store<PacsStore>(MiddleWare.debugLog, buildThunk<PacsStore>()),
-    RxScheduleSupport {
+class PacsStore : Store<PacsStore>(debugLog, buildThunk<PacsStore>()) {
     /**
      * 缩略图数据
      */

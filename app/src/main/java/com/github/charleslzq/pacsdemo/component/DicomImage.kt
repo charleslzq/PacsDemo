@@ -12,7 +12,8 @@ import com.github.charleslzq.pacsdemo.R
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
-import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
+import com.github.charleslzq.pacsdemo.support.callOnCompute
+import com.github.charleslzq.pacsdemo.support.runOnCompute
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -21,7 +22,7 @@ import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 class DicomImage(
     imageLayout: View,
     imageFrameStore: ImageFrameStore
-) : Component<View, ImageFrameStore>(imageLayout, imageFrameStore), RxScheduleSupport {
+) : Component<View, ImageFrameStore>(imageLayout, imageFrameStore) {
     private val imageView: ImageView = view.findViewById(R.id.image)
     private var operationMode: OperationMode =
         PlayMode(imageView.context, PlayModeGestureListener(store.dispatch, ::onDragStart))

@@ -10,7 +10,7 @@ import android.widget.TableRow
 import android.widget.ViewFlipper
 import com.github.charleslzq.pacsdemo.component.store.ImageDisplayActions
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
-import com.github.charleslzq.pacsdemo.support.ViewUtils
+import com.github.charleslzq.pacsdemo.support.getTypedChildren
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -72,14 +72,14 @@ class ViewSelector(
                     listOf(displayedChild)
                 }
                 PacsStore.LayoutOption.ONE_TWO -> {
-                    ViewUtils.getTypedChildren(
+                    getTypedChildren(
                         displayedChild as LinearLayout,
                         ConstraintLayout::class.java
                     )
                 }
                 else -> {
-                    ViewUtils.getTypedChildren(displayedChild as TableLayout, TableRow::class.java)
-                        .flatMap { ViewUtils.getTypedChildren(it, ConstraintLayout::class.java) }
+                    getTypedChildren(displayedChild as TableLayout, TableRow::class.java)
+                        .flatMap { getTypedChildren(it, ConstraintLayout::class.java) }
                 }
             }
         }

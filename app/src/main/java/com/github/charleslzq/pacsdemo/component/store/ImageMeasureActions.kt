@@ -4,8 +4,8 @@ import android.graphics.*
 import com.github.charleslzq.kotlin.react.DispatchAction
 import com.github.charleslzq.kotlin.react.castOrNull
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore.*
-import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
 import com.github.charleslzq.pacsdemo.support.UndoSupport
+import com.github.charleslzq.pacsdemo.support.runOnCompute
 import java.util.*
 
 /**
@@ -33,7 +33,7 @@ operator fun PointF.div(float: Float) = if (float != 0f) PointF(
 fun PointF.distance(pointF: PointF = PointF(0f, 0f)) =
     Math.sqrt((this - pointF).let { it * it }.toDouble())
 
-object ImageMeasureActions : RxScheduleSupport {
+object ImageMeasureActions {
     private const val PRECISION = 2
 
     /**
