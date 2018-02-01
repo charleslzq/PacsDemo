@@ -15,14 +15,15 @@ import com.github.charleslzq.pacsdemo.broker.DicomWebSocketMessageBroker
 import com.github.charleslzq.pacsdemo.broker.RemoteSaveHandler
 import com.github.charleslzq.pacsdemo.broker.message.StoreMessageListener
 import com.github.charleslzq.pacsdemo.service.impl.DicomDataServiceImpl
-import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
+import com.github.charleslzq.pacsdemo.support.callOnIo
+import com.github.charleslzq.pacsdemo.support.runOnIo
 import java.io.File
 import java.util.*
 
 /**
  * 本地dicom数据的android后台服务
  */
-class DicomDataServiceBackground : Service(), RxScheduleSupport {
+class DicomDataServiceBackground : Service() {
     private val logTag = javaClass.name
     private lateinit var messageBroker: DicomMessageBroker
     private lateinit var dataStore: DicomDataStore<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>

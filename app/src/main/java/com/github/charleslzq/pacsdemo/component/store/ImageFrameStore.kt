@@ -7,8 +7,8 @@ import com.github.charleslzq.dicom.data.DicomSeriesMetaInfo
 import com.github.charleslzq.dicom.data.DicomStudyMetaInfo
 import com.github.charleslzq.kotlin.react.ObservableStatus
 import com.github.charleslzq.kotlin.react.Store
-import com.github.charleslzq.pacsdemo.support.MiddleWare
 import com.github.charleslzq.pacsdemo.support.UndoSupport
+import com.github.charleslzq.pacsdemo.support.debugLog
 import java.net.URI
 import java.util.*
 
@@ -54,7 +54,7 @@ data class ImageFrameModel(
  * @param layoutPosition 位置参数 0-8
  */
 class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
-    MiddleWare.debugLog,
+    debugLog,
     buildThunk<ImageFrameStore>(UndoSupport<Bitmap>(), Stack<PointF>())
 ) {
     /**
@@ -260,7 +260,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     init {
         reduce(ImageFrameStore::gestureScale) {
             on<ScaleChange> {
-                getNewScaleFactor(state * event.scaleFactor)
+                state * event.scaleFactor
             }
             on<StudyModeReset> {
                 1.0f
@@ -276,7 +276,10 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * 复合了自动扩充和触摸调整因素的位置矩阵
      */
     val compositeMatrix
-        get() = Matrix(matrix).apply { postScale(autoScale, autoScale) }
+        get() = Matrix().apply {
+            postScale(autoScale, autoScale)
+            postConcat(matrix)
+        }
     private val matrixValues
         get() = FloatArray(9).apply { compositeMatrix.getValues(this) }
     private val imageX
@@ -485,9 +488,6 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     fun getInvertMatrix() = Matrix().apply {
         compositeMatrix.invert(this)
     }
-
-    private fun getNewScaleFactor(rawScaleFactor: Float): Float =
-        Math.max(1.0f, Math.min(rawScaleFactor * gestureScale, 5.0f))
 
     /**
      * 修改是否允许播放

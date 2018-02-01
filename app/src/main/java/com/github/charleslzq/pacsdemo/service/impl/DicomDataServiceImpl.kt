@@ -8,7 +8,8 @@ import com.github.charleslzq.pacsdemo.broker.DicomMessageBroker
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackground
 import com.github.charleslzq.pacsdemo.support.MemCache
-import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
+import com.github.charleslzq.pacsdemo.support.callOnIo
+import com.github.charleslzq.pacsdemo.support.runOnIo
 
 /**
  * Created by charleslzq on 17-11-15.
@@ -21,7 +22,7 @@ class DicomDataServiceImpl(
     private val messageBroker: DicomMessageBroker,
     private val dataStore: DicomDataStore<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>,
     private val sharedPreferences: SharedPreferences
-) : Binder(), DicomDataService, RxScheduleSupport {
+) : Binder(), DicomDataService {
     private val cache = MemCache(DicomPatient::class.java, 5)
 
     @Suppress("UNCHECKED_CAST")

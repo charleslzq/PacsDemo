@@ -13,7 +13,7 @@ import com.github.charleslzq.pacsdemo.component.store.ImageThumbModel
  */
 class DicomSeriesThumbListAdpater(
     val thumbList: MutableList<ImageThumbModel>
-) : RecyclerView.Adapter<DicomSeriesThumbListAdpater.ViewHolder>(), RxScheduleSupport {
+) : RecyclerView.Adapter<DicomSeriesThumbListAdpater.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.thumbView.setImageBitmap(thumbList[position].thumb)
     }

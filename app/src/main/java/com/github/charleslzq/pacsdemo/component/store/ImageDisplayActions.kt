@@ -5,7 +5,9 @@ import com.github.charleslzq.dicom.data.DicomSeriesMetaInfo
 import com.github.charleslzq.dicom.data.DicomStudyMetaInfo
 import com.github.charleslzq.kotlin.react.DispatchAction
 import com.github.charleslzq.pacsdemo.support.BitmapCache
-import com.github.charleslzq.pacsdemo.support.RxScheduleSupport
+import com.github.charleslzq.pacsdemo.support.callOnIo
+import com.github.charleslzq.pacsdemo.support.runOnCompute
+import com.github.charleslzq.pacsdemo.support.runOnIo
 import java.net.URI
 
 /**
@@ -20,7 +22,7 @@ data class PatientSeriesModel(
     val thumb: URI? = null
 )
 
-object ImageDisplayActions : RxScheduleSupport {
+object ImageDisplayActions {
     private val seriesModels: MutableMap<String, PatientSeriesModel> = mutableMapOf()
     private var bitmapCache = BitmapCache()
     private const val PRE_LOAD_RANGE = 5
