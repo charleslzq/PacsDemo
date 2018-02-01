@@ -279,9 +279,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     /**
      * 通过触摸调整后的位置矩阵
      */
-    var matrix by ObservableStatus(
-        Matrix(),
-        debugLog({ "matrix scale" }) { FloatArray(9).apply { it.getValues(this) }[Matrix.MSCALE_X].toString() })
+    var matrix by ObservableStatus(Matrix())
         private set
 
     init {
