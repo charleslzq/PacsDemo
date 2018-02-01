@@ -221,6 +221,10 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             on<Reset> { 0 }
         }
     }
+
+    /**
+     * 图片显示模型
+     */
     var displayModel by ObservableStatus(ImageDisplayModel())
         private set
 
@@ -246,6 +250,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
         get() = if (displayModel.images.isNotEmpty()) displayModel.images[0].width * autoScale else -1f
     val viewHeight
         get() = if (displayModel.images.isNotEmpty()) displayModel.images[0].height * autoScale else -1f
+
     /**
      * 通过触摸缩放图形的缩放比
      */
@@ -255,7 +260,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     init {
         reduce(ImageFrameStore::gestureScale) {
             on<ScaleChange> {
-                state * event.scaleFactor
+                getNewScaleFactor(state * event.scaleFactor)
             }
             on<StudyModeReset> {
                 1.0f
@@ -282,6 +287,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
         get() = if (displayModel.images.isNotEmpty()) matrixValues[Matrix.MSCALE_X] * displayModel.images[0].width else -1f
     private val imageHeight
         get() = if (displayModel.images.isNotEmpty()) matrixValues[Matrix.MSCALE_Y] * displayModel.images[0].height else -1f
+
     /**
      * 通过触摸调整后的位置矩阵
      */
@@ -355,6 +361,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             }
         }
     }
+
     /**
      * 是否反色
      */
@@ -381,6 +388,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             on<MoveModel> { event.reverseColor }
         }
     }
+
     /**
      * 是否伪彩
      */
@@ -437,6 +445,9 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
         }
     }
 
+    /**
+     * 测量模式绘布模型
+     */
     var canvasModel by ObservableStatus(ImageCanvasModel())
         private set
 
@@ -469,7 +480,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
         get() = if (index == size - 1) 0 else index
 
     /**
-     * 获取当前位置矩阵的反矩阵, 给测量模式计算点所赢处的原始坐标
+     * 获取当前位置矩阵的反矩阵, 给测量模式计算点在原始图像上的坐标
      */
     fun getInvertMatrix() = Matrix().apply {
         compositeMatrix.invert(this)
@@ -529,15 +540,30 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     class ReverseColor
     class PseudoColor
 
+    /**
+     * 手势缩放事件
+     */
     data class ScaleChange(val scaleFactor: Float, val focus: PointF)
+
+    /**
+     * 手势拖动事件,仅在study模式下出发
+     */
     data class LocationTranslate(val distanceX: Float, val distanceY: Float)
+
+    /**
+     * 绘制临时的测量图像
+     */
     data class DrawLines(val tmp: Bitmap?, val canUndo: Boolean)
+
+    /**
+     * 重置测量数据
+     */
     class ClearMeasure
 
     enum class Measure {
-        NONE,
-        LINE,
-        ANGEL
+        NONE, // 无
+        LINE, // 测量线模式
+        ANGEL // 测量角模式
     }
 
     companion object {
