@@ -7,19 +7,15 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import com.github.charleslzq.pacsdemo.R
 import com.github.charleslzq.pacsdemo.component.store.ImageThumbModel
+import com.github.charleslzq.pacsdemo.recycler.ReactiveRecyclerViewAdpater
 
 /**
  * Created by charleslzq on 17-11-20.
  */
-class DicomSeriesThumbListAdpater(
-    val thumbList: MutableList<ImageThumbModel>
-) : RecyclerView.Adapter<DicomSeriesThumbListAdpater.ViewHolder>() {
+class DicomSeriesThumbListAdpater :
+    ReactiveRecyclerViewAdpater<ImageThumbModel, DicomSeriesThumbListAdpater.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.thumbView.setImageBitmap(thumbList[position].thumb)
-    }
-
-    override fun getItemCount(): Int {
-        return thumbList.size
+        holder.thumbView.setImageBitmap(dataList[position].thumb)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

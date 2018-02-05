@@ -24,12 +24,11 @@ class ThumbList(
         render(store::thumbList) {
             val adapter = view.adapter
             if (adapter != null && adapter is DicomSeriesThumbListAdpater) {
-                adapter.thumbList.clear()
-                adapter.thumbList.addAll(store.thumbList)
+                adapter.dataList.clear()
+                adapter.dataList.addAll(store.thumbList)
             } else {
-                view.adapter = DicomSeriesThumbListAdpater(store.thumbList)
+                view.adapter = DicomSeriesThumbListAdpater()
             }
-            view.adapter.notifyDataSetChanged()
             if (store.thumbList.isNotEmpty()) {
                 ItemClickSupport.addTo(view)
                     .setOnItemClickListener(object : ItemClickSupport.OnItemClickListener {
