@@ -94,44 +94,32 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     /**
      * 是否允许播放动画
      */
-    private var allowPlay = true
-
-    init {
-        reduce(ImageFrameStore::allowPlay) {
-            on<SetAllowPlay> { event.value }
-            on<Reset> { true }
-        }
+    private var allowPlay by StoreField(true) {
+        on<SetAllowPlay> { event.value }
+        on<Reset> { true }
     }
 
     /**
      * 是否隐藏单元格四个角上的元信息面板和控制面板
      */
-    var hideMeta by ObservableStatus(true)
-        private set
-
-    init {
-        reduce(ImageFrameStore::hideMeta) {
-            on<ImageClicked> { !state }
-            on<BindModel> { event.size == 0 }
-            on<MoveModel> { event.size == 0 }
-            on<ResetDisplay> { false }
-            on<Reset> { true }
-        }
+    var hideMeta by StoreField(true) {
+        on<ImageClicked> { !state }
+        on<BindModel> { event.size == 0 }
+        on<MoveModel> { event.size == 0 }
+        on<ResetDisplay> { false }
+        on<Reset> { true }
     }
+        private set
 
     /**
      * 绑定的dicom数据模型id
      */
-    var bindModId = ""
-        private set
-
-    init {
-        reduce(ImageFrameStore::bindModId) {
-            on<BindModel> { event.modeId }
-            on<MoveModel> { event.modeId }
-            on<Reset> { "" }
-        }
+    var bindModId by StoreField("") {
+        on<BindModel> { event.modeId }
+        on<MoveModel> { event.modeId }
+        on<Reset> { "" }
     }
+        private set
 
     /**
      * 播放动画每帧的时间
@@ -141,103 +129,75 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     /**
      * 当前series中图像的张数
      */
-    var size by ObservableStatus(0)
-        private set
-
-    init {
-        reduce(ImageFrameStore::size) {
-            on<BindModel> { event.size }
-            on<MoveModel> { event.size }
-            on<Reset> { 0 }
-        }
+    var size by StoreField(0) {
+        on<BindModel> { event.size }
+        on<MoveModel> { event.size }
+        on<Reset> { 0 }
     }
+        private set
 
     /**
      * 病人元信息
      */
-    var patientMeta by ObservableStatus(DicomPatientMetaInfo())
-        private set
-
-    init {
-        reduce(ImageFrameStore::patientMeta) {
-            on<BindModel> { event.patient }
-            on<MoveModel> { event.patient }
-            on<Reset> { DicomPatientMetaInfo() }
-        }
+    var patientMeta by StoreField(DicomPatientMetaInfo()) {
+        on<BindModel> { event.patient }
+        on<MoveModel> { event.patient }
+        on<Reset> { DicomPatientMetaInfo() }
     }
+        private set
 
     /**
      * study元信息
      */
-    var studyMeta by ObservableStatus(DicomStudyMetaInfo())
-        private set
-
-    init {
-        reduce(ImageFrameStore::studyMeta) {
-            on<BindModel> { event.study }
-            on<MoveModel> { event.study }
-            on<Reset> { DicomStudyMetaInfo() }
-        }
+    var studyMeta by StoreField(DicomStudyMetaInfo()) {
+        on<BindModel> { event.study }
+        on<MoveModel> { event.study }
+        on<Reset> { DicomStudyMetaInfo() }
     }
+        private set
 
     /**
      * series元信息
      */
-    var seriesMeta by ObservableStatus(DicomSeriesMetaInfo())
-        private set
-
-    init {
-        reduce(ImageFrameStore::seriesMeta) {
-            on<BindModel> { event.series }
-            on<MoveModel> { event.series }
-            on<Reset> { DicomSeriesMetaInfo() }
-        }
+    var seriesMeta by StoreField(DicomSeriesMetaInfo()) {
+        on<BindModel> { event.series }
+        on<MoveModel> { event.series }
+        on<Reset> { DicomSeriesMetaInfo() }
     }
+        private set
 
     /**
      * 图像元信息
      */
-    var imageMeta by ObservableStatus(DicomImageMetaInfo())
-        private set
-
-    init {
-        reduce(ImageFrameStore::imageMeta) {
-            on<ShowImage> { event.meta }
-            on<MoveModel> { event.meta }
-            on<PlayIndexChange> { event.meta }
-            on<Reset> { DicomImageMetaInfo() }
-        }
+    var imageMeta by StoreField(DicomImageMetaInfo()) {
+        on<ShowImage> { event.meta }
+        on<MoveModel> { event.meta }
+        on<PlayIndexChange> { event.meta }
+        on<Reset> { DicomImageMetaInfo() }
     }
+        private set
 
     /**
      * 当前图片在series中的位置
      */
-    var index by ObservableStatus(0)
-        private set
-
-    init {
-        reduce(ImageFrameStore::index) {
-            on<ShowImage> { event.index }
-            on<MoveModel> { event.index }
-            on<PlayIndexChange> { event.index }
-            on<Reset> { 0 }
-        }
+    var index by StoreField(0) {
+        on<ShowImage> { event.index }
+        on<MoveModel> { event.index }
+        on<PlayIndexChange> { event.index }
+        on<Reset> { 0 }
     }
+        private set
 
     /**
      * 图片显示模型
      */
-    var displayModel by ObservableStatus(ImageDisplayModel())
-        private set
-
-    init {
-        reduce(ImageFrameStore::displayModel) {
-            on<ShowImage> { ImageDisplayModel(listOf(event.bitmap)) }
-            on<MoveModel> { ImageDisplayModel(listOf(event.bitmap)) }
-            on<PlayAnimation> { ImageDisplayModel(event.images) }
-            on<Reset> { ImageDisplayModel() }
-        }
+    var displayModel by StoreField(ImageDisplayModel()) {
+        on<ShowImage> { ImageDisplayModel(listOf(event.bitmap)) }
+        on<MoveModel> { ImageDisplayModel(listOf(event.bitmap)) }
+        on<PlayAnimation> { ImageDisplayModel(event.images) }
+        on<Reset> { ImageDisplayModel() }
     }
+        private set
 
     /**
      * 总的缩放比
@@ -281,177 +241,119 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     /**
      * 通过触摸调整后的位置矩阵
      */
-    var matrix by ObservableStatus(Matrix())
-        private set
-
-    init {
-        reduce(ImageFrameStore::matrix) {
-            on<ScaleChange> {
-                state.copy {
-                    postScale(event.scaleFactor, event.scaleFactor, event.focus.x, event.focus.y)
-                }
+    var matrix: Matrix by StoreField(Matrix()) {
+        on<ScaleChange> {
+            state.copy {
+                postScale(event.scaleFactor, event.scaleFactor, event.focus.x, event.focus.y)
             }
-            on<LocationTranslate> {
-                state.copy {
-                    val offsetX = Math.min(
-                        -imageX,
-                        Math.max(-event.distanceX, viewWidth - imageX - imageWidth)
-                    )
-                    val offsetY = Math.min(
-                        -imageY,
-                        Math.max(-event.distanceY, viewHeight - imageY - imageHeight)
-                    )
-                    postTranslate(offsetX, offsetY)
-                }
-            }
-            on<StudyModeReset> {
-                Matrix()
-            }
-            on<Reset> {
-                Matrix()
-            }
-            on<BindModel> {
-                Matrix()
-            }
-            on<MoveModel> { Matrix() }
         }
+        on<LocationTranslate> {
+            state.copy {
+                val offsetX = Math.min(
+                    -imageX,
+                    Math.max(-event.distanceX, viewWidth - imageX - imageWidth)
+                )
+                val offsetY = Math.min(
+                    -imageY,
+                    Math.max(-event.distanceY, viewHeight - imageY - imageHeight)
+                )
+                postTranslate(offsetX, offsetY)
+            }
+        }
+        on<StudyModeReset> { Matrix() }
+        on<Reset> { Matrix() }
+        on<BindModel> { Matrix() }
+        on<MoveModel> { Matrix() }
     }
+        private set
 
     /**
      * 颜色显示矩阵
      */
-    var colorMatrix by ObservableStatus(ColorMatrix())
-        private set
-
-    init {
-        reduce(ImageFrameStore::colorMatrix) {
-            on<ReverseColor> {
-                state.copy {
+    var colorMatrix by StoreField(ColorMatrix()) {
+        on<ReverseColor> {
+            state.copy {
+                postConcat(reverseMatrix)
+            }
+        }
+        on<ResetDisplay> { ColorMatrix() }
+        on<StudyModeReset> { ColorMatrix() }
+        on<Reset> { ColorMatrix() }
+        on<BindModel> { ColorMatrix() }
+        on<MoveModel> {
+            ColorMatrix().apply {
+                if (event.reverseColor) {
                     postConcat(reverseMatrix)
-                }
-            }
-            on<ResetDisplay> {
-                ColorMatrix()
-            }
-            on<StudyModeReset> {
-                ColorMatrix()
-            }
-            on<Reset> {
-                ColorMatrix()
-            }
-            on<BindModel> {
-                ColorMatrix()
-            }
-            on<MoveModel> {
-                ColorMatrix().apply {
-                    if (event.reverseColor) {
-                        postConcat(reverseMatrix)
-                    }
                 }
             }
         }
     }
+        private set
 
     /**
      * 是否反色
      */
-    var reverseColor by ObservableStatus(false)
-        private set
-
-    init {
-        reduce(ImageFrameStore::reverseColor) {
-            on<ReverseColor> {
-                !state
-            }
-            on<ResetDisplay> {
-                false
-            }
-            on<StudyModeReset> {
-                false
-            }
-            on<Reset> {
-                false
-            }
-            on<BindModel> {
-                false
-            }
-            on<MoveModel> { event.reverseColor }
-        }
+    var reverseColor by StoreField(false) {
+        on<ReverseColor> { !state }
+        on<ResetDisplay> { false }
+        on<StudyModeReset> { false }
+        on<Reset> { false }
+        on<BindModel> { false }
+        on<MoveModel> { event.reverseColor }
     }
+        private set
 
     /**
      * 是否伪彩
      */
-    var pseudoColor by ObservableStatus(false)
-        private set
-
-    init {
-        reduce(ImageFrameStore::pseudoColor) {
-            on<PseudoColor> {
-                !state
-            }
-            on<ResetDisplay> {
-                false
-            }
-            on<StudyModeReset> {
-                false
-            }
-            on<Reset> {
-                false
-            }
-            on<BindModel> {
-                false
-            }
-            on<MoveModel> { event.pseudoColor }
-        }
+    var pseudoColor by StoreField(false) {
+        on<PseudoColor> { !state }
+        on<ResetDisplay> { false }
+        on<StudyModeReset> { false }
+        on<Reset> { false }
+        on<BindModel> { false }
+        on<MoveModel> { event.pseudoColor }
     }
+        private set
 
     /**
      * 所处的测量模式
      */
-    var measure by ObservableStatus(Measure.NONE)
-        private set
-
-    init {
-        reduce(ImageFrameStore::measure) {
-            on<MeasureLineTurned> {
-                when (state) {
-                    Measure.LINE -> Measure.NONE
-                    else -> Measure.LINE
-                }
+    var measure by StoreField(Measure.NONE) {
+        on<MeasureLineTurned> {
+            when (state) {
+                Measure.LINE -> Measure.NONE
+                else -> Measure.LINE
             }
-            on<MeasureAngleTurned> {
-                when (state) {
-                    Measure.ANGEL -> Measure.NONE
-                    else -> Measure.ANGEL
-                }
-            }
-            on<ResetMeasure> { Measure.NONE }
-            on<Reset> { Measure.NONE }
-            on<BindModel> {
-                Measure.NONE
-            }
-            on<MoveModel> { Measure.NONE }
         }
+        on<MeasureAngleTurned> {
+            when (state) {
+                Measure.ANGEL -> Measure.NONE
+                else -> Measure.ANGEL
+            }
+        }
+        on<ResetMeasure> { Measure.NONE }
+        on<Reset> { Measure.NONE }
+        on<BindModel> {
+            Measure.NONE
+        }
+        on<MoveModel> { Measure.NONE }
     }
+        private set
 
     /**
      * 测量模式绘布模型
      */
-    var canvasModel by ObservableStatus(ImageCanvasModel())
-        private set
-
-    init {
-        reduce(ImageFrameStore::canvasModel) {
-            on<ImageCanvasModel> { event }
-            on<DrawLines> { state.copy(tmp = event.tmp, canUndo = event.canUndo) }
-            on<ResetMeasure> { ImageCanvasModel() }
-            on<Reset> { ImageCanvasModel() }
-            on<BindModel> { ImageCanvasModel() }
-            on<MoveModel> { event.canvasModel }
-            on<ClearMeasure> { ImageCanvasModel() }
-        }
+    var canvasModel by StoreField(ImageCanvasModel()) {
+        on<ImageCanvasModel> { event }
+        on<DrawLines> { state.copy(tmp = event.tmp, canUndo = event.canUndo) }
+        on<ResetMeasure> { ImageCanvasModel() }
+        on<Reset> { ImageCanvasModel() }
+        on<BindModel> { ImageCanvasModel() }
+        on<MoveModel> { event.canvasModel }
+        on<ClearMeasure> { ImageCanvasModel() }
     }
+        private set
 
     /**
      * 是否可播放

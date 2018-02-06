@@ -1,7 +1,6 @@
 package com.github.charleslzq.pacsdemo.component.store
 
 import android.graphics.Bitmap
-import com.github.charleslzq.kotlin.react.ObservableStatus
 import com.github.charleslzq.kotlin.react.Store
 import com.github.charleslzq.pacsdemo.support.callOnIo
 import com.github.charleslzq.pacsdemo.support.debugLog
@@ -21,42 +20,30 @@ class PacsStore : Store<PacsStore>(debugLog, buildThunk<PacsStore>()) {
     /**
      * 缩略图数据
      */
-    var thumbList by ObservableStatus(mutableListOf<ImageThumbModel>())
-        private set
-
-    init {
-        reduce(PacsStore::thumbList) {
-            on<SeriesListUpdated> { event.thumbList.toMutableList() }
-        }
+    var thumbList by StoreField(mutableListOf<ImageThumbModel>()) {
+        on<SeriesListUpdated> { event.thumbList.toMutableList() }
     }
+        private set
 
     /**
      * 被选中的缩略图的序号, 仅在1*1布局下有用
      */
-    var selected: Int by ObservableStatus(-1)
-        private set
-
-    init {
-        reduce(PacsStore::selected) {
-            on<ChangeLayout> { -1 }
-            on<SeriesListUpdated> { -1 }
-            on<ThumbListItemClicked>(require = { layoutOption == LayoutOption.ONE_ONE }) {
-                event.position
-            }
+    var selected: Int by StoreField(-1) {
+        on<ChangeLayout> { -1 }
+        on<SeriesListUpdated> { -1 }
+        on<ThumbListItemClicked>(require = { layoutOption == LayoutOption.ONE_ONE }) {
+            event.position
         }
     }
+        private set
 
     /**
      * 布局
      */
-    var layoutOption: LayoutOption by ObservableStatus(LayoutOption.ONE_ONE)
-        private set
-
-    init {
-        reduce(PacsStore::layoutOption) {
-            on<ChangeLayout> { LayoutOption.values()[event.layoutOrdinal] }
-        }
+    var layoutOption: LayoutOption by StoreField(LayoutOption.ONE_ONE) {
+        on<ChangeLayout> { LayoutOption.values()[event.layoutOrdinal] }
     }
+        private set
 
     /**
      * 单元格store列表

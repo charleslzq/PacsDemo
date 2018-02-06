@@ -95,10 +95,14 @@ class PacsDemoActivity : AppCompatActivity() {
                                 patient.metaInfo,
                                 study.metaInfo,
                                 it.metaInfo,
-                                it.images.sortedBy { it.instanceNumber?.toInt() }
+                                it.images.sortedBy {
+                                    it.instanceNumber.takeIf { it.isNotBlank() }?.toInt()
+                                }
                                     .filter { it.files[ImageFrameModel.DEFAULT] != null }
                                     .map { ImageFrameModel(it) },
-                                it.images.sortedBy { it.instanceNumber?.toInt() }
+                                it.images.sortedBy {
+                                    it.instanceNumber.takeIf { it.isNotBlank() }?.toInt()
+                                }
                                     .map { it.files[ImageFrameModel.THUMB] }
                                     .firstOrNull()
                             )
@@ -130,9 +134,9 @@ class PacsDemoActivity : AppCompatActivity() {
     }
 
     companion object {
-        val PATIENT_ID = "patientId"
-        val STUDY_ID = "studyId"
-        val SERIES_ID = "seriesId"
-        val IMAGE_NUM = "imageNum"
+        const val PATIENT_ID = "patientId"
+        const val STUDY_ID = "studyId"
+        const val SERIES_ID = "seriesId"
+        const val IMAGE_NUM = "imageNum"
     }
 }
