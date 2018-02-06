@@ -142,14 +142,12 @@ class ImageControlPanel(
         }
 
         renderByAll(store::displayModel, store::index) {
-            play.post {
-                play.text =
-                        if (store.displayModel.images.size > 1 && store.index != store.size - 1) {
-                            view.context.resources.getString(R.string.image_pause)
-                        } else {
-                            view.context.resources.getString(R.string.image_play)
-                        }
-            }
+            play.text =
+                    if (store.displayModel.images.size > 1 && store.index != store.size - 1) {
+                        view.context.resources.getString(R.string.image_pause)
+                    } else {
+                        view.context.resources.getString(R.string.image_play)
+                    }
         }
 
         render(property = store::canvasModel, require = { store.hasImage }) {

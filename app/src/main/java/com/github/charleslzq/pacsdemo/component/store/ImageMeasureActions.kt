@@ -1,10 +1,14 @@
 package com.github.charleslzq.pacsdemo.component.store
 
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Path
+import android.graphics.PointF
+import android.graphics.Rect
 import com.github.charleslzq.kotlin.react.DispatchAction
 import com.github.charleslzq.kotlin.react.castOrNull
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore.*
 import com.github.charleslzq.pacsdemo.support.UndoSupport
+import com.github.charleslzq.pacsdemo.support.applyCanvas
 import com.github.charleslzq.pacsdemo.support.runOnCompute
 import java.util.*
 
@@ -292,22 +296,20 @@ object ImageMeasureActions {
         points: Stack<PointF>,
         drawingText: Pair<PointF, String>
     ) = undoSupport.generate({ createDrawingBase(store)!! }) {
-        Bitmap.createBitmap(it.width, it.height, it.config).apply {
-            Canvas(this).apply {
-                drawBitmap(it, 0f, 0f, store.linePaint)
-                drawPath(Path().apply {
-                    moveTo(points[0].x, points[0].y)
-                    repeat(points.size - 1) {
-                        lineTo(points[it + 1].x, points[it + 1].y)
-                    }
-                }, store.linePaint)
-                drawText(
-                    drawingText.second,
-                    drawingText.first.x,
-                    drawingText.first.y,
-                    store.stringPaint
-                )
-            }
+        Bitmap.createBitmap(it.width, it.height, it.config).applyCanvas {
+            drawBitmap(it, 0f, 0f, store.linePaint)
+            drawPath(Path().apply {
+                moveTo(points[0].x, points[0].y)
+                repeat(points.size - 1) {
+                    lineTo(points[it + 1].x, points[it + 1].y)
+                }
+            }, store.linePaint)
+            drawText(
+                drawingText.second,
+                drawingText.first.x,
+                drawingText.first.y,
+                store.stringPaint
+            )
         }
     }
 
@@ -321,78 +323,76 @@ object ImageMeasureActions {
             val coordinates = toLines(*points.toTypedArray())
             if (store.hasImage) {
                 createDrawingBase(store)?.let {
-                    dispatch(DrawLines(it.apply {
-                        Canvas(this).apply {
-                            if (coordinates.size > 3) {
-                                drawLines(coordinates, store.linePaint)
-                            }
-                            val lastX = points.last().x.toInt()
-                            val lastY = points.last().y.toInt()
-                            if (showMagnify) {
-                                getCurrentImage(store)?.run {
-                                    val range = arrayOf(
-                                        (store.range / store.scale).toInt(),
-                                        width - lastX,
-                                        lastX,
-                                        height - lastY,
-                                        lastY
-                                    ).min()!!
-                                    val magnifyRange =
-                                        arrayOf(width - lastX, lastX, height - lastY, lastY).max()!!
-                                    val magnify = Math.min(
-                                        if (range > 20) 3 else (60f / range).toInt(),
-                                        (magnifyRange.toFloat() / (2 * range)).toInt()
-                                    )
-                                    if (magnify > 1) {
-                                        val srcRect = Rect(
-                                            lastX - range,
-                                            lastY - range,
-                                            lastX + range,
-                                            lastY + range
-                                        )
-                                        val startX = if (lastX > 2 * magnify * range) {
-                                            lastX - 2 * magnify * range
-                                        } else {
-                                            lastX
-                                        }
-                                        val startY = if (lastY > 2 * magnify * range) {
-                                            lastY - 2 * magnify * range
-                                        } else {
-                                            lastY
-                                        }
-                                        val dstRect = Rect(
-                                            startX,
-                                            startY,
-                                            startX + 2 * magnify * range,
-                                            startY + 2 * magnify * range
-                                        )
-                                        val magnifyDistance = magnify.toFloat() * range
-                                        val halfLineLength =
-                                            Math.min(magnifyDistance, Math.max(10f, .5f * range))
-                                        drawBitmap(this, srcRect, dstRect, store.linePaint)
-                                        drawLine(
-                                            startX + magnifyDistance,
-                                            startY + magnifyDistance - halfLineLength,
-                                            startX + magnifyDistance,
-                                            startY + magnifyDistance + halfLineLength,
-                                            store.linePaint
-                                        )
-                                        drawLine(
-                                            startX + magnifyDistance - halfLineLength,
-                                            startY + magnifyDistance,
-                                            startX + magnifyDistance + halfLineLength,
-                                            startY + magnifyDistance, store.linePaint
-                                        )
-                                    }
-                                }
-                            } else {
-                                drawCircle(
-                                    lastX.toFloat(),
-                                    lastY.toFloat(),
-                                    5f / store.scale,
-                                    store.pointPaint
+                    dispatch(DrawLines(it.applyCanvas {
+                        if (coordinates.size > 3) {
+                            drawLines(coordinates, store.linePaint)
+                        }
+                        val lastX = points.last().x.toInt()
+                        val lastY = points.last().y.toInt()
+                        if (showMagnify) {
+                            getCurrentImage(store)?.run {
+                                val range = arrayOf(
+                                    (store.range / store.scale).toInt(),
+                                    width - lastX,
+                                    lastX,
+                                    height - lastY,
+                                    lastY
+                                ).min()!!
+                                val magnifyRange =
+                                    arrayOf(width - lastX, lastX, height - lastY, lastY).max()!!
+                                val magnify = Math.min(
+                                    if (range > 20) 3 else (60f / range).toInt(),
+                                    (magnifyRange.toFloat() / (2 * range)).toInt()
                                 )
+                                if (magnify > 1) {
+                                    val srcRect = Rect(
+                                        lastX - range,
+                                        lastY - range,
+                                        lastX + range,
+                                        lastY + range
+                                    )
+                                    val startX = if (lastX > 2 * magnify * range) {
+                                        lastX - 2 * magnify * range
+                                    } else {
+                                        lastX
+                                    }
+                                    val startY = if (lastY > 2 * magnify * range) {
+                                        lastY - 2 * magnify * range
+                                    } else {
+                                        lastY
+                                    }
+                                    val dstRect = Rect(
+                                        startX,
+                                        startY,
+                                        startX + 2 * magnify * range,
+                                        startY + 2 * magnify * range
+                                    )
+                                    val magnifyDistance = magnify.toFloat() * range
+                                    val halfLineLength =
+                                        Math.min(magnifyDistance, Math.max(10f, .5f * range))
+                                    drawBitmap(this, srcRect, dstRect, store.linePaint)
+                                    drawLine(
+                                        startX + magnifyDistance,
+                                        startY + magnifyDistance - halfLineLength,
+                                        startX + magnifyDistance,
+                                        startY + magnifyDistance + halfLineLength,
+                                        store.linePaint
+                                    )
+                                    drawLine(
+                                        startX + magnifyDistance - halfLineLength,
+                                        startY + magnifyDistance,
+                                        startX + magnifyDistance + halfLineLength,
+                                        startY + magnifyDistance, store.linePaint
+                                    )
+                                }
                             }
+                        } else {
+                            drawCircle(
+                                lastX.toFloat(),
+                                lastY.toFloat(),
+                                5f / store.scale,
+                                store.pointPaint
+                            )
                         }
                     }, true))
                 }

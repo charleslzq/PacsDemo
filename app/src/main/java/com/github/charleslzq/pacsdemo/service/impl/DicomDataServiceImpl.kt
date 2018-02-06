@@ -9,6 +9,7 @@ import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackground
 import com.github.charleslzq.pacsdemo.support.MemCache
 import com.github.charleslzq.pacsdemo.support.callOnIo
+import com.github.charleslzq.pacsdemo.support.edit
 import com.github.charleslzq.pacsdemo.support.runOnIo
 
 /**
@@ -42,9 +43,9 @@ class DicomDataServiceImpl(
                 .toMutableSet()
         patients.addAll(patientId)
 
-        val editor = sharedPreferences.edit()
-        editor.putStringSet(DicomDataServiceBackground.PATIENTS, patients)
-        editor.apply()
+        sharedPreferences.edit {
+            putStringSet(DicomDataServiceBackground.PATIENTS, patients)
+        }
 
         messageBroker.requirePatients(*patientId)
     }
@@ -52,16 +53,16 @@ class DicomDataServiceImpl(
     override fun refreshPatient(vararg patientId: String) = runOnIo {
         dataStore.clearData()
 
-        val editor = sharedPreferences.edit()
-        editor.putStringSet(DicomDataServiceBackground.PATIENTS, setOf(*patientId))
-        editor.apply()
+        sharedPreferences.edit {
+            putStringSet(DicomDataServiceBackground.PATIENTS, setOf(*patientId))
+        }
 
         messageBroker.refreshPatients(*patientId)
     }
 
     override fun setUrl(url: String) = runOnIo {
-        val editor = sharedPreferences.edit()
-        editor.putString(DicomDataServiceBackground.WS_URL, url)
-        editor.apply()
+        sharedPreferences.edit {
+            putString(DicomDataServiceBackground.WS_URL, url)
+        }
     }
 }

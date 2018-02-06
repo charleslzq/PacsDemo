@@ -8,7 +8,9 @@ import com.github.charleslzq.dicom.data.DicomStudyMetaInfo
 import com.github.charleslzq.kotlin.react.ObservableStatus
 import com.github.charleslzq.kotlin.react.Store
 import com.github.charleslzq.pacsdemo.support.UndoSupport
+import com.github.charleslzq.pacsdemo.support.copy
 import com.github.charleslzq.pacsdemo.support.debugLog
+import com.github.charleslzq.pacsdemo.support.values
 import java.net.URI
 import java.util.*
 
@@ -255,7 +257,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * 通过触摸缩放图形的缩放比
      */
     val gestureScale
-        get() = FloatArray(9).apply { matrix.getValues(this) }[Matrix.MSCALE_X]
+        get() = matrix.values()[Matrix.MSCALE_X]
 
     /**
      * 复合了自动扩充和触摸调整因素的位置矩阵
@@ -266,7 +268,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
             postConcat(matrix)
         }
     private val matrixValues
-        get() = FloatArray(9).apply { compositeMatrix.getValues(this) }
+        get() = compositeMatrix.values()
     private val imageX
         get() = matrixValues[Matrix.MTRANS_X]
     private val imageY
@@ -285,12 +287,12 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     init {
         reduce(ImageFrameStore::matrix) {
             on<ScaleChange> {
-                Matrix(state).apply {
+                state.copy {
                     postScale(event.scaleFactor, event.scaleFactor, event.focus.x, event.focus.y)
                 }
             }
             on<LocationTranslate> {
-                Matrix(state).apply {
+                state.copy {
                     val offsetX = Math.min(
                         -imageX,
                         Math.max(-event.distanceX, viewWidth - imageX - imageWidth)
@@ -324,7 +326,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     init {
         reduce(ImageFrameStore::colorMatrix) {
             on<ReverseColor> {
-                ColorMatrix(state).apply {
+                state.copy {
                     postConcat(reverseMatrix)
                 }
             }

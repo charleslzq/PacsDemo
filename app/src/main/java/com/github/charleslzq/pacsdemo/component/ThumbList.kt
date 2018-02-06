@@ -9,6 +9,7 @@ import android.view.View
 import com.github.charleslzq.pacsdemo.component.store.ImageDisplayActions
 import com.github.charleslzq.pacsdemo.component.store.PacsStore
 import com.github.charleslzq.pacsdemo.support.DicomSeriesThumbListAdpater
+import com.github.charleslzq.pacsdemo.support.getViewHolder
 
 /**
  * Created by charleslzq on 17-11-27.
@@ -90,7 +91,7 @@ class ThumbList(
     }
 
     private fun getThumbView(position: Int) =
-        (view.findViewHolderForAdapterPosition(position) as? DicomSeriesThumbListAdpater.ViewHolder)?.thumbView
+        view.getViewHolder<DicomSeriesThumbListAdpater.ViewHolder>(position)?.thumbView
 
     companion object {
         const val tag = "thumbList"

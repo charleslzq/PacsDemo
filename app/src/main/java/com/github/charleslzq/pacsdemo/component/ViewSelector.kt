@@ -68,19 +68,9 @@ class ViewSelector(
         private fun getImageCellsFromPanel(view: ViewFlipper): List<View> {
             val displayedChild = view.getChildAt(view.displayedChild)
             return when (PacsStore.LayoutOption.values()[view.displayedChild]) {
-                PacsStore.LayoutOption.ONE_ONE -> {
-                    listOf(displayedChild)
-                }
-                PacsStore.LayoutOption.ONE_TWO -> {
-                    getTypedChildren(
-                        displayedChild as LinearLayout,
-                        ConstraintLayout::class.java
-                    )
-                }
-                else -> {
-                    getTypedChildren(displayedChild as TableLayout, TableRow::class.java)
-                        .flatMap { getTypedChildren(it, ConstraintLayout::class.java) }
-                }
+                PacsStore.LayoutOption.ONE_ONE -> listOf(displayedChild)
+                PacsStore.LayoutOption.ONE_TWO -> (displayedChild as LinearLayout).getTypedChildren<ConstraintLayout>()
+                else -> (displayedChild as TableLayout).getTypedChildren<TableRow>().flatMap { it.getTypedChildren<ConstraintLayout>() }
             }
         }
     }

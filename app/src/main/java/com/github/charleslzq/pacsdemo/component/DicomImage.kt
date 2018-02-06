@@ -3,7 +3,10 @@ package com.github.charleslzq.pacsdemo.component
 import android.content.ClipData
 import android.content.ClipDescription
 import android.content.res.Resources
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import android.widget.ImageView
@@ -12,6 +15,7 @@ import com.github.charleslzq.pacsdemo.R
 import com.github.charleslzq.pacsdemo.component.gesture.*
 import com.github.charleslzq.pacsdemo.component.store.ImageFrameStore
 import com.github.charleslzq.pacsdemo.support.IndexAwareAnimationDrawable
+import com.github.charleslzq.pacsdemo.support.applyCanvas
 import com.github.charleslzq.pacsdemo.support.callOnCompute
 import com.github.charleslzq.pacsdemo.support.runOnCompute
 
@@ -104,7 +108,7 @@ class DicomImage(
         }
 
         render(property = ImageFrameStore::canvasModel, require = { store.hasImage }) {
-            Canvas(getCurrentImage()!!.also { imageView.setImageBitmap(it) }).apply {
+            getCurrentImage()!!.also { imageView.setImageBitmap(it) }.applyCanvas {
                 store.canvasModel.drawing?.let { drawBitmap(it, 0f, 0f, store.linePaint) }
                 store.canvasModel.tmp?.let { drawBitmap(it, 0f, 0f, store.linePaint) }
             }

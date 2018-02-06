@@ -16,6 +16,7 @@ import com.github.charleslzq.pacsdemo.broker.RemoteSaveHandler
 import com.github.charleslzq.pacsdemo.broker.message.StoreMessageListener
 import com.github.charleslzq.pacsdemo.service.impl.DicomDataServiceImpl
 import com.github.charleslzq.pacsdemo.support.callOnIo
+import com.github.charleslzq.pacsdemo.support.edit
 import com.github.charleslzq.pacsdemo.support.runOnIo
 import java.io.File
 import java.util.*
@@ -55,11 +56,11 @@ class DicomDataServiceBackground : Service() {
         }
 
         runOnIo {
-            val editor = sharedPreferences.edit()
-            editor.putString(CLIENT_ID, clientId)
-            editor.putString(WS_URL, wsUrl)
-            editor.putStringSet(PATIENTS, patients)
-            editor.apply()
+            sharedPreferences.edit {
+                putString(CLIENT_ID, clientId)
+                putString(WS_URL, wsUrl)
+                putStringSet(PATIENTS, patients)
+            }
         }
 
         messageBroker = DicomWebSocketMessageBroker(wsUrl, clientId)
