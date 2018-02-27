@@ -95,19 +95,19 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * 是否允许播放动画
      */
     var allowPlay by StoreField(true) {
+        reset { on<Reset>() }
         on<SetAllowPlay> { event.value }
-        on<Reset> { true }
     }
 
     /**
      * 是否隐藏单元格四个角上的元信息面板和控制面板
      */
     var hideMeta by StoreField(true) {
+        reset { on<Reset>() }
         on<ImageClicked> { !state }
         on<BindModel> { event.size == 0 }
         on<MoveModel> { event.size == 0 }
         on<ResetDisplay> { false }
-        on<Reset> { true }
     }
         private set
 
@@ -115,9 +115,9 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * 绑定的dicom数据模型id
      */
     var bindModId by StoreField("") {
+        reset { on<Reset>() }
         on<BindModel> { event.modeId }
         on<MoveModel> { event.modeId }
-        on<Reset> { "" }
     }
         private set
 
@@ -130,9 +130,9 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * 当前series中图像的张数
      */
     var size by StoreField(0) {
+        reset { on<Reset>() }
         on<BindModel> { event.size }
         on<MoveModel> { event.size }
-        on<Reset> { 0 }
     }
         private set
 
@@ -140,9 +140,9 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * 病人元信息
      */
     var patientMeta by StoreField(DicomPatientMetaInfo()) {
+        reset { on<Reset>() }
         on<BindModel> { event.patient }
         on<MoveModel> { event.patient }
-        on<Reset> { DicomPatientMetaInfo() }
     }
         private set
 
@@ -150,9 +150,9 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * study元信息
      */
     var studyMeta by StoreField(DicomStudyMetaInfo()) {
+        reset { on<Reset>() }
         on<BindModel> { event.study }
         on<MoveModel> { event.study }
-        on<Reset> { DicomStudyMetaInfo() }
     }
         private set
 
@@ -160,9 +160,9 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * series元信息
      */
     var seriesMeta by StoreField(DicomSeriesMetaInfo()) {
+        reset { on<Reset>() }
         on<BindModel> { event.series }
         on<MoveModel> { event.series }
-        on<Reset> { DicomSeriesMetaInfo() }
     }
         private set
 
@@ -170,10 +170,10 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * 图像元信息
      */
     var imageMeta by StoreField(DicomImageMetaInfo()) {
+        reset { on<Reset>() }
         on<ShowImage> { event.meta }
         on<MoveModel> { event.meta }
         on<PlayIndexChange> { event.meta }
-        on<Reset> { DicomImageMetaInfo() }
     }
         private set
 
@@ -181,10 +181,10 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * 当前图片在series中的位置
      */
     var index by StoreField(0) {
+        reset { on<Reset>() }
         on<ShowImage> { event.index }
         on<MoveModel> { event.index }
         on<PlayIndexChange> { event.index }
-        on<Reset> { 0 }
     }
         private set
 
@@ -192,10 +192,10 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * 图片显示模型
      */
     var displayModel by StoreField(ImageDisplayModel()) {
+        reset { on<Reset>() }
         on<ShowImage> { ImageDisplayModel(listOf(event.bitmap)) }
         on<MoveModel> { ImageDisplayModel(listOf(event.bitmap)) }
         on<PlayAnimation> { ImageDisplayModel(event.images) }
-        on<Reset> { ImageDisplayModel() }
     }
         private set
 
@@ -242,6 +242,12 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * 通过触摸调整后的位置矩阵
      */
     var matrix: Matrix by StoreField(Matrix()) {
+        reset {
+            on<Reset>()
+            on<StudyModeReset>()
+            on<BindModel>()
+            on<MoveModel>()
+        }
         on<ScaleChange> {
             state.copy {
                 postScale(event.scaleFactor, event.scaleFactor, event.focus.x, event.focus.y)
@@ -260,10 +266,6 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
                 postTranslate(offsetX, offsetY)
             }
         }
-        on<StudyModeReset> { Matrix() }
-        on<Reset> { Matrix() }
-        on<BindModel> { Matrix() }
-        on<MoveModel> { Matrix() }
     }
         private set
 
@@ -271,15 +273,17 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * 颜色显示矩阵
      */
     var colorMatrix by StoreField(ColorMatrix()) {
+        reset {
+            on<Reset>()
+            on<StudyModeReset>()
+            on<BindModel>()
+            on<ResetDisplay>()
+        }
         on<ReverseColor> {
             state.copy {
                 postConcat(reverseMatrix)
             }
         }
-        on<ResetDisplay> { ColorMatrix() }
-        on<StudyModeReset> { ColorMatrix() }
-        on<Reset> { ColorMatrix() }
-        on<BindModel> { ColorMatrix() }
         on<MoveModel> {
             ColorMatrix().apply {
                 if (event.reverseColor) {
@@ -294,11 +298,13 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * 是否反色
      */
     var reverseColor by StoreField(false) {
+        reset {
+            on<Reset>()
+            on<StudyModeReset>()
+            on<BindModel>()
+            on<ResetDisplay>()
+        }
         on<ReverseColor> { !state }
-        on<ResetDisplay> { false }
-        on<StudyModeReset> { false }
-        on<Reset> { false }
-        on<BindModel> { false }
         on<MoveModel> { event.reverseColor }
     }
         private set
@@ -307,11 +313,13 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * 是否伪彩
      */
     var pseudoColor by StoreField(false) {
+        reset {
+            on<Reset>()
+            on<StudyModeReset>()
+            on<BindModel>()
+            on<ResetDisplay>()
+        }
         on<PseudoColor> { !state }
-        on<ResetDisplay> { false }
-        on<StudyModeReset> { false }
-        on<Reset> { false }
-        on<BindModel> { false }
         on<MoveModel> { event.pseudoColor }
     }
         private set
@@ -320,6 +328,11 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * 所处的测量模式
      */
     var measure by StoreField(Measure.NONE) {
+        reset {
+            on<Reset>()
+            on<BindModel>()
+            on<MoveModel>()
+        }
         on<MeasureLineTurned> {
             when (state) {
                 Measure.LINE -> Measure.NONE
@@ -332,12 +345,6 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
                 else -> Measure.ANGEL
             }
         }
-        on<ResetMeasure> { Measure.NONE }
-        on<Reset> { Measure.NONE }
-        on<BindModel> {
-            Measure.NONE
-        }
-        on<MoveModel> { Measure.NONE }
     }
         private set
 
@@ -345,13 +352,14 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
      * 测量模式绘布模型
      */
     var canvasModel by StoreField(ImageCanvasModel()) {
+        reset {
+            on<Reset>()
+            on<BindModel>()
+            on<ClearMeasure>()
+        }
         on<ImageCanvasModel> { event }
         on<DrawLines> { state.copy(tmp = event.tmp, canUndo = event.canUndo) }
-        on<ResetMeasure> { ImageCanvasModel() }
-        on<Reset> { ImageCanvasModel() }
-        on<BindModel> { ImageCanvasModel() }
         on<MoveModel> { event.canvasModel }
-        on<ClearMeasure> { ImageCanvasModel() }
     }
         private set
 
@@ -421,7 +429,6 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     class StudyModeReset
     class Reset
     class ResetDisplay
-    class ResetMeasure
 
     class ImageClicked
     class MeasureLineTurned

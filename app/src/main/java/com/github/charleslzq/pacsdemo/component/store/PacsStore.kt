@@ -29,8 +29,10 @@ class PacsStore : Store<PacsStore>(debugLog, buildThunk<PacsStore>()) {
      * 被选中的缩略图的序号, 仅在1*1布局下有用
      */
     var selected: Int by StoreField(-1) {
-        on<ChangeLayout> { -1 }
-        on<SeriesListUpdated> { -1 }
+        reset {
+            on<ChangeLayout>()
+            on<SeriesListUpdated>()
+        }
         on<ThumbListItemClicked>(require = { layoutOption == LayoutOption.ONE_ONE }) {
             event.position
         }
