@@ -94,7 +94,7 @@ class ImageFrameStore(val layoutPosition: Int) : Store<ImageFrameStore>(
     /**
      * 是否允许播放动画
      */
-    private var allowPlay by StoreField(true) {
+    var allowPlay by StoreField(true) {
         on<SetAllowPlay> { event.value }
         on<Reset> { true }
     }
