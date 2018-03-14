@@ -18,13 +18,18 @@ import com.koushikdutta.async.http.WebSocket
  * Created by charleslzq on 17-11-15.
  */
 class DicomWebSocketClient(
-        private val url: String,
+        private var url: String,
         private val dicomMessageListener: DicomMessageListener,
         private val gson: Gson = Converters.registerLocalDateTime(GsonBuilder()).create()
 ) : RxScheduleSupport {
     private var webSocket: WebSocket? = null
     private val logTag = this.javaClass.name
     private val heartBeat = "@heart"
+
+    fun setUrl(newUrl: String) {
+        url = newUrl
+        connect()
+    }
 
     fun connect() {
         runOnIo {

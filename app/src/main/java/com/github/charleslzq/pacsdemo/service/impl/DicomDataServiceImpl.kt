@@ -5,6 +5,7 @@ import android.os.Binder
 import com.github.charleslzq.dicom.data.DicomPatient
 import com.github.charleslzq.dicom.store.DicomDataStore
 import com.github.charleslzq.pacsdemo.broker.DicomMessageBroker
+import com.github.charleslzq.pacsdemo.broker.DicomWebSocketMessageBroker
 import com.github.charleslzq.pacsdemo.service.DicomDataService
 import com.github.charleslzq.pacsdemo.service.background.DicomDataServiceBackground
 import com.github.charleslzq.pacsdemo.support.MemCache
@@ -62,6 +63,8 @@ class DicomDataServiceImpl(
             val editor = sharedPreferences.edit()
             editor.putString(DicomDataServiceBackground.WS_URL, url)
             editor.apply()
+
+            (messageBroker as? DicomWebSocketMessageBroker)?.setUrl(url)
         }
     }
 }

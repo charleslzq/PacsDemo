@@ -16,6 +16,10 @@ class DicomWebSocketMessageBroker(
     private val dicomMessageListener = CompositeDicomMessageListener()
     private val dicomClient = DicomWebSocketClient(url, dicomMessageListener, gson)
 
+    fun setUrl(url: String) {
+        dicomClient.setUrl(url)
+    }
+
     override fun requirePatients(vararg patientId: String) {
         val headers = mapOf(
                 MessageHeaders.CLIENT_ID.value to clientId,
