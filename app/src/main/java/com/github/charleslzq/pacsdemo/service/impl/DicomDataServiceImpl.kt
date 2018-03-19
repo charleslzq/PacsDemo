@@ -20,7 +20,7 @@ import com.github.charleslzq.pacsdemo.support.runOnIo
  * @param sharedPreferences android共享数据库,存储clientId等
  */
 class DicomDataServiceImpl(
-    private val messageBroker: DicomMessageBroker,
+    private val messageBroker: DicomMessageBroker<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>,
     private val dataStore: DicomDataStore<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>,
     private val sharedPreferences: SharedPreferences
 ) : Binder(), DicomDataService {

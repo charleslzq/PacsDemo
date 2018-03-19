@@ -1,6 +1,8 @@
 package com.github.charleslzq.pacsdemo.broker
 
 import com.fatboyindustrial.gsonjodatime.Converters
+import com.github.charleslzq.dicom.data.ImageMeta
+import com.github.charleslzq.dicom.data.Meta
 import com.github.charleslzq.pacsdemo.broker.message.*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -9,12 +11,12 @@ import com.google.gson.GsonBuilder
  * Created by charleslzq on 17-11-15.
  * 消息代理websocket实现
  */
-class DicomWebSocketMessageBroker(
+class DicomWebSocketMessageBroker<P : Meta, T : Meta, E : Meta, I : ImageMeta>(
     url: String,
     private val clientId: String,
     private val gson: Gson = Converters.registerLocalDateTime(GsonBuilder()).create()
-) : DicomMessageBroker {
-    private val dicomMessageListener = CompositeDicomMessageListener()
+) : DicomMessageBroker<P, T, E, I> {
+    private val dicomMessageListener = CompositeDicomMessageListener<P, T, E, I>()
     private val dicomClient = DicomWebSocketClient(url, dicomMessageListener, gson)
 
     override fun requirePatients(vararg patientId: String) {
@@ -49,11 +51,11 @@ class DicomWebSocketMessageBroker(
         dicomClient.send(gson.toJson(message))
     }
 
-    override fun register(listener: DicomMessageListener) {
+    override fun register(listener: DicomMessageListener<P, T, E, I>) {
         dicomMessageListener.register(listener)
     }
 
-    override fun cancel(listener: DicomMessageListener) {
+    override fun cancel(listener: DicomMessageListener<P, T, E, I>) {
         dicomMessageListener.cancel(listener)
     }
 

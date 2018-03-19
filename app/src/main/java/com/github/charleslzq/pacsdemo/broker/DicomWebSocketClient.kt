@@ -2,6 +2,8 @@ package com.github.charleslzq.pacsdemo.broker
 
 import android.util.Log
 import com.fatboyindustrial.gsonjodatime.Converters
+import com.github.charleslzq.dicom.data.ImageMeta
+import com.github.charleslzq.dicom.data.Meta
 import com.github.charleslzq.pacsdemo.broker.message.DicomMessageListener
 import com.github.charleslzq.pacsdemo.broker.message.Message
 import com.github.charleslzq.pacsdemo.broker.message.MessageHeaders
@@ -20,9 +22,9 @@ import com.koushikdutta.async.http.WebSocket
  * @param dicomMessageListener 消息处理器
  * @param gson 将消息转换成对象
  */
-class DicomWebSocketClient(
+class DicomWebSocketClient<P : Meta, T : Meta, E : Meta, I : ImageMeta>(
     private val url: String,
-    private val dicomMessageListener: DicomMessageListener,
+    private val dicomMessageListener: DicomMessageListener<P, T, E, I>,
     private val gson: Gson = Converters.registerLocalDateTime(GsonBuilder()).create()
 ) {
     private var webSocket: WebSocket? = null

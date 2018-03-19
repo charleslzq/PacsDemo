@@ -1,5 +1,7 @@
 package com.github.charleslzq.pacsdemo.broker
 
+import com.github.charleslzq.dicom.data.ImageMeta
+import com.github.charleslzq.dicom.data.Meta
 import com.github.charleslzq.dicom.store.DicomImageFileSaveHandler
 import java.io.File
 import java.net.URI
@@ -9,8 +11,8 @@ import java.net.URI
  * 在接受到图像层级的meta.json文件时,需要将其中指定的图片从服务器上下载到本地
  * @param dicomMessageBroker 消息代理, 发送文件请求
  */
-class RemoteSaveHandler(
-    private val dicomMessageBroker: DicomMessageBroker
+class RemoteSaveHandler<P : Meta, T : Meta, E : Meta, I : ImageMeta>(
+    private val dicomMessageBroker: DicomMessageBroker<P, T, E, I>
 ) : DicomImageFileSaveHandler {
 
     /**

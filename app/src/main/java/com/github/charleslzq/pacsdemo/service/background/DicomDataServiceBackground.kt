@@ -26,7 +26,7 @@ import java.util.*
  */
 class DicomDataServiceBackground : Service() {
     private val logTag = javaClass.name
-    private lateinit var messageBroker: DicomMessageBroker
+    private lateinit var messageBroker: DicomMessageBroker<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>
     private lateinit var dataStore: DicomDataStore<DicomPatientMetaInfo, DicomStudyMetaInfo, DicomSeriesMetaInfo, DicomImageMetaInfo>
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var clientId: String
